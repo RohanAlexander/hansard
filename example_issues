@@ -1,0 +1,97 @@
+Al! -> All
+aswas -> as was
+maintaina -> maintain a
+longterm -> long term
+Parlia- ment -> Parliament
+honorable -> honourable 
+
+
+
+
+-------
+
+
+
+
+Line 1691710
+- Case 1
+- Should be merged into the line above - it's a continuation and there's nobody else speaking in between. There's no reason for the statement to not be part of the statement in the line above.
+- statement_type for 1691709 is talk.start and then statement_type for 1691710 is para. 
+
+
+Line 1691722
+- Case 1
+
+
+Line 1691724
+- Case 2
+- Should be attributed to the person in 1691722, because it's a response to an interjection in 1691723.
+- statement_type for 1691724 is para, statement_type for 1691723 is interjection and statement_type for 1691722 is para.
+
+
+Line 1691738
+- Case 1
+
+Line 1691739
+- Case 1, slight variant
+- statement_type for 1691737 is talk.start, statement_type for 1691738 is para, and statement_type for 1691739 is para. 
+- All three should be merged into one line.
+- This slight variant on case 1 would be picked up by the same code running through twice, although probably faster to code it into the one run through.
+
+
+Line 1691750
+- Case 2, slight variant where the statement_type is slightly different.
+- Should be attributed to the person in 1691748, because it's a response to an interjection in 1691749.
+- statement_type for 1691748 is talk.start, statement_type for 1691749 is interjection and statement_type for 1691750 is para.
+
+
+Line 1691770
+- Case 3
+- Should be attributed to the person in 1691769 as it's a quote and doesn't need to be its own statement, but would be best to add within quotation marks.
+- statement_type for 1691770 is quote and for 1691769 is talk.start
+
+
+Line 1691771
+- Case 3, slight variant
+- Should be attributed to the person in 1691769 as it's a quote and doesn't need to be its own statement, but would be best to add within quotation marks. The one above it is a quote.
+- statement_type for 1691771 is quote, statement_type for 1691770 is quote, and for 1691769 is talk.start
+
+
+Line 1691769
+Missing subdebate title
+
+Line 1691770
+- Case 3, slight variant
+
+
+
+
+If statement_type == "talk.start"
+
+
+
+
+
+
+----
+
+Appear to have missed (http://historichansard.net/hofreps/1901/19010510_reps_1_1/):
+"STANDING ORDERS
+Mr. BARTON (Hunter- Minister for
+
+External Affairs). - I lay on the table a draft of standing orders and rules for the House of Representatives, and move -
+
+That the document be printed.
+Copies will be distributed to honorable members to-morrow, as soon as the printing can be finished.
+
+Question resolved in the affirmative.
+
+page 33
+"
+
+
+Appear to have missed (although it is a petition) (http://historichansard.net/hofreps/1901/19010522_REPS_1_1/):
+"PETITION
+Mr. Piesse presented a petition from 1,367 citizens of Tasmania, praying that the Post-office might not be used for the facilitation of gambling."
+
+
