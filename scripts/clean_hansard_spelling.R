@@ -2,7 +2,7 @@
 # Purpose: We don't really need everything to be spelt correctly, but fixing some common spelling issues would be great.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 23 July 2018
+# Last updated: 24 July 2018
 # Prerequisites: You need to have the Hansard in a data frame - see get_data_from_xml_to_dataframe.
 
 
@@ -43,75 +43,89 @@ words_in_statements$right_spelling <- hunspell_check(words_in_statements$word, d
 wrong_words_in_statements <- words_in_statements %>% 
   filter(right_spelling == FALSE) %>% 
   mutate(recommended_word = hunspell_suggest(word))
-  
+wrong_words_in_statements <- wrong_words_in_statements[,1:3]
+write.table(wrong_words_in_statements, "wrong.txt", sep="\t", row.names=FALSE)
 
 #### Fix issues ####
-??? "by" <- "bv"
-??? "endorse" <- "indorse"
-??? "endorsement" <- "indorsement"
-??? "has" <- "ha3"
-??? "Hon" <- "hon"
-??? "I'm" <- "lm"
-??? "it" <- "lt"
-??? "they" <- "thev"
-??? "Tory" <- "tory"
-??? "very" <- "verv"
-??? "we" <- "ve"
-???? "00m"
-????? "tralia"
-"Address inReply" <- "AddressinReply"
-"Attorney General"<- "AttorneyGeneral"
-"Attorney General's" <- "AttorneyGeneral's"
-"Australian" <- "Austraiian"
-"central" <- "cental"
-"connection" <- "connexion"
-"do not" <- "donot"
-"Eden Monaro" <- "EdenMonaro"
-"employee" <- "employe"
-"employes"
-"ex-servicemen" <- "exservicemen"
-"favorable"
-"free trade" <- "freetrade"
-"Governor General" <- "GovernorGeneral" 
-"GovernorGeneral's"
-"have been" <- "havebeen"
-"honorable member" <- "honorablemember"
-"honorable"
-"Honorable"
-"in the" <- "inthe"
-"ing"
-"It" <- "Tt"
-"Kanakas" <- "kanakas"
-"lias"
-"Ministry" <- "Mini stry"
-"not" <- "npt"
-"notice paper" <- "noticepaper"
-"of the" <- "ofthe"
-"of" <- "o'f"
-"ot"
-"pf"
-"Postmaster General" <- "PostmasterGeneral"
-"Postmaster General's" <- "PostmasterGeneral's"
-"self government" <- "selfgovernment"
-"th"
-"tha"
-"thai"
-"that the" <- "thatthe"
-"the Government" <- "theGovernment"
-"the honorable" <- "thehonorable"
-"the honorable" <- "thehonorable"
-"this" <- "thi3"
-"tho"
-"tion"
-"tlie"
-"to the" <- "tothe"
-"Vice President" <- "VicePresident"
-"we" <- "wc"
-"wheat growers" <- "wheatgrowers"
-"will be" <- "willbe"
-"wool growers" <- "woolgrowers"
-"would be" <- "wouldbe"
 
+""
+# The above provides a bunch of possible issues and if want to examine the context use:
+rows_of_statements_that_contain_string <- some_hansard %>%
+  filter(str_detect(statement, " pf "))
+
+# Based on above we have the following issues and corrections
+corrections <- c(
+  " 1 rise " = " I rise ",
+  " 1he " =  " the ", 
+  " actionwas " = " action was ",
+  " AddressinReply " = " Address in Reply ",
+  " Al! " = " All ",
+  " aswas " = " as was ",
+  " AttorneyGeneral " = " Attorney General ",
+  " AttorneyGeneral's " = " Attorney General's ",
+  " Aus tralia " = " Australia ",
+  " Austraiian " = " Australian ",
+  " bv " =  " by ",
+  " cental " = " central ",
+  " connexion " = " connection ",
+  " donot " = " do not ",
+  " EdenMonaro " = " Eden Monaro ",
+  " employe " = " employee ",
+  " employes " = " employees ",
+  " exservicemen " = " ex-servicemen ",
+  " freetrade " = " free trade ",
+  " GovernorGeneral"  = " Governor General ",
+  " GovernorGeneral's " = " Governor General's ",
+  " ha ve " = " have ",
+  " ha3 " =  " has ",
+  " havebeen " = " have been ",
+  " hon orable " =  " honorable ",
+  " honorablemember " = " honorable member ",
+  " i3 " = " is ",
+  " isthat " = " is that ",
+  " Ilansard " = " Hansard ", 
+  " indorse " = " endorse ", 
+  " indorsement " = " endorsement ",
+  " inthe " = " in the ",
+  " kanakas " = " Kanakas ",
+  " LabourParty " = " Labour Party ",
+  " lias " = " has ",
+  " longterm " = " long term ",
+  " maintaina " = " maintain a ",
+  " Mini stry " = " Ministry ",
+  " noticepaper " = " notice paper ",
+  " npt " = " not ",
+  " npt " = " not ",
+  " o'f " = " of ",
+  " ofthe " = " of the ",
+  " OppositionI " = " Opposition I ",
+  " Parlia- ment " = " Parliament ",
+  " PostmasterGeneral " = " Postmaster General ",
+  " PostmasterGeneral's " = " Postmaster General's ",
+  " pre,viously " = " previously ",
+  " selfgovernment " = " self government ",
+  " thatthe " = " that the ",
+  " theexpression " = "the expression",
+  " thefreight " = " the freight ",
+  " theGovernment " = " the Government ",
+  " thehonorable " = " the honorable ",
+  " thev " = " they ",
+  " thi3 " = " this ",
+  " tothe " = " to the ",
+  " Tt " = " It ",
+  " twomore " = " two more ",
+  " verv " =  " very ",
+  " VicePresident " = " Vice President ",
+  " wc " = " we ",
+  " wheatgrowers " = " wheat growers ",
+  " willbe " = " will be ",
+  " woolgrowers " = " wool growers ",
+  " wouldbe " = " would be "
+)
+
+# Do the replacement
+some_hansard$statement <- str_replace_all(some_hansard$statement, corrections)
+rm(corrections)
 
 
 #### Clean up ####

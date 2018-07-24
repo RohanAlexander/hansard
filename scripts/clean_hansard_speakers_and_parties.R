@@ -77,3 +77,11 @@ test <- all_hansard %>%
   filter(number_of_names >1) %>%
   distinct(speaker_name_meta) %>%
   arrange(speakerID)
+
+
+#### Get political parties ####
+# Reduce the dataset to just the variables related to the speakers
+parties <- all_hansard %>% 
+  select(party) %>% 
+  count(party, sort = TRUE)
+
