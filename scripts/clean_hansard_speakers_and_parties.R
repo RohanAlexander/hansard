@@ -2,7 +2,7 @@
 # Purpose: We need the speakers names and details to be consistent.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 23 July 2018
+# Last updated: 25 July 2018
 # Prerequisites: You need to have the Hansard in a data frame - see get_data_from_xml_to_dataframe.
 
 
@@ -82,6 +82,6 @@ test <- all_hansard %>%
 #### Get political parties ####
 # Reduce the dataset to just the variables related to the speakers
 parties <- all_hansard %>% 
-  select(party) %>% 
-  count(party, sort = TRUE)
+  select(speakerID, party, speaker_name_meta) %>% 
+  count(party,speakerID, speaker_name_meta, sort = TRUE)
 
