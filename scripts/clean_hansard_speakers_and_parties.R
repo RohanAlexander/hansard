@@ -2,7 +2,7 @@
 # Purpose: We need the speakers names and details to be consistent.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 25 July 2018
+# Last updated: 27 July 2018
 # Prerequisites: You need to have the Hansard in a data frame - see get_data_from_xml_to_dataframe.
 
 
