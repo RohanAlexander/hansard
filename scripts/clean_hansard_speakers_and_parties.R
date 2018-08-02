@@ -2,12 +2,13 @@
 # Purpose: We need the speakers names and details to be consistent.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 27 July 2018
+# Last updated: 31 July 2018
 # Prerequisites: You need to have the Hansard in a data frame - see get_data_from_xml_to_dataframe.
 
 
 #### Set up workspace ####
 # Load libraries
+library(lubridate)
 library(tictoc)
 library(tidytext)
 library(tidyverse)
@@ -15,12 +16,16 @@ library(tidyverse)
 
 
 #### Load data ####
+# Load Hansard data
 load("outputs/all_hansard.Rda") # Takes a minute
 # Create a working sample of 100,000 statements 
-set.seed(123) # Comment if you want to run on full dataset
-some_random_rows <- sample(1:nrow(all_hansard), 100000) # Comment if you want to run on full dataset
-all_hansard <- all_hansard[some_random_rows, ] # Comment if you want to run on full dataset
-rm(some_random_rows) # Comment if you want to run on full dataset
+# set.seed(123) # Comment if you want to run on full dataset
+# some_random_rows <- sample(1:nrow(all_hansard), 100000) # Comment if you want to run on full dataset
+# all_hansard <- all_hansard[some_random_rows, ] # Comment if you want to run on full dataset
+# rm(some_random_rows) # Comment if you want to run on full dataset
+
+# Load Parliamentary Handbook parliamentarians data
+load("outputs/parliamentary_handbook.Rda") 
 
 
 #### Get speakers? 'Hear, hear!'####
@@ -32,10 +37,20 @@ length(unique(all_hansard$speakerID))
 length(unique(all_hansard$speaker_name_meta))
 length(unique(all_hansard$speaker_name_display))
 
-speakers_by_speakerID <- all_hansard %>%
+# We have a list of accepted names from the House so first match those to the speaker_name_meta list
+speakers_by_name_and_ID <- all_hansard %>%
   select(speakerID, speaker_name_meta) %>% 
   unique() %>% 
-  add_count(speakerID, sort = TRUE) %>% 
+  add_count(speakerID, sort = TRUE)
+
+speakers_by_name_and_ID <- speakers_by_name_and_ID %>% 
+  mutate(in_handbook = if_else(speaker_name_meta %in% parliamentary_handbook$Hansard_name, 1, 0))
+
+
+
+
+
+ %>% 
   filter(n>1)
 # speaker_name_meta = "CHANEY, Fred+D3309" needs to be looked at
 
