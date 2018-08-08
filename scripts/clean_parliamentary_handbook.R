@@ -2,7 +2,7 @@
 # Purpose: A list of everyone who won an election is available in the Parliamentary Handbook (add link: HERE). This script cleans the data to make it comparable with the Hansard data. It can then be used to check the speakers.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 1 August 2018
+# Last updated: 7 August 2018
 # Prerequisites: You need to have the table from the Parliamentary Handbook saved as a CSV (see data/parliamentary_handbook.csv).
 
 
@@ -55,8 +55,10 @@ parliamentary_handbook <- parliamentary_handbook %>%
 
 # Add Hansard name
 parliamentary_handbook <- parliamentary_handbook %>%
-  mutate(hansardName = paste0(toupper(surname), ", ", firstName)) %>%
-  replace_with_na(replace = list(hansardName = "NA, NA"))
+  mutate(useThisName = if_else(!is.na(commonName), commonName, firstName)) %>% 
+  mutate(hansardName = paste0(toupper(surname), ", ", useThisName)) %>%
+  replace_with_na(replace = list(hansardName = "NA, NA")) %>% 
+  select(-useThisName)
 
 
 #### Add gender ####
