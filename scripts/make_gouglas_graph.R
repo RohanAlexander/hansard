@@ -1,4 +1,3 @@
-# library(broom)
 library(ggrepel)
 library(lubridate)
 library(tidyverse)
