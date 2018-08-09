@@ -113,7 +113,7 @@ speakers_by_name_and_ID <- speakers_by_name_and_ID %>%
 
 write.csv(speakers_by_name_and_ID, "speakers_by_name_and_ID.csv")
 
-
+# Need to save the modified Hansard
 
 
 
