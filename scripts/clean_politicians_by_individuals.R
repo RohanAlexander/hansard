@@ -61,7 +61,7 @@ politicians_by_individuals <- politicians_by_individuals %>%
   left_join(gender_based_on_name,
             by = c("firstName" = "name", "birthYear" = "year_min"))
 # Correct mistakes - NA or female to male
-politicians_by_individuals$gender[politicians_by_individuals$uniqueKey %in% c(
+politicians_by_individuals$gender[politicians_by_individuals$uniqueID %in% c(
   "batcheloregerton1901",
   "beazleykim1945",
   "blainadair1934",
@@ -113,7 +113,7 @@ politicians_by_individuals$gender[politicians_by_individuals$uniqueKey %in% c(
   "wilkiekim1998"
 )] <- "male"
 # Correct mistakes - NA or male to female
-politicians_by_individuals$gender[politicians_by_individuals$uniqueKey %in% c(
+politicians_by_individuals$gender[politicians_by_individuals$uniqueID %in% c(
   "brodtmanngai2010",
   "brownbillkay1966",
   "jacksonsharryn2001",
@@ -132,7 +132,7 @@ rm(pre_1930_results,
 politicians_by_individuals <- politicians_by_individuals %>%
   select (-c(proportion_female, proportion_male, year_max)) %>%
   select(
-    uniqueKey,
+    uniqueID,
     surname,
     allOtherNames,
     firstName,
