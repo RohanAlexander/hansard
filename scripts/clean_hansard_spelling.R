@@ -2,7 +2,7 @@
 # Purpose: We don't really need everything to be spelt correctly, but fixing some common spelling issues would be great.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 29 July 2018
+# Last updated: 14 July 2018
 # Prerequisites: You need to have the Hansard in a data frame - see get_data_from_xml_to_dataframe.
 
 
@@ -46,18 +46,19 @@ ignore_list <- c(ignore_these_area_names, ignore_these_electorate_names)
 # Run the spell check using Hunspell: https://cran.r-project.org/web/packages/hunspell/vignettes/intro.html
 words_in_statements$right_spelling <- hunspell_check(words_in_statements$word, dict = dictionary('en_GB', add_words = ignore_list))
 
-# Filter to just wrong words and add a column of suggestions - takes a while
+# Filter to just wrong words
 wrong_words_in_statements <- words_in_statements %>% 
   filter(right_spelling == FALSE) %>% 
-  filter(n >= 2) %>% 
-  mutate(recommended_word = hunspell_suggest(word))
-# wrong_words_in_statements <- wrong_words_in_statements[,1:3]
-# write.table(wrong_words_in_statements, "wrong.txt", sep="\t", row.names=FALSE)
+  filter(n >= 2) 
+# %>%  # You can add a column of suggestions - takes a while - if you want, by pipe to the next row, but it doesn't seem to get you much in this case
+#   mutate(recommended_word = hunspell_suggest(word))
+# wrong_words_in_statements <- wrong_words_in_statements[,1:3] # If you included the column of suggestions then you need this if you want to write.table
+write.table(wrong_words_in_statements, "wrong.txt", sep="\t", row.names=FALSE)
 
 #### Fix issues ####
 # The above provides a bunch of possible issues and if want to examine the context use:
-rows_of_statements_that_contain_string <- all_hansard %>%
-  filter(str_detect(statement, " pf "))
+# rows_of_statements_that_contain_string <- all_hansard %>%
+#   filter(str_detect(statement, " pf "))
 
 # Based on above we have the following issues and corrections
 # The \\b \\b works to isolate just the word - if we didn't include these before and after the search term then searching for, say, "Mon" and replacing it with "Monica", would also change all "Monica" to "Monicaica".
@@ -1747,7 +1748,7 @@ corrections <- c(
 )
 
 # Do the replacement
-all_hansard$statement <- str_replace_all(all_hansard$statement, corrections)
+all_hansard$statement <- str_replace_all(all_hansard$statement, corrections) # Takes a while
 rm(corrections)
 
 
