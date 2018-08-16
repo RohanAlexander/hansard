@@ -16,14 +16,31 @@ Notes:
 
 To update:
 
+- Update Patrick Gorman's birthday.
+- Fix the way that clean_hansard_spelling works so that it is looking up a table instead of all in the script.
 - ABD says Frederick William Holder was an independent and resigned from his party. Has been left as it was, but maybe check vote records for 1903 and 1906 and update the list of parties?
 - A bunch of the parties didn't have exact dates for the change, especially in the 1900s and 1910s. Need to go back to them and update. Look for years that have day and month of 1 January.
 - The parties are especially dodgy and need to be checked.
-- Fix the way that clean_hansard_spelling works so that it is looking up a table instead of all in the script.
-- Update Patrick Gorman's birthday.
-- Michael Danby to retire at next election - update that division at next election.
-- Emma Husar to retire at next election - update that division at next election.
-- Wayne Swan to retire at next election - update that division at next election.
-- Gai Brodtmann to retire at next election - update that division at next election.
-- ACT redistribution - from 2 to 3 seats - update those divisions at next election.
 - Can we split out date of announcing retirement/resignation and the actual date of not longer being the member. Otherwise we just get a bunch leaving at the election, even if they announced it much earlier. Also the treatment of this seems to be inconsistent so would be good to check/fix.
+
+Next election:
+
+- Retirements:
+  + Kate Ellis (Adelaide) announced 9 March 2017
+  + Wayne Swan (Lilley) announced 10 February 2018
+  + Michael Danby (Melbourne Ports) announced 5 July 2018
+  + Jenny Macklin (Jagajaga) announced 6 July 2018
+  + Emma Husar (Lindsay) announced 8 August 2018
+  + Hartsuyker (Cowper) announced 8 August 2018
+  + Gai Brodtmann (Canberra) announced 13 August 2018
+- Division changes:
+  + Victoria gets another - Fraser
+  + ACT gets another - Bean
+  + South Australia reduced - Port Adelaide removed
+- Divisions renaming:
+  + Batman -> Cooper
+  + McMillan -> Monash
+  + Melbourne Ports -> Macnamara
+  + Murray -> Nicholls
+  + Wakefield -> Spence
+  + Denison -> Clark
