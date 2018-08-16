@@ -2,7 +2,7 @@
 # Purpose: Associate a group, based on similar topics, for every statement in Hansard.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 13 June 2018
+# Last updated: 15 August 2018
 # Prerequisites: Uses all_hansard_titles_and_dates.Rda which is an output of get_list_of_titles.R
 # Issues:
 
@@ -10,13 +10,14 @@
 #### Workspace set-up ####
 # Load libraries
 library(dplyr)
+library(modelr) # Used in the kfolds section
 library(tidytext)
 library(tidyverse)
 library(tm)
 library(topicmodels)
 
-# Load data
-load("outputs/all_hansard_text.Rda") # Takes a while
+# Load Hansard statements
+load("outputs/hansard/all_hansard.Rda") # Takes a while
 
 # Bind custom list of stopwords to the default list
 custom_stop_words <- bind_rows(
@@ -30,15 +31,13 @@ custom_stop_words <- bind_rows(
 )
 
 
-#### Create a working sample of data ####
+#### Topic modelling at word level ####
 # Get a sample of 100,000 statements
 set.seed(123)
-some_random_rows <- sample(1:nrow(all_hansard_text), 100000)
-some_hansard_text <- all_hansard_text[some_random_rows, ]
-rm(all_hansard_text, some_random_rows)
+some_random_rows <- sample(1:nrow(all_hansard), 100000)
+some_hansard_text <- all_hansard[some_random_rows, ]
+rm(all_hansard, some_random_rows)
 
-
-#### Topic modelling at word level ####
 # Tokenize the statements to words and remove stopwords
 cleaned_hansard <- some_hansard_text %>% # Start with the 100,000 sample
   unnest_tokens(word, statement) %>% # Splits the statement column into a column of tokens (words in this case, but could be changed) called word
@@ -51,18 +50,18 @@ hansard_dtm <- cleaned_hansard %>% # Take the tokenised dataset
   cast_dtm(document, term, count) # Create DocumentTermMatrix
 
 # Conduct LDA to find groups of topics
-chapters_lda <- LDA(hansard_dtm, k = 5, control = list(seed = 1234)) # Change k to get a different number of groups. Should go through a process to find the optimal k.
+# Be careful running this. Takes a while. Comment out to avoid accidently running it.
+# chapters_lda <- LDA(hansard_dtm, k = 5, control = list(seed = 1234)) # Will need to go through a process to find the optimal k.
 
 # Look at the words that make up the topic-groups
-Terms <- terms(chapters_lda, 30)
-Terms[, 1:3]
+Terms <- terms(chapters_lda, 10) # Look at the top ten words
+Terms[, 1:5] # For all five topics
+
+# Get the spread of topics over each parliament
+each_parliaments_topics <- tidy(chapters_lda, matrix = "gamma")
 
 
-
-
-
-# Worked example for text
-
+#### Worked example ####
 text <- tibble(
   statement = c(
     "The Labour party believes in immigration, preferably of people of the British race. It is no reflection upon Southern Europeans to say that this country, having been pioneered and developed by the British people, must be retained for them, and any Government should protect our own kith and kin against the possibility of being displaced by foreigners.",
@@ -73,8 +72,7 @@ text <- tibble(
   parliament.no = c(1, 1, 1, 1)
 )
 
-
-
+# Get the list of words
 text_example <- text %>%
   unnest_tokens(word, statement) %>%
   anti_join(custom_stop_words) %>% # Remove the stop words
@@ -86,8 +84,83 @@ text_example_dtm <- text_example %>% # Take the tokenised dataset
   cast_dtm(document, term, count) # Create DocumentTermMatrix
 
 # Conduct LDA to find groups of topics
-example_lda <- LDA(text_example_dtm, k = 2, control = list(seed = 1234)) # Change k to get a different number of groups. Should go through a process to find the optimal k.
+example_lda <- LDA(text_example_dtm, k = 2, control = list(seed = 1234)) # 2 topics have been specified
 
 # Look at the words that make up the topic-groups
 Terms <- terms(example_lda, 10)
 Terms[, 1:2]
+
+
+#### With k-fold cross validation ####
+# The main issue is that it's not clear how many topics is appropriate to specify. One way to solve this is cross-validation (*insert Peter's Hastie/Tibshirani joke here*).
+# Essentially what is going to happen is that we'll implement LDA with a test/train setup and a bunch of possible numbers of topics and then compare the results using perplexity. 
+# Based on https://stackoverflow.com/questions/21355156/topic-models-cross-validation-with-loglikelihood-or-perplexity
+
+folds <- 5
+n <- nrow(hansard_dtm)
+splitfolds <- sample(1:folds, n, replace = TRUE)
+candidate_k <- c(2, 3, 4, 5, 10, 20, 30, 40, 50, 75, 100, 200, 300) # candidates for how many topics
+
+
+cv1 <- crossv_kfold(hansard_dtm, 5)
+cv1$train[1]
+cv1$test[1]
+models <- map(cv1$train, ~ lm(mpg ~ wt, data = .))
+errs <- map2_dbl(models, cv1$test, rmse)
+hist(errs)
+
+cv1 <- crossv_kfold(mtcars, 5)
+cv1
+
+library(purrr)
+cv2 <- crossv_mc(mtcars, 100)
+models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
+errs <- map2_dbl(models, cv2$test, rmse)
+hist(errs)
+
+
+
+# Alternative from https://cran.r-project.org/web/packages/ldatuning/vignettes/topics.html
+
+# install.packages("ldatuning")
+library(ldatuning)
+
+data("AssociatedPress", package="topicmodels")
+dtm <- AssociatedPress[1:10, ]
+
+result <- FindTopicsNumber(
+  dtm,
+  topics = seq(from = 2, to = 15, by = 1),
+  metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
+  method = "Gibbs",
+  control = list(seed = 77),
+  mc.cores = 2L,
+  verbose = TRUE
+)
+FindTopicsNumber_plot(result)
+
+
+
+
+result <- FindTopicsNumber(
+  hansard_dtm,
+  topics = seq(from = 2, to = 100, by = 5),
+  metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
+  method = "Gibbs",
+  control = list(seed = 77),
+  mc.cores = 2L,
+  verbose = TRUE
+)
+
+FindTopicsNumber_plot(result)
+
+example_lda_12 <- LDA(hansard_dtm, k = 12, control = list(seed = 1234)) # 2 topics have been specified
+Sys.time()
+example_lda_20 <- LDA(hansard_dtm, k = 20, control = list(seed = 1234)) # 2 topics have been specified
+Sys.time()
+example_lda_50 <- LDA(hansard_dtm, k = 50, control = list(seed = 1234)) # 2 topics have been specified
+Sys.time()
+
+perplexity(example_lda_12)
+perplexity(example_lda_20)
+perplexity(example_lda_50)

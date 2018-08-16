@@ -57,8 +57,12 @@ write.table(wrong_words_in_statements, "wrong.txt", sep="\t", row.names=FALSE)
 
 #### Fix issues ####
 # The above provides a bunch of possible issues and if want to examine the context use:
-# rows_of_statements_that_contain_string <- all_hansard %>%
-#   filter(str_detect(statement, " pf "))
+rows_of_statements_that_contain_string <- all_hansard %>%
+  filter(str_detect(statement, " connexion "))
+
+rows_of_statements_that_contain_string <- some_hansard_text %>%
+  filter(str_detect(statement, " connexion "))
+
 
 # Based on above we have the following issues and corrections
 # The \\b \\b works to isolate just the word - if we didn't include these before and after the search term then searching for, say, "Mon" and replacing it with "Monica", would also change all "Monica" to "Monicaica".
