@@ -31,7 +31,7 @@ Next election:
   + Michael Danby (Melbourne Ports) announced 5 July 2018
   + Jenny Macklin (Jagajaga) announced 6 July 2018
   + Emma Husar (Lindsay) announced 8 August 2018
-  + Hartsuyker (Cowper) announced 8 August 2018
+  + Luke Hartsuyker (Cowper) announced 8 August 2018
   + Gai Brodtmann (Canberra) announced 13 August 2018
 - Division changes:
   + Victoria gets another - Fraser

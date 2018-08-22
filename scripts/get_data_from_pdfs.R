@@ -2,19 +2,9 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to tidied text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 20 August 2018
-# Prerequisites: You need to have downloaded the PDFs from the parliament's website  - get_80s_and_90s_PDFs.R. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan.
+# Last updated: 22 August 2018
+# Prerequisites: You need to have downloaded the PDFs from the parliament's website - get_80s_and_90s_PDFs.R. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan.
 # To do:
-
-
-#### To delete start ####
-# install.packages("pdftools")
-# library(pdftools)
-# 
-# text <- pdf_text("71_PV.62.pdf")
-# text2 <- strsplit(text, "\n")
-# head(text2[[1]])
-#### To delete end ####
 
 
 #### Set up workspace ####
@@ -24,36 +14,67 @@ library(tidyverse)
 library(tm)
 # update.packages()
 
-read <- readPDF(engine = c("xpdf"), control = list(text = "-layout")) # Despite the name this affects the options for how to read PDFs, it doesn't actually read the PDFs
 
+#### Read in PDFs ####
+read <- readPDF(engine = c("xpdf")) # Despite the name this affects the options for how to read PDFs, it doesn't actually read the PDFs. -layout asks it to maintain the layout as best as possible. 
+# Handy for background: https://data.library.virginia.edu/reading-pdf-files-into-r-for-text-mining/
+# An alternative is here that tries to maintain the layout: 
+# read <- readPDF(engine = c("xpdf"), control = list(text = "-layout"))
+# Handy example of UN speeches: https://medium.com/@CharlesBordet/how-to-extract-and-clean-data-from-pdf-files-in-r-da11964e252e
+# The issue with this is that the PDFs are two column - the version without trying to maintain layout just seems to put the second column under the first one, which is what we'd want.
 
-#### Read in data ####
-# Will need to come back here to update ahead of the main read through
+# Iterate over files from here
 document <- Corpus(URISource("scripts/1990-12-21.pdf"), readerControl = list(reader = read))
 doc <- content(document[[1]]) # Unsure why this has to be done
+rm(read, document)
 # doc[1:600]
 
-# For some reason the encoding is latin1 - maybe an option in readPDF(?), but it's easier to work with UTF-8
+
+#### Clean the data ####
+# For some reason the encoding is latin1 - maybe an option in readPDF(?), but it's easier to work with UTF-8 - god help me how long it took for me to work this out
 doc <- iconv(doc, from = "latin1", to = "UTF-8")
 
-# Remove the top content - come back here to get the data that's important
-joint_house_row <- grep("JOINT HOUSE", doc)[1]
-doc <- doc[(joint_house_row): length(doc)]
+# Remove the top content and just go to the speaking component - removing a lot of information that could be useful and might be worth coming back here to sort it out at some point
+joint_house_row <- grep("JOINT HOUSE", doc)[1] # The 1 is just needed in case there is more than one occurrence
+doc <- doc[(joint_house_row + 2): length(doc)]
+rm(joint_house_row)
 head(doc)
-doc[1:100]
+# doc[1:100]
 
-# Fix some errors
+# Convert to tibble
+doc_tibble <- tibble(doc)
+names(doc_tibble) <- c("text")
+head(doc_tibble)
+doc_tibble[25:35, ]
+# write_csv(doc_tibble, "look_at_moi.csv")
+
+# Fix some typos and conversion errors
 # doc <- str_replace(doc, "^ ", "")
-# doc <- str_trim(doc, side = c("left")) # Don't do this - some of the line have a whole bunch of spacing at the front because they are in teh second column and this removes that.
-doc <- str_replace_all(doc, "·", "-")
+# doc <- str_trim(doc, side = c("left")) # Don't do this - some of the line have a whole bunch of spacing at the front because they are in teh second column and this removes that
+doc_tibble$text <- str_replace_all(doc_tibble$text, "·", "-") # This seems to be coming about because of an issue with the PDF reader - for some reason hyphens are being read in as dots
+doc_tibble$text <- str_replace_all(doc_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
+
+
+#### Add identifiers ####
+# Identify headers - should remove them?
+doc_tibble <- doc_tibble %>% 
+  mutate(headerRow = if_else(grepl("^\\f", doc_tibble$text), 1, 0)) # \f is used by the PDF parser to signal page breaks
+
+# Identify speakers - TBD
+
+# write_csv(doc_tibble, "Ttest.csv")
+
+
+
+
+
+
+
+
 
 # nchar(doc[85]) # Max length of a line seems to be 48. Could use this to do the split?
 # doc_split <- strsplit(doc, "\\.{48}")
 
-# Remove header
-# header_rows <- grep("^\\f", doc) # Remember: \f are for page breaks
-# doc[header_rows] <- "page" # I put a marker here that will be useful later
-# doc <- doc[- (header_rows - 1)]
 
 # Deal with the two columns
 page_breaks <- grep("\\f", doc) # Need to know where the page breaks are to know where to put the right column
@@ -67,10 +88,7 @@ doc[1:20]
 doc_split[1:20]
 
 ####
-doc_tibble <- tibble(doc)
-names(doc_tibble) <- c("text")
-head(doc_tibble)
-doc_tibble[1:50, ]
+
 
 nchar(doc_tibble$text[10])
 
