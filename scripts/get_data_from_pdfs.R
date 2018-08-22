@@ -95,6 +95,77 @@ doc_tibble <- doc_tibble %>%
 doc_tibble <-
   doc_tibble[3:nrow(doc_tibble), ] # Just get rid of that top bit for now - work out how to do this properly
 
+# write_csv(doc_tibble, "Ttest.csv")
+
+##
+# Right, let's try this instead of all below - don't @ me - it should work well enough and my supervisor is breathing down my neck
+# Come back here - there are issues with the parsing here that are affecting the specifics of the statements. It's fit for purpose, but not ideal. Should probably pre-process the text e.g. if letter then two spaces then letter in the first 40 spots then probably change to letter one space letter. Things like that.
+doc_tibble <- doc_tibble %>%
+  mutate(ordering = 1:nrow(doc_tibble))
+
+doc_tibble_both <- doc_tibble %>%
+  filter(line_type == "both") %>%
+  separate(text, c("first_column", "second_column"), sep = "[ ]{2,}", remove = FALSE)
+
+doc_tibble_secondColumnOnly <- doc_tibble %>%
+  filter(line_type == "secondColumnOnly") %>% 
+  mutate(first_column = NA,
+         second_column = text)
+
+doc_tibble_firstColumnOnly <- doc_tibble %>%
+  filter(line_type == "firstColumnOnly") %>%
+  mutate(first_column = text,
+         second_column = NA)
+
+doc_tibble_pageBreak <- doc_tibble %>%
+  filter(line_type == "pageBreak") %>% 
+  mutate(first_column = NA,
+         second_column = NA)
+
+doc_tibble_lineBreak <- doc_tibble %>%
+  filter(line_type == "lineBreak") %>% 
+  mutate(first_column = NA,
+         second_column = NA)
+
+doc_tibble <-
+  bind_rows(
+    doc_tibble_both,
+    doc_tibble_secondColumnOnly,
+    doc_tibble_firstColumnOnly,
+    doc_tibble_pageBreak,
+    doc_tibble_lineBreak
+  ) %>% 
+  arrange(ordering)
+
+rm(
+  doc_tibble_both,
+  doc_tibble_secondColumnOnly,
+  doc_tibble_firstColumnOnly,
+  doc_tibble_pageBreak,
+  doc_tibble_lineBreak
+)
+
+doc_tibble <- doc_tibble %>% 
+  mutate(is_page_break = if_else(line_type == "pageBreak", TRUE, FALSE)) %>% 
+  group_by(is_page_break) %>% 
+  mutate(count = sequence(n())) %>%
+  ungroup() %>% 
+  mutate(count = ifelse(is_page_break, count, NA)) %>%
+  fill(count)
+  
+doc_tibble_test <- doc_tibble %>% 
+  gather(position, text_in_position, -c(text, line_type, ordering, is_page_break, count)) %>% 
+  mutate(counter = 1:n()) %>% 
+  arrange(count, counter)
+
+names(doc_tibble)
+
+
+
+
+##
+
+
 doc_tibble <- doc_tibble %>%
   mutate(
     split_string = case_when(
@@ -103,6 +174,15 @@ doc_tibble <- doc_tibble %>%
       line_type == "firstColumnOnly" ~ str_split(text, pattern = "\\s{2,}")
     )
   )
+
+doc_tibble$split_string[10] %>% class()
+
+doc_tibble <- doc_tibble %>%
+  # str_split_fixed(split_string, "\", \"", 2)
+  separate(split_string, c("A", "B"), sep = "\", \"", remove = FALSE)
+
+
+  
 
 
 unlist(c("Friday, 21 December 1990", "Second Reading"))
