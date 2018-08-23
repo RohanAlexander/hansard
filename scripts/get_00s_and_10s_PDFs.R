@@ -14,9 +14,9 @@ library(tidyverse)
 
 
 #### Set up data to scrape ####
-data_to_scrape <- read_csv("data/CSV_of_parlinfo_urls.csv")
+data_to_scrape <- read_csv("scripts/get_00s_and_10s_csv_of_URLs.csv")
 
-the_dates <- data_to_scrape[3:250,] # Change this as appropriate
+the_dates <- data_to_scrape[3:250,] # Change this as appropriate. Have done 1:2 inclusive.
 
 
 #### Scraping ####
