@@ -2,7 +2,7 @@
 # Purpose: This is a function that will us regular expressions to fix some spelling. It will be called a bunch of text files.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 24 July 2018
+# Last updated: 25 August 2018
 # Prerequisites: 1) a bunch of text files; 2) a two column csv with the misspelling and the replacement (generate that last one by using clean_hansard_spelling.R or whatever)
 
 
@@ -21,29 +21,35 @@ head(corrections_table)
 # The \\b \\b works to isolate just the word - if we didn't include these before and after the search term then searching for, say, "Mon" and replacing it with "Monica", would also change all "Monica" to "Monicaica". https://xkcd.com/208/.
 corrections_table <- corrections_table %>% 
   mutate(original = paste0("\\b", original, "\\b"))
-str_replace("Mon1heica", corrections_table$original[2], corrections_table$corrected[2])
-str_replace("Mon 1he ica", corrections_table$original[2], corrections_table$corrected[2])
-
-# Do the replacement
-walk2(file_names, save_names, ~get_text_from_PDFs(.x, .y))
-
-
+# str_replace("Mon1heica", corrections_table$original[2], corrections_table$corrected[2])
+# str_replace("Mon 1he ica", corrections_table$original[2], corrections_table$corrected[2])
 original <- corrections_table$original
 corrections <- corrections_table$corrected
 
-str_replace("Mon 1he ica", original, corrections)
+names(corrections) <- original
+# Save the named vector?
+
+# Do the replacement
+# str_replace_all(text$text, corrections)
+str_replace_all("1 rise in 1he house", corrections)
+
+save(corrections, file = "outputs/corrections.RData")
 
 
-all_hansard$statement <- ?str_replace_all(all_hansard$statement, corrections) # Takes a while
-rm(corrections)
 
 
-str_replace_all(c("Aus tralia", "Ap"), "\\bAus tralia\\b", "--")
 
 
-#### Clean up ####
-# Save
-TBD
 
-# Remove
-rm(wrong_words_in_statements, words_in_statements)
+
+
+library(readr)
+library(stringr)
+some_text <- read_lines("outputs/some_text_files/1981-03-12.txt")
+
+load("outputs/corrections.RData")
+some_text_mod <- str_replace_all(some_text, corrections)
+
+some_text_mod[542]
+
+write(some_text_mod, file = "hehehehee.txt")
