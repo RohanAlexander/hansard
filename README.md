@@ -16,7 +16,8 @@ Notes:
 
 To update:
 
-- Update Patrick Gorman's birthday.
+- Update Patrick Gorman's birthday - 12.12.1984.
+- Turnbull.
 - Fix the way that clean_hansard_spelling works so that it is looking up a table instead of all in the script.
 - ABD says Frederick William Holder was an independent and resigned from his party. Has been left as it was, but maybe check vote records for 1903 and 1906 and update the list of parties?
 - A bunch of the parties didn't have exact dates for the change, especially in the 1900s and 1910s. Need to go back to them and update. Look for years that have day and month of 1 January.

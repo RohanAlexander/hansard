@@ -2,7 +2,7 @@
 # Purpose: This file gets Australian Hansard PDF files from the parliament website for the dates that they only make PDFs available.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 23 August 2018
+# Last updated: 27 August 2018
 # Prerequisites: 
 # To do:
 
@@ -14,9 +14,11 @@ library(tidyverse)
 
 
 #### Set up data to scrape ####
-data_to_scrape <- read_csv("scripts/get_00s_and_10s_csv_of_URLs.csv")
+data_to_scrape <- read_csv("scripts/get_90s_forgotten_csv_of_URLs.csv")
 
-the_dates <- data_to_scrape[3:250,] # Change this as appropriate. Have done 1:2 inclusive.
+# the_dates <- data_to_scrape[1:2,] # Change this as appropriate. Have done 1:2 inclusive.
+the_dates <- data_to_scrape[3:nrow(the_dates),] # Change this as appropriate. Have done 1:2 inclusive.
+
 
 
 #### Scraping ####
