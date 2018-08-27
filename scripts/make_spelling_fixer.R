@@ -11,38 +11,38 @@
 library(tidyverse)
 # update.packages()
 
-
 # Load data
 corrections_table <- read_csv2("scripts/misspelt_words_with_corrections.csv")
 head(corrections_table)
 # str_replace("you're insane 1 rise to say", corrections_table$original[1], corrections_table$corrected[1])
 
+
+#### Add regular expressions ####
 # Update data
 # The \\b \\b works to isolate just the word - if we didn't include these before and after the search term then searching for, say, "Mon" and replacing it with "Monica", would also change all "Monica" to "Monicaica". https://xkcd.com/208/.
 corrections_table <- corrections_table %>% 
   mutate(original = paste0("\\b", original, "\\b"))
 # str_replace("Mon1heica", corrections_table$original[2], corrections_table$corrected[2])
 # str_replace("Mon 1he ica", corrections_table$original[2], corrections_table$corrected[2])
+
+
+#### Adjust for type ####
 original <- corrections_table$original
 corrections <- corrections_table$corrected
-
+# Change the name
 names(corrections) <- original
-# Save the named vector?
 
-# Do the replacement
-# str_replace_all(text$text, corrections)
+# Check it works
 str_replace_all("1 rise in 1he house", corrections)
 
+
+#### Save the file ####
 save(corrections, file = "outputs/corrections.RData")
 
 
 
-
-
-
-
-
-
+#### Use case ####
+# Example of how to use it:
 library(readr)
 library(stringr)
 some_text <- read_lines("outputs/some_text_files/1981-03-12.txt")
