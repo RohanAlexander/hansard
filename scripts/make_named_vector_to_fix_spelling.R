@@ -2,8 +2,8 @@
 # Purpose: This is a function that will us regular expressions to fix some spelling. It will be called a bunch of text files.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 25 August 2018
-# Prerequisites: 1) a bunch of text files; 2) a two column csv with the misspelling and the replacement (generate that last one by using clean_hansard_spelling.R or whatever)
+# Last updated: 27 August 2018
+# Prerequisites: A two column csv with the misspelling and the replacement (generate that last one by using clean_hansard_spelling.R or whatever)
 
 
 #### Set up workspace ####
@@ -12,7 +12,7 @@ library(tidyverse)
 # update.packages()
 
 # Load data
-corrections_table <- read_csv2("scripts/misspelt_words_with_corrections.csv")
+corrections_table <- read_csv2("data/misc/misspelt_words_with_corrections.csv")
 head(corrections_table)
 # str_replace("you're insane 1 rise to say", corrections_table$original[1], corrections_table$corrected[1])
 
@@ -38,6 +38,7 @@ str_replace_all("1 rise in 1he house", corrections)
 
 #### Save the file ####
 save(corrections, file = "outputs/corrections.RData")
+
 
 
 

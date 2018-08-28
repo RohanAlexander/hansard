@@ -2,7 +2,7 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to tidied text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 26 August 2018
+# Last updated: 28 August 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website - get_80s_and_90s_PDFs.R. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan.
 # To do:
 
@@ -22,6 +22,7 @@ load("outputs/corrections.RData")
 read <-
   readPDF(engine = c("xpdf")) # Despite the name this affects the options for how to read PDFs, it doesn't actually read the PDFs. -layout asks it to maintain the layout as best as possible.
 # Handy for background: https://data.library.virginia.edu/reading-pdf-files-into-r-for-text-mining/
+read <- readPDF(engine = c("xpdf"), control = list(info = "-f"))
 # An alternative is here that tries to maintain the layout:
 # read <- readPDF(engine = c("xpdf"), control = list(text = "-layout"))
 # Engine options: c("pdftools", "xpdf", "Rpoppler", "ghostscript", "Rcampdf", "custom")
@@ -54,8 +55,8 @@ save_names <-
 # save_names <- paste0("outputs/hansard_text_files/", save_names)
 save_names <- paste0("/Volumes/SanDisk/hansard_txt/", save_names)
 
-save_names <- save_names[995:length(save_names)]
-file_names <- file_names[995:length(file_names)]
+# save_names <- save_names[1773:length(save_names)]
+# file_names <- file_names[1773:length(file_names)]
 
 
 get_text_from_PDFs <-

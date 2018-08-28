@@ -17,7 +17,7 @@ library(tidyverse)
 data_to_scrape <- read_csv("scripts/get_90s_forgotten_csv_of_URLs.csv")
 
 # the_dates <- data_to_scrape[1:2,] # Change this as appropriate. Have done 1:2 inclusive.
-the_dates <- data_to_scrape[3:nrow(the_dates),] # Change this as appropriate. Have done 1:2 inclusive.
+the_dates <- data_to_scrape[3:nrow(data_to_scrape),] # Change this as appropriate. Have done 1:2 inclusive.
 
 
 
