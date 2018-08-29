@@ -36,8 +36,8 @@ library(tm)
 # Get list of Hansard PDF filenames
 file_names <-
   list.files(
-    #path = "/Volumes/SanDisk/hansard_txt", # Use this for all of them, comment to just run on test group
-    path = "outputs/for_testing_hansard_txt", # Use this for testing, comment to get all
+    path = "/Volumes/SanDisk/hansard_txt", # Use this for all of them, comment to just run on test group
+    # path = "outputs/for_testing_hansard_txt", # Use this for testing, comment to get all
     pattern = "*.txt",
     recursive = TRUE,
     full.names = TRUE
@@ -47,8 +47,8 @@ file_names
 # Make list of the names that we'll save it all with
 csv_dates <-
   list.files(
-    #path = "/Volumes/SanDisk/hansard_txt", # Use this for all of them, comment to just run on test group
-    path = "outputs/for_testing_hansard_txt", # Use this for testing, comment to get all
+    path = "/Volumes/SanDisk/hansard_txt", # Use this for all of them, comment to just run on test group
+    # path = "outputs/for_testing_hansard_txt", # Use this for testing, comment to get all
     pattern = "*.txt",
     recursive = TRUE,
     full.names = FALSE
@@ -56,11 +56,13 @@ csv_dates <-
   str_replace(".txt", ".csv")
 csv_dates
 
-dir.create("outputs/for_testing_hansard_cleaned_text_files") # Thanks Hadley! Creates a folder, just gives a warning if already exists
-save_names <- paste0("outputs/for_testing_hansard_cleaned_text_files/", csv_dates)
+# dir.create("outputs/for_testing_hansard_cleaned_text_files") # Thanks Hadley! Creates a folder, just gives a warning if already exists
+save_names <- paste0("outputs/hansard/each_hansard_txt/", csv_dates)
 # dir.create("/Volumes/SanDisk/hansard_cleaned_text_files") # Thanks Hadley! Creates a folder
 # save_names <- paste0("/Volumes/SanDisk/hansard_cleaned_text_files/", save_names)
 
+# file_names <- file_names[1:3]
+# save_names <- save_names[1:3]
 
 #### Create the function that will be passed to walk2 ####
 tidy_the_hansard_text_files <-

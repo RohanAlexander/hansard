@@ -2,7 +2,7 @@
 # Purpose: Associate a group, based on similar topics, for every statement in Hansard.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 28 August 2018
+# Last updated: 29 August 2018
 # Prerequisites: 
 # Issues:
 
@@ -11,6 +11,7 @@
 # Load libraries
 # library(dplyr)
 # library(modelr) # Used in the kfolds section
+library(tictoc)
 library(tidytext)
 library(tidyverse)
 # library(tm)
@@ -34,7 +35,7 @@ custom_stop_words <- bind_rows(
 #### Topic modelling at word level ####
 # Get a sample of 100,000 statements
 set.seed(123)
-some_random_rows <- sample(1:nrow(words_in_hansard_by_date), 5)
+some_random_rows <- sample(1:nrow(words_in_hansard_by_date), 100)
 some_hansard_text <- words_in_hansard_by_date[some_random_rows, ]
 rm(words_in_hansard_by_date, some_random_rows)
 
@@ -53,14 +54,18 @@ hansard_dtm <- cleaned_hansard %>% # Take the tokenised dataset
 
 # Conduct LDA to find groups of topics
 # Be careful running this. Takes a while. Comment out to avoid accidently running it.
-chapters_lda <- LDA(hansard_dtm, k = 25, control = list(seed = 1234)) # Will need to go through a process to find the optimal k.
+tic('Running LDA model')
+# chapters_lda <- LDA(hansard_dtm, k = 25, control = list(seed = 1234)) # Will need to go through a process to find the optimal k.
+toc()
 
 # Look at the words that make up the topic-groups
 Terms <- terms(chapters_lda, 10) # Look at the top ten words
 Terms[, 1:25] # For all twenty-five topics
 
 # Get the spread of topics over each parliament
-each_parliaments_topics <- tidy(chapters_lda, matrix = "gamma")
+each_days_topics <- tidy(chapters_lda, matrix = "gamma")
+save(each_days_topics, file = "outputs/each_days_topics.Rda")
+
 
 
 #### Worked example ####

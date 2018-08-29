@@ -2,7 +2,7 @@
 # Purpose: This file takes Australian Hansard text file CSVs and mashes them all together.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 28 August 2018
+# Last updated: 29 August 2018
 # Prerequisites: You a folder of csvs e.g. the outputs of make_text_Tibble_from_text_files.R
 # To do:
 
@@ -17,8 +17,8 @@ library(tidyverse)
 file_names <-
   list.files(
     #path = "/Volumes/SanDisk/hansard_words/csv", # Use this for all of them, comment to just run on test group
-    path = "outputs/for_testing_hansard_cleaned_text_files",
-    # Use this for testing, comment to get all
+    # path = "outputs/for_testing_hansard_cleaned_text_files", # Use this for testing, comment to get all
+    path = "outputs/hansard/each_hansard_txt",
     pattern = "*.csv",
     recursive = TRUE,
     full.names = TRUE
@@ -30,8 +30,9 @@ list_of_csvs <- map(file_names, read.csv)
 csv_dates <- file_names %>% 
   str_replace(".csv", "") %>% 
   # str_replace("/Volumes/SanDisk/hansard_words/", "")
-  str_replace("outputs/for_testing_hansard_cleaned_text_files/", "")
-
+  # str_replace("outputs/for_testing_hansard_cleaned_text_files/", "")
+  str_replace("outputs/hansard/each_hansard_txt/", "")
+csv_dates
 
 #### Create the function ####
 # Read each dataframe into that list
@@ -60,3 +61,5 @@ words_in_hansard_by_date <- bind_rows(my_data)
 
 # Save the big dataframe
 save(words_in_hansard_by_date, file = "outputs/words.Rda")
+
+rm(masher, file_names, csv_dates, list_of_csvs, my_data, words_in_hansard_by_date)

@@ -2,8 +2,8 @@
 # Purpose: 
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 28 August 2018
-# Prerequisites: You a folder of txt files e.g. the outputs of get_data_from_pdfs.R
+# Last updated: 29 August 2018
+# Prerequisites: 
 # To do:
 
 
@@ -37,7 +37,8 @@ library(tm)
 file_names <-
   list.files(
     #path = "/Volumes/SanDisk/hansard_txt", # Use this for all of them, comment to just run on test group
-    path = "outputs/for_testing_individual_hansard",
+    # path = "outputs/for_testing_individual_hansard",
+    path = "outputs/hansard/each_hansard",
     # Use this for testing, comment to get all
     pattern = "*.Rda",
     recursive = TRUE,
@@ -45,7 +46,9 @@ file_names <-
   )
 file_names
 
-dir.create("outputs/for_testing_hansard_cleaned_Rda_files") # Thanks Hadley! Creates a folder, just gives a warning if already exists
+dir.create("outputs/hansard/each_hansard_txt/") # Thanks Hadley! Creates a folder, just gives a warning if already exists
+
+# file_names <- file_names[1:3]
 
 
 #### Create the function that will be passed to walk2 ####
@@ -79,7 +82,7 @@ tidy_the_hansard_text_files <-
     parsed_text_file <- this_hansard_as_tibble %>%
       mutate(stem_word = wordStem(word, language = "english"))
     
-    save_here <- paste0("outputs/for_testing_hansard_cleaned_Rda_files/", date, ".csv")
+    save_here <- paste0("outputs/hansard/each_hansard_txt/", date, ".csv")
     
     # Save the CSV
     write_csv(parsed_text_file, path = save_here)
