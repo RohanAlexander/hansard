@@ -32,6 +32,7 @@ Next election:
   + Emma Husar (Lindsay) announced 8 August 2018
   + Luke Hartsuyker (Cowper) announced 8 August 2018
   + Gai Brodtmann (Canberra) announced 13 August 2018
+  + Julia Banks (Chisholm) announced 29 August 2018
 - Division changes:
   + Victoria gets another - Fraser
   + ACT gets another - Bean
