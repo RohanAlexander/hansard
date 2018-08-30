@@ -1,16 +1,22 @@
 # Analysis of Australian Hansard
 
-This contains the scripts and related material that I am putting together for a text analysis of Australian Hansard. The Hansard dataset doesn't seem to be able to be included in this repo, but please get in touch if you are interested.
+This contains the scripts and related material that I am putting together for a text analysis of Australian Hansard. The full Hansard dataset doesn't seem to be able to be included in this repo, but please get in touch if you are interested.
 
-To start, download the XML files of Hansard from 1901 to 1980. Unpack them, and then run the get_data_from_xml_to_dataframe.R file to convert to a dataframe. After this you need to try to fix as many of the typos, mistakes, and transcription errors in Hansard as possible, by running clean_hansard_spelling.R. 
+## Getting started
+To start, download the XML files of Hansard from 1901 to 1980 from Tim Sherratt at University of Canberra. Unpack them, and then run the get_data_from_xml_to_dataframe.R file to convert to a dataframe. After this you need to try to fix as many of the typos, mistakes, and transcription errors in Hansard as possible, by running clean_hansard_spelling.R. 
 
-The data associated with the Hansard statements (politician name, party, etc) is also full of issues. I found it easier to start with the tables provided in the list of historical members in the Parliamentary Handbook and to fix the mistakes in that, instead of fixing the list implied by Hansard. So grab that list from parliament website and split it into constituent parts, then you can run clean_politicians_by_divisions.R, clean_politicians_by_individuals.R and clean_politicians_by_party.R. The result of all that what seems to be a reasonably accurate list of all the politicians, divisions and parties.
+The data associated with the Hansard statements (politician name, party, etc) is also full of issues. I found it easier to start with the tables provided in the list of historical members in the Parliamentary Handbook and to fix the mistakes in that (i.e. they had Malcolm Turnbull's electorate wrong!), instead of fixing the list implied by Hansard. So grab that list from parliament website and split it into constituent parts, then you can run clean_politicians_by_divisions.R, clean_politicians_by_individuals.R and clean_politicians_by_party.R. The result of all that what seems to be a reasonably accurate list of all the politicians, divisions and parties - available in the outputs folder. Just from this you can make some nice graphs, for instance:
+
+[Age at first election to House of Reps](outputs/figures/age_at_election.pdf)
 
 After this, you can try some topic modelling, using topic_modelling_LDA.R.
 
+## Next steps (expand this)
+Once you've gotten started you'll probably want the complete period. Unfortunately, the 1981 - 1997 records aren't available in XML (someone at Hansard said it's because the XML doesn't exist for those years). You can get the 1997 onwards XML from a combination of Open Australia and Andrew Turpin at University of Melbourne. So one option is to just have a gap in your analysis. But fortunately, the PDFs are available. So scrape those from the Hansard website. Then parse the PDF and get some text output. You can then run topic modelling on the whole period.
 
 
-Notes:
+
+## Notes
 
 - In the list of parties, the acronym LIB had been used for the Commonwealth Liberal Party of Deakin, Cook etc in 1910s. This was also the acronym used for the Liberal Party of Australia of Menzies etc from the 1940s. Although the parties are related, it's a bit confusing. Has been left as it was, but might be worth changing to avoid confusion?
 
