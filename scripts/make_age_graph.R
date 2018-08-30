@@ -1,85 +1,96 @@
 library(lubridate)
 library(tidyverse)
+library(ggrepel)
 
 load("outputs/politicians_by_individuals.Rda")
 load("outputs/politicians_by_division.Rda")
+election_dates <- read_csv("data/misc/misc_elections_data.csv")
 
-politicians_by_division <- politicians_by_division %>% 
-  group_by(uniqueID) %>% 
+politicians_by_division <- politicians_by_division %>%
+  group_by(uniqueID) %>%
   slice(which.min(electionDate))
-  
-politicians_by_individuals <- politicians_by_individuals %>% 
-  left_join(politicians_by_division, by = "uniqueID") %>% 
-  select("uniqueID", "surname", "allOtherNames", "firstName", "commonName", "gender", "birthDate", "birthYear", "electionDate")
+
+politicians_by_individuals <- politicians_by_individuals %>%
+  left_join(politicians_by_division, by = "uniqueID") %>%
+  select(
+    "uniqueID",
+    "surname",
+    "allOtherNames",
+    "firstName",
+    "commonName",
+    "gender",
+    "birthDate",
+    "birthYear",
+    "electionDate",
+    "wasEverPrimeMinister"
+  )
 
 rm(politicians_by_division)
 
-politicians_by_individuals <- politicians_by_individuals %>% 
-  mutate(ageAtFirstElection = as.integer(floor((electionDate - birthDate) / 365) ), 
-         electionYear = ifelse(is.na(birthDate), (as.integer(year(electionDate))), NA),
-         ageInYears = electionYear - birthYear,
-         ageAtFirstElection = if_else(is.na(ageAtFirstElection), ageInYears, ageAtFirstElection)) %>% 
-  select(-electionYear, -ageInYears)
-         
-politicians_by_individuals <- politicians_by_individuals %>% 
+politicians_by_individuals <- politicians_by_individuals %>%
+  mutate(
+    ageAtFirstElection = as.integer(floor((
+      electionDate - birthDate
+    ) / 365)),
+    electionYear = ifelse(is.na(birthDate), (as.integer(year(
+      electionDate
+    ))), NA),
+    ageInYears = electionYear - birthYear,
+    ageAtFirstElection = if_else(is.na(ageAtFirstElection), ageInYears, ageAtFirstElection)
+  ) %>%
+  select(-electionYear,-ageInYears)
+
+politicians_by_individuals <- politicians_by_individuals %>%
   mutate(firstElectionYear = year(electionDate))
 
-politicians_by_age_at_election <- politicians_by_individuals %>% 
-  group_by(firstElectionYear) %>% 
+politicians_by_age_at_election <- politicians_by_individuals %>%
+  group_by(firstElectionYear) %>%
   summarise(averageAge = mean(ageAtFirstElection))
 
 head(politicians_by_age_at_election)
 
-## UP TO HERE - Need the elections and byelections years
+data_for_graph <- election_dates %>%
+  left_join(politicians_by_age_at_election,
+            by = c("year" = "firstElectionYear")) %>%
+  select(year, election, averageAge, comment)
 
+data_for_graph <- data_for_graph %>%
+  mutate(averageAge = ifelse(is.na(election), NA, averageAge)) 
 
-head(politicians)
-
-politicians <- politicians %>% 
-  filter(byElection == "No") %>% 
-  group_by(uniqueKey) %>% 
-  summarise(yearEnteredParliament = min(dateOfElection)) %>% 
-  mutate(yearEnteredParliament = year(yearEnteredParliament))
-
-new_politicians_year_count <- politicians %>% 
-  group_by(yearEnteredParliament) %>% 
-  summarise(numberOfNewOnes = n())
-
-new_politicians_year_count$winner <- c("Not labor", "Not labor", "Not labor", "Labor", "Not labor", "Labor", "Not labor", "Not labor", "Not labor", "Not labor", "Not labor", "Labor", "Not labor", "Not labor", "Not labor", "Not labor", "Labor", "Labor", "Not labor", "Not labor", "Not labor", "Not labor", "Not labor", "Not labor", "Not labor", "Not labor", "Not labor", "Labor", "Labor", "Not labor", "Not labor", "Not labor", "Labor", "Labor", "Labor", "Labor", "Labor", "Not labor", "Not labor", "Not labor", "Not labor", "Labor", "Labor", "Not labor", "Not labor")
-
-new_politicians_year_count$comment <- c("", "", "", "", "", "Fisher '14", "", "", "", "", "", "", "Lyons '31", "", "", "", "Curtin '43", "", "Menzies '49", "", "", "", "", "", "", "", "", "", "", "Fraser '75", "", "", "", "", "", "", "", "Howard '96", "", "", "", "Kevin '07", "", "", "")
-
-data_for_graph <- tibble(year = 1901:2018)
-
-data_for_graph <-
-  left_join(data_for_graph, new_politicians_year_count, by = c("year" = "yearEnteredParliament"))
-
-colo <- c("Labor" = "#f00011", "Not labor" = "#050e47")
+data_for_graph$comment[data_for_graph$comment == "Lyons '31"] <- NA
+data_for_graph$comment[data_for_graph$comment == "Menzies '49"] <- NA
+data_for_graph$comment[data_for_graph$comment == "Howard '96"] <- NA
 
 head(data_for_graph)
+head(politicians_by_individuals)
+politicians_by_individuals$ageAtFirstElection <- as.double(politicians_by_individuals$ageAtFirstElection)
 
-data_for_graph <- data_for_graph %>% 
-  filter(!is.na(winner))
+just_prime_ministers <- politicians_by_individuals %>% 
+  filter(wasEverPrimeMinister == 1) %>% 
+  mutate(commonName = if_else(is.na(commonName), firstName, commonName)) %>% 
+  unite(useName, commonName, surname, remove = FALSE, sep = " ")
+
 
 ggplot(data = data_for_graph,
-       mapping = aes(x = year, y = numberOfNewOnes, color = winner, label = comment)) +
-  geom_point(na.rm = TRUE, size = 6) +
-  geom_text(size = 6, vjust = -0.8, nudge_y = 0.5) +
-  annotate("text", label = "(First parliament)", x = 1908, y = 72, size = 6, colour = "Black") +
-  annotate("text", label = "(No. of seats increases)", x = 1949, y = 65, size = 6, colour = "Black") +
+       mapping = aes(x = year, y = averageAge)) +
+  geom_point(data = politicians_by_individuals, colour = "grey", mapping = aes(x = firstElectionYear, y = ageAtFirstElection)) +
+  geom_point(na.rm = TRUE, shape = 21) +
+  geom_point(data = just_prime_ministers, mapping = aes(x = firstElectionYear, y = ageAtFirstElection)) +
+  geom_smooth(data = politicians_by_individuals, linetype="dashed", colour = "black", mapping = aes(x = firstElectionYear, y = ageAtFirstElection)) +
+  geom_label_repel(data = just_prime_ministers, mapping = aes(x = firstElectionYear, y = ageAtFirstElection, label = useName), segment.size  = 0.2, segment.color = "grey50", repel = 15) +
   labs(
-    y = "Number",
+    y = "Age",
     x = "Year",
-    color = "Election winner",
-    title = "Newly elected House of Representatives Members, by election",
-    caption = "By-elections removed. Data from Parliamentary Handbook as modified by Rohan Alexander."
+    title = "Age first elected to House of Representatives",
+    caption = "Data based on Parliamentary Handbook."
   ) +
   theme_classic() +
-  theme(text = element_text(size = 18)) +
-  scale_colour_manual(values = colo)
+  theme(text = element_text(size = 18))
+
+
 
 ggsave(
-  "outputs/newly_elected_by_party.pdf",
+  "outputs/figures/age_at_election.pdf",
   height = 8.27,
   width = 11.69,
   units = "in"

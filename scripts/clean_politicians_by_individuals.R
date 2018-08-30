@@ -2,7 +2,7 @@
 # Purpose: The dataset about all the politicians in the data folder, and want to fix the classes and add genders to it and save it in outputs.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 10 August 2018
+# Last updated: 29 August 2018
 # Prerequisites: You need to have the dataset of politicians based on (but modified from) the Parliamentary Handbook saved as a CSV (see data/politicians/politicians_by_individuals.csv).
 
 
