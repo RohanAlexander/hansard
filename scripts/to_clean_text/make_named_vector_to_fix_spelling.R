@@ -33,7 +33,7 @@ corrections <- corrections_table$corrected
 names(corrections) <- original
 
 # Check it works
-str_replace_all("1 rise in 1he house", corrections)
+str_replace_all("1 rise in 1he iinportant house", corrections)
 
 
 #### Save the file ####

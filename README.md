@@ -5,7 +5,7 @@ This contains the scripts and related material that I am putting together for a 
 ## Getting started
 To start, download the XML files of Hansard from 1901 to 1980 from Tim Sherratt at University of Canberra. Unpack them, and then run the get_data_from_xml_to_dataframe.R file to convert to a dataframe. After this you need to try to fix as many of the typos, mistakes, and transcription errors in Hansard as possible, by running clean_hansard_spelling.R. 
 
-The data associated with the Hansard statements (politician name, party, etc) is also full of issues. I found it easier to start with the tables provided in the list of historical members in the Parliamentary Handbook and to fix the mistakes in that (i.e. they had Malcolm Turnbull's electorate wrong!), instead of fixing the list implied by Hansard. So grab that list from parliament website and split it into constituent parts, then you can run clean_politicians_by_divisions.R, clean_politicians_by_individuals.R and clean_politicians_by_party.R. The result of all that what seems to be a reasonably accurate list of all the politicians, divisions and parties - available in the outputs folder. Just from this you can make some nice graphs, for instance:
+The data associated with the Hansard statements (politician name, party, etc) is also full of issues. I found it easier to start with the tables provided in the list of historical members in the Parliamentary Handbook and to fix the mistakes in that, instead of fixing the list implied by Hansard. So grab that list from parliament website and split it into constituent parts, then you can run clean_politicians_by_divisions.R, clean_politicians_by_individuals.R and clean_politicians_by_party.R. The result of all that what seems to be a reasonably accurate list of all the politicians, divisions and parties - available in the outputs folder. Just from this you can make some nice graphs, for instance:
 
 [Age at first election to House of Reps](outputs/figures/age_at_election.pdf)
 
@@ -17,6 +17,11 @@ Once you've gotten started you'll probably want the complete period. Unfortunate
 
 
 ## Notes
+
+- Check 1948-09-08 - there seems to be two URLs: /parlInfo/download/hansard80/hansardr80/1948-09-08/toc_pdf/19480908_reps_18_198.pdf;fileType=application/pdf#search=%221940s%22 and /parlInfo/download/hansard80/hansardr80/19480908/toc_pdf/19480908_REPS_18_198.pdf;fileType=application/pdf#search=%221940s%22 and also check 1911-12-04 - again seems to be two URLs in the search results: /parlInfo/download/hansard80/hansardr80/1911-12-04/toc_pdf/19111204_reps_4_62.pdf;fileType=application/pdf#search=%221910s%22
+1911-12-04.pdf and /parlInfo/download/hansard80/hansardr80/19111204/toc_pdf/19111204_REPS_4_62.pdf;fileType=application/pdf#search=%221910s%22.
+
+- (30 August): The stemming is happening at the text to csv conversion. I don't think this makes sense. Change it to happen as part of the topic modelling because will make it easier to construct custom dictionary.
 
 - In the list of parties, the acronym LIB had been used for the Commonwealth Liberal Party of Deakin, Cook etc in 1910s. This was also the acronym used for the Liberal Party of Australia of Menzies etc from the 1940s. Although the parties are related, it's a bit confusing. Has been left as it was, but might be worth changing to avoid confusion?
 
