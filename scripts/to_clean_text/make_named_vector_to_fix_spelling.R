@@ -39,7 +39,7 @@ str_replace_all("1 rise in 1he iinportant house", corrections)
 #### Save the file ####
 save(corrections, file = "outputs/corrections.RData")
 
-
+corrections[1:100]
 
 
 #### Use case ####

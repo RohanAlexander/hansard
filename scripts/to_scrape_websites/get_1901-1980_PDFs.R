@@ -29,11 +29,8 @@ visit_address_and_save_PDF <-
   function(name_of_address_to_visit,
            name_of_where_to_save) {
     download.file(name_of_address_to_visit, name_of_where_to_save)
-    
     print(paste("Done with", name_of_where_to_save, "at", Sys.time()))  # Helpful so that you know progress when running it on all the records
-    
     Sys.sleep(sample(15:30, 1)) # Space out requests by somewhere between 15 and 30 seconds each
-    
   }
 
 safe_visit_address_and_save_PDF <- safely(visit_address_and_save_PDF)
@@ -46,7 +43,6 @@ safe_visit_address_and_save_PDF <- safely(visit_address_and_save_PDF)
 # address_to_visit <- c("This_is_not_a_URL", address_to_visit[3:4]) # testing the safety behaviour
 # save_name <- save_name[5:6] # One last test
 # address_to_visit <- address_to_visit[5:6] # One last test
-
 save_name <- save_name[5:length(save_name)] # main run
 address_to_visit <- address_to_visit[5:length(address_to_visit)] # main run
 

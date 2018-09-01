@@ -14,8 +14,8 @@
 
 
 #### Set up workspace ####
-library(stringi)
-library(stringr)
+# library(stringi)
+# library(stringr)
 library(tidyverse)
 library(tm)
 # update.packages()
@@ -41,11 +41,11 @@ read <-
 #### Create lists of PDFs to read and file names to save text as ####
 # Get list of Hansard PDF filenames
 # Change the path as required:
-# use_this_path_to_get_pdfs  <- "data/for_testing_hansard_pdf"
-use_this_path_to_get_pdfs  <- "/Volumes/SanDisk/hansard_pdfs"
+use_this_path_to_get_pdfs  <- "data/for_testing_hansard_pdf"
+# use_this_path_to_get_pdfs  <- "/Volumes/SanDisk/hansard_pdfs"
 
-# use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
-use_this_path_to_save_csv_files  <- "/Volumes/SanDisk/hansard_csv"
+use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
+# use_this_path_to_save_csv_files  <- "/Volumes/SanDisk/hansard_csv"
 
 file_names <-
   list.files(
@@ -74,7 +74,7 @@ get_text_from_PDFs <-
              readerControl = list(reader = read))
     # document <-
     #   Corpus(
-    #     URISource("data/for_testing_hansard_pdf/1996-04-30.pdf"),
+    #     URISource("data/for_testing_hansard_pdf/1946-11-07.pdf"),
     #     readerControl = list(reader = read)
     #   ) # for testing
     doc <- content(document[[1]]) # Unsure why this has to be done
@@ -82,7 +82,7 @@ get_text_from_PDFs <-
     
     # For some reason the encoding is latin1 - maybe an option in readPDF(?), but it's easier to work with UTF-8 - god help me how long it took for me to work this out
     doc <- iconv(doc, from = "latin1", to = "UTF-8")
-    # doc[400:800]
+    doc[1:500]
     
     # Convert to tibble
     doc_tibble <- tibble(doc)
@@ -93,6 +93,22 @@ get_text_from_PDFs <-
       str_replace_all(doc_tibble$text, "·", "-") # This seems to be coming about because of an issue with the PDF reader - for some reason hyphens are being read in as dots
     doc_tibble$text <-
       str_replace_all(doc_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
+    doc_tibble$text <-
+      str_replace_all(doc_tibble$text, "(?<=[:upper:])[:space:](?=[:upper:][:space:])", "")
+    doc_tibble$text <-
+      str_replace_all(doc_tibble$text, "--", "-- ")
+    doc_tibble$text <-
+      str_replace_all(doc_tibble$text, "--  ", "-- ")
+    doc_tibble$text <-
+      str_replace_all(doc_tibble$text, ".--", ". --")
+    
+    
+    
+    
+    
+    # Fix spelling
+    doc_tibble$text <-
+      str_replace_all(doc_tibble$text, corrections)
     
     # Identify headers and remove them
     doc_tibble <- doc_tibble %>%
@@ -117,17 +133,30 @@ get_text_from_PDFs <-
       filter(firstSpeakerRow == TRUE) %>%
       select(-firstSpeakerRow)
     
-    # Identify speakers - THIS CAN BE IMPROVED e.g. it doesn't look within a string.
-    # This is way we identify them - amend as appropriate:
+    # Identify speakers - THIS CAN BE IMPROVED e.g. does it look within a string?
+    # This is the way we identify them - amend as appropriate:
     find_based_on_this <-
       c(
         "Mr [:upper:]{3,}",
+        "Mr. McEWEN.",
         "The Clerk-",
         "Honourable members interjecting-",
         "Mr Leo McLeay-",
-        "^[:^lower:]{3,}$"
+        "^[:^lower:]{3,}$",
+        "Mr. [:upper:]{3,} .",
+        "Mr. [:upper:]{3,}.",
+        "Mr. [:upper:]{3,}[:space:][:upper:]{3,}.",
+        "Dr. [:upper:]{3,}.",
+        "Sir [:upper:]{3,}[:space:][:upper:]{3,}.",
+        "Ms [:upper:]{3,}-",
+        "Dr [:upper:]{3,}-",
+        "Dr [:alpha:]{3,}-",
+        "Mr [:alpha:]{3,}-"
       )
     find_based_on_this <- paste(find_based_on_this, collapse = "|")
+    
+    # str_replace("Government Sir JOHN FORREST. -- I desire", "Sir [:upper:]{3,}[:space:][:upper:]{3,}.", "HEH")
+    
     
     doc_tibble <- doc_tibble %>%
       mutate(speakerName = str_detect(text, find_based_on_this))
@@ -143,10 +172,6 @@ get_text_from_PDFs <-
     
     # Combine all text into one bundle - WHY?
     # just_the_text <- c(doc_tibble$text)
-    
-    # Fix spelling
-    doc_tibble$text_spoken <-
-      str_replace_all(doc_tibble$text_spoken, corrections)
     
     # Save file
     # write_csv(doc_tibble, "name_of_output_csv_file")
