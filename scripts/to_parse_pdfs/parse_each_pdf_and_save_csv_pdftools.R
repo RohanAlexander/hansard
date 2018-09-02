@@ -3,7 +3,7 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to tidied text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 1 September 2018
+# Last updated: 2 September 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website, e.g. get_80s_and_90s_PDFs.R. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan. For testing purposes there should be some in the /data folder.
 # To do:
 # - Identify and remove front matter
@@ -223,7 +223,7 @@ test_pdftools <-
 # write_lines(test_pdftools, "test_pdftools.csv")
 # write_lines(test_tm, "test_tm.csv")
 
-test_textreader$text[13]
+# test_textreader$text[13]
 
 test_tibble_pdftools <- tibble(text = test_pdftools)
 
@@ -231,9 +231,6 @@ test_tibble_pdftools$page_num <- 1:nrow(test_tibble_pdftools)
 
 test_tibble_pdftools <-
   separate_rows(test_tibble_pdftools, text, sep = "\\n")
-
-
-# UP TO HERE
 
 test_tibble_pdftools$text_mod <- test_tibble_pdftools$text
 
@@ -251,8 +248,7 @@ test_tibble_pdftools$text_mod <-
     test_tibble_pdftools$text_mod,
     "(?<=[:space:][:upper:])[:space:](?=[:upper:][:space:])",
     ""
-  )
-
+  ) # Thanks Monica, also https://stackoverflow.com/questions/31280327/remove-extra-white-space-from-between-letters-in-r-using-gsub
 test_tibble_pdftools$text_mod <-
   str_replace_all(test_tibble_pdftools$text_mod, "--", "-- ")
 test_tibble_pdftools$text_mod <-
@@ -261,7 +257,7 @@ test_tibble_pdftools$text_mod <-
   str_replace_all(test_tibble_pdftools$text_mod, ".--", ". --")
 
 # Fix spelling
-tic('Not fixed')
+tic('Spelling')
 test_tibble_pdftools$text_mod <-
   str_replace_all(test_tibble_pdftools$text_mod, corrections)
 toc()
@@ -304,11 +300,8 @@ test_tibble_pdftools <- test_tibble_pdftools %>%
   filter(page_num >= firstPageOfInterest) %>%
   select(-firstSpeakerRow)
 
-test_tibble_pdftools[1:100,]
-
 test_tibble_pdftools <- test_tibble_pdftools %>%
   select(-text)
-
 
 test_tibble_pdftools <- test_tibble_pdftools %>%
   mutate(line_number = 1:nrow(test_tibble_pdftools)) %>%
@@ -320,7 +313,7 @@ test_tibble_pdftools <- test_tibble_pdftools %>%
     )
   )
 
-write_csv(test_tibble_pdftools, "TEST.csv")
+# write_csv(test_tibble_pdftools, "TEST.csv")
 
 test_tibble_pdftools <- test_tibble_pdftools %>%
   mutate(text_mod = if_else(
@@ -328,10 +321,6 @@ test_tibble_pdftools <- test_tibble_pdftools %>%
     str_trim(text_mod, side = c("left")),
     text_mod
   ))
-
-
-# doc_tibble <- doc_tibble %>%
-#   mutate(line_type = if_else(text == "", "lineBreak", line_type))
 
 # Right, let's try this - don't @ me - it should work well enough and my supervisor is breathing down my neck
 # Come back here - there are issues with the parsing here that are affecting the specifics of the statements. It's fit for purpose, but not ideal. Should probably pre-process the text e.g. if letter then two spaces then letter in the first 40 spots then probably change to letter one space letter. Things like that.
@@ -371,7 +360,9 @@ test_tibble_pdftools <-
 rm(
   test_tibble_pdftools_both,
   test_tibble_pdftools_secondColumnOnly,
-  test_tibble_pdftools_firstColumnOnly
+  test_tibble_pdftools_firstColumnOnly,
+  firstPageOfInterest,
+  rowOfFirstSPEAKER
 )
 
 test_tibble_pdftools_test <-
@@ -381,5 +372,122 @@ test_tibble_pdftools_test <-
   mutate(counter = 1:n()) %>%
   arrange(page_num, counter)
 
+# Check for empty rows
+test_tibble_pdftools_test <- test_tibble_pdftools_test %>% 
+  mutate(emptyCell = if_else(text_in_position == "" | is.na(text_in_position), 1, 0)) %>% 
+  filter(emptyCell == 0) %>% 
+  select(-emptyCell)
 
-names(test_tibble_pdftools)
+
+test_tibble_pdftools_test$text_in_position <- str_replace_all(test_tibble_pdftools_test$text_in_position, "Mr.. ", "Mr ")
+test_tibble_pdftools_test$text_in_position <- str_replace_all(test_tibble_pdftools_test$text_in_position, "Dr.. ", "Dr ")
+test_tibble_pdftools_test$text_in_position <- str_replace_all(test_tibble_pdftools_test$text_in_position, "A UENS", "ALIENS")
+test_tibble_pdftools_test$text_in_position <- str_replace_all(test_tibble_pdftools_test$text_in_position, "— BRITIS H APPLICANTS", "BRITISH APPLICANTS")
+
+
+
+test_tibble_pdftools_test$text_in_position <- str_squish(test_tibble_pdftools_test$text_in_position)
+
+test_tibble_pdftools_test$text_in_position <- str_replace_all(test_tibble_pdftools_test$text_in_position, "—(?=[:alpha:])", "— ")
+
+# Fix spelling
+tic('Spelling')
+test_tibble_pdftools_test$text_in_position <-
+  str_replace_all(test_tibble_pdftools_test$text_in_position, corrections)
+toc()
+
+
+# Identify speakers - THIS CAN BE IMPROVED e.g. does it look within a string?
+# This is the way we identify them - amend as appropriate:
+findSpeakersBasedOnThis <-
+  c(
+    "Dr [:upper:]{3,}-",
+    "Dr [:alpha:]{3,}-",
+    "Ms [:upper:]{3,}-",
+    "Mr [:alpha:]{3,}-",
+    "Mr [:alpha:]{3,}.—",
+    "Mr [:upper:]{3,}",
+    "Mr.McEWEN.",
+    "Mr. McEWEN.",
+    "Mr. [:upper:]{3,} .",
+    "Mr. [:upper:]{3,}.",
+    "Mr.[:upper:]{3,}.",
+    "Mr. [:upper:]{3,}[:space:][:upper:]{3,}.",
+    "Dr. [:upper:]{3,}.",
+    "Sir [:upper:]{3,}[:space:][:upper:]{3,}.",
+    "The Clerk-",
+    "Honourable members interjecting-",
+    "Mr Leo McLeay-",
+    "' Mr Calwell"
+  )
+findSpeakersBasedOnThis <- paste(findSpeakersBasedOnThis, collapse = "|")
+
+# str_replace("Government Sir JOHN FORREST. -- I desire", "Sir [:upper:]{3,}[:space:][:upper:]{3,}.", "HEH")
+
+
+
+findTitlesBasedOnThis <-
+  c("^[:upper:]{3,}"
+  )
+
+
+findTitlesBasedOnThis <- paste(findTitlesBasedOnThis, collapse = "|")
+
+test_tibble_pdftools_test <- test_tibble_pdftools_test %>%
+  mutate(possibleSpeaker = str_detect(text_in_position, findSpeakersBasedOnThis),
+         possibleTitle = str_detect(text_in_position, findTitlesBasedOnThis),
+         possibleTitle = if_else(possibleSpeaker == TRUE & possibleTitle == TRUE, FALSE, possibleTitle))
+
+
+test_tibble_pdftools_test$possibleTitle <- ifelse(test_tibble_pdftools_test$possibleTitle == TRUE, 'possibleTitle', 'probablyNotATitle')
+
+test_tibble_pdftools_test_test <- test_tibble_pdftools_test %>%
+  spread(possibleTitle, text_in_position)
+
+
+test_tibble_pdftools_test_test <- test_tibble_pdftools_test_test %>%
+  mutate(lagPossibleTitle = lag(possibleTitle),
+         titleNumberer = if_else(!is.na(possibleTitle) & is.na(lagPossibleTitle), 1, 0)) %>% 
+  mutate(titleNumbererer = cumsum(titleNumberer),
+         titleNumbererer = ifelse(is.na(possibleTitle), NA, titleNumbererer)) %>% 
+  select(-lagPossibleTitle)
+
+combinedTitles <- test_tibble_pdftools_test_test %>%
+  filter(!is.na(titleNumbererer)) %>% 
+  group_by(titleNumbererer) %>%
+  summarise(possibleTitle = paste(possibleTitle, collapse = " ")) 
+
+
+test_tibble_pdftools_test_test <- test_tibble_pdftools_test_test %>%
+  filter(is.na(titleNumbererer) | titleNumberer != 0) %>% 
+  select(-possibleTitle)
+
+test_tibble_pdftools_test_test <- test_tibble_pdftools_test_test %>%
+  left_join(combinedTitles)
+
+test_tibble_pdftools_test_test <- test_tibble_pdftools_test_test %>%
+  lag(possibleTitle) %>% 
+  select(-position, -counter, -titleNumberer, -titleNumbererer)
+
+
+names(test_tibble_pdftools_test_test)
+
+
+test_tibble_pdftools_test$possibleSpeaker <- ifelse(test_tibble_pdftools_test$possibleSpeaker == TRUE, 1, 0)
+
+test_tibble_pdftools_test <- test_tibble_pdftools_test %>%
+  mutate(speakerGroups = cumsum(possibleSpeaker))
+
+# Thanks to Mark Needham for this: https://markhneedham.com/blog/2015/06/27/r-dplyr-squashing-multiple-rows-per-group-into-one/
+test_tibble_pdftools_test <- test_tibble_pdftools_test %>%
+  group_by(speakerGroups) %>%
+  summarise(text_in_position = paste(text_in_position, collapse = " "))
+
+
+
+
+# Split out speakers and headings
+test_tibble_pdftools_test <- test_tibble_pdftools_test %>% 
+  separate(text_in_position, c("speakerOrTitle", "theText"), sep = "[^[:alnum:]]+")
+
+
