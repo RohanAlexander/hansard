@@ -39,18 +39,18 @@ str_replace_all("1 rise in 1he iinportant house", corrections)
 #### Save the file ####
 save(corrections, file = "outputs/corrections.RData")
 
-corrections[1:100]
+
 
 
 #### Use case ####
 # Example of how to use it:
-library(readr)
-library(stringr)
-some_text <- read_lines("outputs/some_text_files/1981-03-12.txt")
-
-load("outputs/corrections.RData")
-some_text_mod <- str_replace_all(some_text, corrections)
-
-some_text_mod[542]
-
-write(some_text_mod, file = "hehehehee.txt")
+# library(readr)
+# library(stringr)
+# some_text <- read_lines("outputs/some_text_files/1981-03-12.txt")
+# 
+# load("outputs/corrections.RData")
+# some_text_mod <- str_replace_all(some_text, corrections)
+# 
+# some_text_mod[542]
+# 
+# write(some_text_mod, file = "hehehehee.txt")

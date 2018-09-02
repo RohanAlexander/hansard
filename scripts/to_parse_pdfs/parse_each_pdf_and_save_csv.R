@@ -3,10 +3,9 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to tidied text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 30 August 2018
+# Last updated: 1 September 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website, e.g. get_80s_and_90s_PDFs.R. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan. For testing purposes there should be some in the /data folder.
 # To do:
-# - Talk to Matt
 # - Identify and remove front matter
 # - Identify and remove headers/footers
 # - Deal with two columns better
@@ -44,7 +43,8 @@ read <-
 use_this_path_to_get_pdfs  <- "data/for_testing_hansard_pdf"
 # use_this_path_to_get_pdfs  <- "/Volumes/SanDisk/hansard_pdfs"
 
-use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
+use_this_path_to_save_csv_files  <-
+  "outputs/hansard/hansard_csv_files"
 # use_this_path_to_save_csv_files  <- "/Volumes/SanDisk/hansard_csv"
 
 file_names <-
@@ -94,17 +94,15 @@ get_text_from_PDFs <-
     doc_tibble$text <-
       str_replace_all(doc_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
     doc_tibble$text <-
-      str_replace_all(doc_tibble$text, "(?<=[:upper:])[:space:](?=[:upper:][:space:])", "")
+      str_replace_all(doc_tibble$text,
+                      "(?<=[:upper:])[:space:](?=[:upper:][:space:])",
+                      "")
     doc_tibble$text <-
       str_replace_all(doc_tibble$text, "--", "-- ")
     doc_tibble$text <-
       str_replace_all(doc_tibble$text, "--  ", "-- ")
     doc_tibble$text <-
       str_replace_all(doc_tibble$text, ".--", ". --")
-    
-    
-    
-    
     
     # Fix spelling
     doc_tibble$text <-
@@ -188,56 +186,200 @@ walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y))
 
 
 
-#### Alternative ####
+
+
+
+
+
+
+
+
+#### Alternative using PDFtexttools ####
 # COME BACK HERE AND MAKE THE PARSER BETTER BUT JOHN IS ON THE WAR PATH AND THERE'S NO TIME
 # install.packages('textreadr')
+library(pdftools)
 # library(textreadr)
-# library(tidyverse)
+# install.packages('textclean')
+library(textclean)
+library(tidyverse)
+library(tictoc)
+# library(tm)
+
+# Get the spell checker
+load("outputs/corrections.RData")
+
+
 #
 # pdf_doc <- ?system.file("data/some_hansard_pdfs/1981-02-24.pdf", package = "textreadr")
 #
-# test <- read_pdf("data/some_hansard_pdfs/1981-02-24.pdf")
+# test_textreader <- read_pdf("data/for_testing_hansard_pdf/1984-02-28.pdf")
+test_pdftools <-
+  pdf_text("data/for_testing_hansard_pdf/1946-11-07.pdf")
+# test_tm_options <- readPDF(control = list(text = "-layout"))
+# test_tm <- Corpus(URISource("data/for_testing_hansard_pdf/1984-02-28.pdf"), readerControl = list(reader = test_tm_options))
+# test_tm <- content(test_tm[[1]])
+# head(test_tm)
+# write_csv(test_textreader, "test_textreader.csv")
+# write_lines(test_pdftools, "test_pdftools.csv")
+# write_lines(test_tm, "test_tm.csv")
+
+test_textreader$text[13]
+
+test_tibble_pdftools <- tibble(text = test_pdftools)
+
+test_tibble_pdftools$page_num <- 1:nrow(test_tibble_pdftools)
+
+test_tibble_pdftools <-
+  separate_rows(test_tibble_pdftools, text, sep = "\\n")
 
 
+# UP TO HERE
 
+test_tibble_pdftools$text_mod <- test_tibble_pdftools$text
 
+# Fix some minor issues
+test_tibble_pdftools$text_mod <-
+  str_replace_all(test_tibble_pdftools$text_mod, "·", "-") # This seems to be coming about because of an issue with the PDF reader - for some reason hyphens are being read in as dots
+test_tibble_pdftools$text_mod <-
+  str_replace_all(test_tibble_pdftools$text_mod, "•", "-") # This seems to be coming about because of an issue with the PDF reader - for some reason hyphens are being read in as dots
+test_tibble_pdftools$text_mod <-
+  str_replace_all(test_tibble_pdftools$text_mod, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
 
-### TESTING DEBRIS
-
-
-read <-
-  readPDF(engine = c("xpdf"),
-          control = list(info = "-f", text = "-layout"))
-
-document <-
-  Corpus(
-    URISource("/Volumes/SanDisk/hansard_pdfs/2011-05-11.pdf"),
-    readerControl = list(reader = read)
+# test_tibble_pdftools$text_mod <- replace_kern(test_tibble_pdftools$text_mod)
+test_tibble_pdftools$text_mod <-
+  str_replace_all(
+    test_tibble_pdftools$text_mod,
+    "(?<=[:space:][:upper:])[:space:](?=[:upper:][:space:])",
+    ""
   )
-doc <- content(document[[1]]) # Unsure why this has to be done
-rm(document)
 
-# For some reason the encoding is latin1 - maybe an option in readPDF(?), but it's easier to work with UTF-8 - god help me how long it took for me to work this out
-doc <- iconv(doc, from = "latin1", to = "UTF-8")
-
-# Convert to tibble
-doc_tibble <- tibble(doc)
-names(doc_tibble) <- c("text")
-
-doc_tibble$text <-
-  str_replace_all(doc_tibble$text, "·", "-") # This seems to be coming about because of an issue with the PDF reader - for some reason hyphens are being read in as dots
-doc_tibble$text <-
-  str_replace_all(doc_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
-
-# Identify headers - should remove them?
-doc_tibble <- doc_tibble %>%
-  mutate(headerRow = if_else(grepl("^\\f", doc_tibble$text), 1, 0)) # \f is used by the PDF parser to signal page breaks
-
-# Identify speakers - TBD
-
-
-# Combine all text into one bundle
-just_the_text <- c(doc_tibble$text)
+test_tibble_pdftools$text_mod <-
+  str_replace_all(test_tibble_pdftools$text_mod, "--", "-- ")
+test_tibble_pdftools$text_mod <-
+  str_replace_all(test_tibble_pdftools$text_mod, "--  ", "-- ")
+test_tibble_pdftools$text_mod <-
+  str_replace_all(test_tibble_pdftools$text_mod, ".--", ". --")
 
 # Fix spelling
-just_the_text <- str_replace_all(just_the_text, corrections)
+tic('Not fixed')
+test_tibble_pdftools$text_mod <-
+  str_replace_all(test_tibble_pdftools$text_mod, corrections)
+toc()
+
+
+# Identify headers and remove them
+test_tibble_pdftools <- test_tibble_pdftools %>%
+  group_by(page_num) %>%
+  mutate(lineNumber = 1:n()) %>%
+  mutate(lastLine = n()) %>%
+  ungroup()
+
+test_tibble_pdftools <- test_tibble_pdftools %>%
+  filter(lineNumber != 1) %>%
+  select(-lineNumber)
+
+# # Identify footers and remove them
+# test_tibble_pdftools <- test_tibble_pdftools %>%
+#   group_by(page_num) %>%
+#   mutate(lastLine = n()) %>%
+#   ungroup()
+#
+# test_tibble_pdftools <- test_tibble_pdftools %>%
+#   filter(lineNumber != 1) %>%
+#   select(-lineNumber)
+
+
+# Identify front matter and remove it
+test_tibble_pdftools <- test_tibble_pdftools %>%
+  mutate(firstSpeakerRow = str_detect(text_mod, "SPEAKER"))
+test_tibble_pdftools$firstSpeakerRow[test_tibble_pdftools$firstSpeakerRow == FALSE] <-
+  NA
+
+rowOfFirstSPEAKER <-
+  test_tibble_pdftools$firstSpeakerRow[test_tibble_pdftools$firstSpeakerRow == TRUE] %>% which() %>% first()
+firstPageOfInterest <-
+  test_tibble_pdftools[rowOfFirstSPEAKER, "page_num"] %>% as.integer()
+
+test_tibble_pdftools <- test_tibble_pdftools %>%
+  filter(page_num >= firstPageOfInterest) %>%
+  select(-firstSpeakerRow)
+
+test_tibble_pdftools[1:100,]
+
+test_tibble_pdftools <- test_tibble_pdftools %>%
+  select(-text)
+
+
+test_tibble_pdftools <- test_tibble_pdftools %>%
+  mutate(line_number = 1:nrow(test_tibble_pdftools)) %>%
+  mutate(
+    line_type = case_when(
+      str_detect(text_mod, "^\\s{40,}") == TRUE ~ "secondColumnOnly",
+      nchar(text_mod) < 48 ~ "firstColumnOnly",
+      TRUE ~ "both"
+    )
+  )
+
+write_csv(test_tibble_pdftools, "TEST.csv")
+
+test_tibble_pdftools <- test_tibble_pdftools %>%
+  mutate(text_mod = if_else(
+    line_type %in% c("both", "firstColumnOnly"),
+    str_trim(text_mod, side = c("left")),
+    text_mod
+  ))
+
+
+# doc_tibble <- doc_tibble %>%
+#   mutate(line_type = if_else(text == "", "lineBreak", line_type))
+
+# Right, let's try this - don't @ me - it should work well enough and my supervisor is breathing down my neck
+# Come back here - there are issues with the parsing here that are affecting the specifics of the statements. It's fit for purpose, but not ideal. Should probably pre-process the text e.g. if letter then two spaces then letter in the first 40 spots then probably change to letter one space letter. Things like that.
+
+test_tibble_pdftools <-
+  test_tibble_pdftools %>% mutate(ordering = 1:nrow(test_tibble_pdftools))
+
+
+# Sunday - come back and tune this to work a little better - throwing away a lot - extra = "merge" - hides them so get rid of that then come back here.
+test_tibble_pdftools_both <- test_tibble_pdftools %>%
+  filter(line_type == "both") %>%
+  separate(
+    text_mod,
+    c("first_column", "second_column"),
+    sep = "[:space:]{2,}",
+    remove = FALSE,
+    extra = "merge"
+  )
+
+test_tibble_pdftools_secondColumnOnly <-
+  test_tibble_pdftools %>% filter(line_type ==
+                                    "secondColumnOnly") %>% mutate(first_column = NA, second_column = text_mod)
+
+test_tibble_pdftools_firstColumnOnly <-
+  test_tibble_pdftools %>% filter(line_type ==
+                                    "firstColumnOnly") %>% mutate(first_column = text_mod, second_column = NA)
+
+
+test_tibble_pdftools <-
+  bind_rows(
+    test_tibble_pdftools_both,
+    test_tibble_pdftools_secondColumnOnly,
+    test_tibble_pdftools_firstColumnOnly
+  ) %>%
+  arrange(ordering)
+
+rm(
+  test_tibble_pdftools_both,
+  test_tibble_pdftools_secondColumnOnly,
+  test_tibble_pdftools_firstColumnOnly
+)
+
+test_tibble_pdftools_test <-
+  test_tibble_pdftools %>%
+  select(-c(text_mod, lastLine, line_type, ordering, line_number)) %>%
+  gather(position, text_in_position,-c(page_num)) %>%
+  mutate(counter = 1:n()) %>%
+  arrange(page_num, counter)
+
+
+names(test_tibble_pdftools)
