@@ -3,7 +3,7 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to CSVs of text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 2 September 2018
+# Last updated: 3 September 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /data folder.
 # To do:
 # - Check if footers need to be replaced
@@ -60,10 +60,10 @@ get_text_from_PDFs <-
   function(name_of_input_PDF_file,
            name_of_output_csv_file) {
     ## Read in the document, based on the filename list, and general tidying
-    pdf_document <-
-      pdf_text(name_of_input_PDF_file)
     # pdf_document <-
-    #   pdf_text("data/for_testing_hansard_pdf/1946-11-07.pdf") # for testing
+    #   pdf_text(name_of_input_PDF_file)
+    pdf_document <-
+      pdf_text("data/for_testing_hansard_pdf/1997-02-05.pdf") # for testing
     
     # Convert to tibble so that tidyverse can be used
     pdf_document_tibble <- tibble(text = pdf_document)
@@ -100,6 +100,8 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "Mr.. ", "Mr ")
     pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "Mrs DE-ANNE KELLY", "Mrs DEANNE KELLY")
+    pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "— BRITIS H APPLICANTS", "BRITISH APPLICANTS")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "—(?=[:alpha:])", "— ")
@@ -117,8 +119,14 @@ get_text_from_PDFs <-
       mutate(lastLine = n()) %>% # This tells you the number of the last line in each page
       ungroup()
     
+    # There are some footers in the 2017 ones - they are rows that just have 'CHAMBER'
+    pdf_document_tibble$text[6424] %>% str_trim()
+    
+    
     pdf_document_tibble <- pdf_document_tibble %>%
       filter(lineNumber != 1) %>% # Remove the first line of each page
+      filter(text %>% str_trim != "CHAMBER") %>% # Remove the footer
+      filter(text %>% str_trim != "FEDERATION CHAMBER") %>% # Remove the footer
       select(-lineNumber, -lastLine)
     
     # Identify footers and remove them
@@ -126,19 +134,25 @@ get_text_from_PDFs <-
     
     
     ## Identify front matter and remove it
-    # We are identifying the start of talking based on the first occurence of 'Mr SPEAKER'. It seems pretty common, but there's going to be some errors and should come back here and improve it.
+    # Primarily identify the start of talking based on the first occurence of 'Mr SPEAKER'. It seems pretty common, but there are some misses (e.g. 1991-01-22). As a backup look for first occurence of "JOINT HOUSE" and then pick the next page.
     pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(firstSpeakerRow = str_detect(text, "SPEAKER")) 
+      mutate(firstSpeakerRow = str_detect(text, "SPEAKER"),
+             firstJointHouseRow = str_detect(text, "JOINT HOUSE")) 
     pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA
+    pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == FALSE] <- NA
     # Get the row and corresponding page and then filter to only pages from that page
     row_of_first_SPEAKER <-
       pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == TRUE] %>% which() %>% first()
-    first_page_of_interest <-
+    row_of_first_JOINTHOUSE <- 
+      pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == TRUE] %>% which() %>% first()
+    first_page_of_interest_SPEAKER <-
       pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer()
+    first_page_of_interest_JOINTHOUSE <-
+      pdf_document_tibble[row_of_first_JOINTHOUSE, "pageNumbers"] %>% as.integer()
     pdf_document_tibble <- pdf_document_tibble %>%
-      filter(pageNumbers >= first_page_of_interest) %>%
-      select(-firstSpeakerRow)
-    rm(first_page_of_interest, row_of_first_SPEAKER)
+      filter(pageNumbers >= min(first_page_of_interest_SPEAKER, first_page_of_interest_JOINTHOUSE+1, na.rm = TRUE)) %>%
+      select(-firstSpeakerRow, -firstJointHouseRow)
+    rm(first_page_of_interest_SPEAKER, row_of_first_SPEAKER)
     
 
     ## Most of the PDFs are arranged as two columns on each page and so most rows are two different speeches and those columns need to be separated
@@ -216,7 +230,7 @@ get_text_from_PDFs <-
       rename(text = textInPosition)
     
     
-    ## Next task is to split out the topic names and the names of the speakers
+    ## The next task is to split out the topic names and the names of the speakers
     # Remove any extra whitespace i.e. two or more spaces and spaces at either end
     pdf_document_tibble$text <-
       str_squish(pdf_document_tibble$text)
@@ -243,7 +257,10 @@ get_text_from_PDFs <-
         "Mr. [:upper:]{3,}[:space:][:upper:]{3,}.",
         "Dr. [:upper:]{3,}.",
         "Sir [:upper:]{3,}[:space:][:upper:]{3,}.",
+        "Colonel [:upper:]{3,}[:punct:]",
         "The Clerk-",
+        "Mrs DEANNE KELLY",
+        "Opposition members interjecting-",
         "Honourable members interjecting-",
         "Mr Leo McLeay-",
         "' Mr Calwell"
@@ -328,20 +345,25 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <- str_replace_all(pdf_document_tibble$text, "- ", "")
     
     # Fix spelling, again
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, corrections)
+    pdf_document_tibble$text <- str_replace_all(pdf_document_tibble$text, corrections)
+    
+    pdf_document_tibble <- pdf_document_tibble %>% 
+      mutate(text = str_squish(text),
+             text = str_replace_all(text, "(?<=[:upper:][:lower:]{1,7})[:space:](?=[^a:lower:][:space:])", ""))
 
     # Split out speakers
     pdf_document_tibble <- pdf_document_tibble %>%
-      separate(text, c("speaker", "theText"), sep = "—", extra = "merge")
+      separate(text, c("speaker", "theText"), sep = "—|\\):|-", extra = "merge") %>% 
+      mutate(speaker = str_squish(speaker),
+             speaker = str_to_title(speaker))
     
+    write_csv(pdf_document_tibble, "testing.csv") # Use this while testing if you want to see what it's looking like
 
     # Save file
     # write_csv(doc_tibble, "name_of_output_csv_file")
     write_csv(pdf_document_tibble, name_of_output_csv_file)
     
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
-    
   }
 
 
