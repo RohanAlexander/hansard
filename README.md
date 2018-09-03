@@ -11,8 +11,10 @@ The data associated with the Hansard statements (politician name, party, etc) is
 
 After this, you can try some topic modelling, using topic_modelling_LDA.R.
 
-## Next steps (expand this)
-Once you've gotten started you'll probably want the complete period. Unfortunately, the 1981 - 1997 records aren't available in XML (someone at Hansard said it's because the XML doesn't exist for those years). You can get the 1997 onwards XML from a combination of Open Australia and Andrew Turpin at University of Melbourne. So one option is to just have a gap in your analysis. But fortunately, the PDFs are available. So scrape those from the Hansard website. Then parse the PDF and get some text output. You can then run topic modelling on the whole period.
+## Next steps
+Once you've gotten started you'll probably want the complete period. Unfortunately, the 1981 - 1997 records aren't available in XML (someone at Hansard said it's because the XML doesn't exist for those years). You can get the 1997 onwards XML from a combination of Open Australia and Andrew Turpin at University of Melbourne. So one option is to just have a gap in your analysis. But fortunately, the PDFs are available. So scrape those from the Hansard website using get_80s_and_90s_PDFs.R. Then parse the PDFs using parse_each_pdf_and_save_csv_tm.R and get some text output. You can then run topic modelling on the whole period using topic_modelling.R.
+
+The issue is that each data source is wrong in it's own way. Also, neither was really designed for topic analysis. In some sense, it might be better to just start with the universe of Australia Hansard and then do everything. So get all of the Hansard PDFs using get_1901-1980_PDFs.R (use get_URLs_of_hansard_PDFs.R to help you get the csv that you need to walk2 over). That's going to take a long weekend or so and many GB in storage.
 
 
 
