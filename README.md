@@ -16,13 +16,15 @@ Once you've gotten started you'll probably want the complete period. Unfortunate
 
 The issue is that each data source is wrong in it's own way. Also, neither was really designed for topic analysis. In some sense, it might be better to just start with the universe of Australia Hansard and then do everything. So get all of the Hansard PDFs using get_1901-1980_PDFs.R (use get_URLs_of_hansard_PDFs.R to help you get the csv that you need to walk2 over). That's going to take a long weekend or so and many GB in storage.
 
+Then you can parse the PDFs with parse_each_pdf_and_save_csv_pdftools.R. Then create a dataframe with the words in each days Hansard using make_topic_modelling_text_input.R.
+
 
 
 ## Notes
 
+- Check that airline crash in the 40s is being accurately accounted for in the politicians data.
 - Check 1948-09-08 - there seems to be two URLs: /parlInfo/download/hansard80/hansardr80/1948-09-08/toc_pdf/19480908_reps_18_198.pdf;fileType=application/pdf#search=%221940s%22 and /parlInfo/download/hansard80/hansardr80/19480908/toc_pdf/19480908_REPS_18_198.pdf;fileType=application/pdf#search=%221940s%22 and also check 1911-12-04 - again seems to be two URLs in the search results: /parlInfo/download/hansard80/hansardr80/1911-12-04/toc_pdf/19111204_reps_4_62.pdf;fileType=application/pdf#search=%221910s%22
 1911-12-04.pdf and /parlInfo/download/hansard80/hansardr80/19111204/toc_pdf/19111204_REPS_4_62.pdf;fileType=application/pdf#search=%221910s%22.
-
 - (30 August): The stemming is happening at the text to csv conversion. I don't think this makes sense. Change it to happen as part of the topic modelling because will make it easier to construct custom dictionary.
 
 - In the list of parties, the acronym LIB had been used for the Commonwealth Liberal Party of Deakin, Cook etc in 1910s. This was also the acronym used for the Liberal Party of Australia of Menzies etc from the 1940s. Although the parties are related, it's a bit confusing. Has been left as it was, but might be worth changing to avoid confusion?
