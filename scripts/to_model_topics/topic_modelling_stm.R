@@ -13,11 +13,12 @@
 # library(modelr) # Used in the kfolds section
 # install.packages("stm")
 library(stm)
+# citation('stm')
 library(tictoc)
 library(tidytext)
 library(tidyverse)
 # library(tm)
-library(topicmodels)
+# library(topicmodels)
 # update.packages()
 
 # Load Hansard statements
