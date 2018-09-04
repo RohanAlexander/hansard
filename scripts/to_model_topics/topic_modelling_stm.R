@@ -11,6 +11,8 @@
 # Load libraries
 # library(dplyr)
 # library(modelr) # Used in the kfolds section
+# install.packages("stm")
+library(stm)
 library(tictoc)
 library(tidytext)
 library(tidyverse)
@@ -19,7 +21,175 @@ library(topicmodels)
 # update.packages()
 
 # Load Hansard statements
-load("outputs/words.Rda") # Takes a while
+load("outputs/hansard/all_hansard_words_by_date.Rda") # Takes a while
+
+
+#### Get a sample of the days ####
+set.seed(123)
+some_random_rows <- sample(1:nrow(all_hansard_words), 30) # Change this 30 to a larger number on the full run through
+some_days_hansard_words <- all_hansard_words[some_random_rows, ]
+rm(all_hansard_words, some_random_rows)
+
+#What you want to do for the graph is to the days by years then run it
+
+
+## Sweet graph from https://juliasilge.com/blog/sherlock-holmes-stm/
+tidy_hansard <- some_days_hansard_words %>%
+  mutate(line = row_number()) %>%
+  unnest_tokens(word, words) %>%
+  anti_join(stop_words) 
+
+tidy_hansard %>%
+  count(word, sort = TRUE)
+
+hansard_tf_idf <- tidy_hansard %>%
+  count(date, word, sort = TRUE) %>%
+  bind_tf_idf(word, date, n) %>%
+  arrange(-tf_idf) %>%
+  group_by(date) %>%
+  top_n(10) %>%
+  ungroup
+install.packages('drlib')
+
+devtools::install_github("dgrtwo/drlib")
+library(drlib)
+install.packages('ggthemes')
+library(ggthemes)
+library(viridis)
+some_random_dates <- sample(some_days_hansard_words$date, 9)
+
+hansard_tf_idf %>%
+  mutate(word = reorder_within(word, tf_idf, date)) %>% 
+  filter(date %in% some_random_dates) %>%
+  ggplot(aes(word, tf_idf, fill = "date")) +
+  # theme_classic() +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~ date, scales = "free", ncol = 3) +
+  scale_x_reordered() +
+  coord_flip() +
+  theme(strip.text=element_text(size=11)) +
+  labs(x = NULL, y = "tf-idf",
+       title = "Highest tf-idf words in Hansard") +
+  theme_tufte() 
+
+##
+
+
+
+processed <- textProcessor(some_days_hansard_words$words, metadata = some_days_hansard_words)
+
+plotRemoved(processed$documents, lower.thresh = seq(1, 200, by = 100))
+out <- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)
+
+docs <- out$documents
+vocab <- out$vocab
+meta <-out$meta
+
+hansardPrevFit <-
+  stm(
+    documents = out$documents,
+    vocab = out$vocab,
+    K = 30,
+    max.em.its = 75,
+    data = out$meta,
+    init.type = "Spectral"
+  )
+
+
+##Sweet graph of probabilities that each word is generated from each topic.
+td_beta <- tidy(hansardPrevFit)
+
+td_beta %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  mutate(topic = paste0("Topic ", topic),
+         term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(term, beta, fill = as.factor(topic))) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free_y") +
+  coord_flip() +
+  scale_x_reordered() +
+  labs(x = NULL, y = expression(beta),
+       title = "Highest word probabilities for each topic",
+       subtitle = "Different words are associated with different topics")
+
+
+
+## Sweet graph of probability each document is generated from each topic
+td_gamma <- tidy(hansardPrevFit, matrix = "gamma",                    
+                 document_names = some_days_hansard_words$date)
+
+ggplot(td_gamma, aes(gamma, fill = as.factor(topic))) +
+  geom_histogram(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~ topic, ncol = 3) +
+  labs(title = "Distribution of document probabilities for each topic",
+       subtitle = "Each topic is associated with 1-3 stories",
+       y = "Number of stories", x = expression(gamma))
+
+
+
+
+ggplot(data = td_gamma, mapping = aes(x = document, y = gamma, colour = topic, group = topic)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  # geom_line() +
+  theme_classic() +
+  scale_colour_viridis_c()
+
+
+
+
+
+
+hansardSelect <-
+  selectModel(
+    out$documents,
+    out$vocab,
+    K = 20,
+    max.em.its = 75,
+    data = out$meta,
+    runs = 20,
+    seed = 8458159 # Thank you to the authors of STM
+  )
+
+plotModels(hansardSelect, pch=c(1,2,3,4), legend.position="bottomright") # Want a model with points in top right
+
+selectedModel <- hansardSelect$runout[[2]]
+
+storage <-
+  searchK(
+    out$documents,
+    out$vocab,
+    K = c(5, 10, 15, 20, 25, 30),
+    data = meta
+  )
+
+labelTopics(selectedModel, c(3, 7, 20))
+
+thoughts3 <- findThoughts(selectedModel, texts = some_days_hansard_words$words, n = 2, topics = 3)$docs[[1]]
+thoughts20 <- findThoughts(selectedModel, texts = some_days_hansard_words$words, n = 2, topics = 20)$docs[[1]]
+
+# par(mfrow = c(1, 2),mar = c(.5, .5, 1, .5))
+# plotQuote(thoughts3, width = 30, main = "Topic 3")
+# plotQuote(thoughts20, width = 30, main = "Topic 20")
+
+plot.STM(selectedModel,type = "summary")
+
+
+
+
+prep <- estimateEffect(1:3 ~ treatment, selectedModel, some_days_hansard_words)
+plot(prep, "treatment", model=gadarianFit,
+     method="pointestimate")
+
+?plot.estimateEffect
+
+plot(mod.out.corr)
+
+draws <- thetaPosterior(selectedModel)
+
+
 
 # Bind custom list of stopwords to the default list
 custom_stop_words <- bind_rows(
@@ -44,11 +214,6 @@ parsed_text_file <- parsed_text_file %>%
 
 
 #### Topic modelling at word level ####
-# Get a sample of 100,000 statements
-set.seed(123)
-some_random_rows <- sample(1:nrow(words_in_hansard_by_date), 100)
-some_hansard_text <- words_in_hansard_by_date[some_random_rows, ]
-rm(words_in_hansard_by_date, some_random_rows)
 
 # Tokenize the statements to words and remove stopwords
 cleaned_hansard <- some_hansard_text %>% # Start with the 100,000 sample

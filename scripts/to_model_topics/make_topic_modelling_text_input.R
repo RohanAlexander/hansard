@@ -15,8 +15,6 @@
 library(furrr)
 library(lubridate)
 # library(SnowballC)
-# install.packages("stm")
-# library(stm)
 library(tictoc)
 library(tidytext)
 library(tidyverse)
