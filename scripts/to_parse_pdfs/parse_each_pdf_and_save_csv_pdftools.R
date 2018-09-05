@@ -3,7 +3,7 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to CSVs of text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 3 September 2018
+# Last updated: 5 September 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /data folder.
 # To do:
 # - Check if footers need to be replaced
@@ -32,12 +32,11 @@ plan(multiprocess)
 #### Create lists of PDFs to read and file names to save text as ####
 # Get list of Hansard PDF filenames
 # Change the path as required:
-use_this_path_to_get_pdfs  <- "data/for_testing_hansard_pdf"
-# use_this_path_to_get_pdfs  <- "/Volumes/SanDisk/hansard_pdfs"
+# use_this_path_to_get_pdfs  <- "data/for_testing_hansard_pdf"
+use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
 
-use_this_path_to_save_csv_files  <-
-  "outputs/hansard/hansard_csv_files"
-# use_this_path_to_save_csv_files  <- "/Volumes/SanDisk/hansard_csv"
+# use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
+use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
 
 file_names <-
   list.files(
@@ -49,12 +48,27 @@ file_names <-
 file_names <- file_names %>% sample()
 file_names
 
+file_names <- sample(file_names, 500) # Just get 1000 of them
+
+parsed_these_already <- read_csv("parsed_these.csv") %>% pull
+head(parsed_these_already)
+file_names <- file_names[!file_names %in% parsed_these_already]
+
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_pdfs, "") %>%
   str_replace(".pdf", ".csv")
 
 save_names <- paste0(use_this_path_to_save_csv_files, save_names)
 save_names
+
+# which(save_names == "/Volumes/Backup/hansard_csv/1915-04-23.csv")
+# didntwork <- save_names[118]
+# 
+# file_names <- file_names[119:length(file_names)]
+# save_names <- save_names[119:length(save_names)]
+# 
+# 
+# write_lines(file_names, "parsed_these.csv")
 
 
 #### Create the function that will be applied to the files ####
@@ -69,7 +83,7 @@ get_text_from_PDFs <-
       pdf_text(name_of_input_PDF_file)
     
     # Get the date - it's needed later in the single or double columns
-    date_of_doc <- str_replace(name_of_input_PDF_file, "data/for_testing_hansard_pdf/", "") %>% 
+    date_of_doc <- str_replace(name_of_input_PDF_file, "/Volumes/Backup/hansard_pdfs/", "") %>% 
       str_replace(".pdf", "") %>% 
       ymd()
     
@@ -298,7 +312,7 @@ get_text_from_PDFs <-
         "Opposition members interjecting-",
         "Honourable members interjecting-",
         "Mr Leo McLeay-",
-        "Ms CHESTERS "
+        "Ms CHESTERS ",
         "' Mr Calwell"
       )
     findSpeakersBasedOnThis <-
@@ -433,6 +447,9 @@ get_text_from_PDFs <-
 # walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y))
 # toc()
 
+safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
+
 tic("Furrr walk2 progress")
-future_walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y), .progress = TRUE)
+future_walk2(file_names, save_names, ~ safely_get_text_from_PDFs(.x, .y), .progress = TRUE)
 toc()
+

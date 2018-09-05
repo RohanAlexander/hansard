@@ -2,7 +2,7 @@
 # Purpose: This file takes Australian Hansard csv files and it converts them to a tidied tibble of text that can be analysed. The words are lowered and punctuation is removed, but stop words are not removed and they are not stemmed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 4 September 2018
+# Last updated: 5 September 2018
 # Prerequisites: You a folder of csv files e.g. the outputs of parse_each_pdf_and_save_csv_pdftools.R 
 # To do:
 # - Well, everything
@@ -13,6 +13,7 @@
 # library(stringr)
 # library(corpus)
 library(furrr)
+library(hunspell)
 library(lubridate)
 # library(SnowballC)
 library(tictoc)
@@ -45,7 +46,7 @@ tidy_the_hansard_csv_files <-
   function(name_of_input_csv_file) {
     
     # Read in the text column of each CSV
-    # name_of_input_csv_file <- "outputs/hansard/hansard_csv_files/1997-02-05.csv" # for testing
+    # name_of_input_csv_file <- "outputs/hansard/hansard_csv_files/1997-08-25.csv" # for testing
     csv_file_as_parsed_PDF <- read_csv(name_of_input_csv_file, col_types = cols()) %>% 
       select(theText)
     
@@ -67,7 +68,7 @@ tidy_the_hansard_csv_files <-
     words_from_text_file <- csv_file_as_parsed_PDF %>%
       select(theText) %>% 
       unnest_tokens(word, theText)
-    
+
     all_words_on_day <- paste(words_from_text_file$word, collapse = ", ")
     
     # Push the date and the words together as a tibble
@@ -92,4 +93,5 @@ toc()
 #### Save and clean up ####
 save(all_hansard_words, file = "outputs/hansard/all_hansard_words_by_date.Rda")
 
-rm(all_hansard_words, file_names, use_this_path_to_get_csvs, tidy_the_hansard_csv_files())
+rm(all_hansard_words, file_names, use_this_path_to_get_csvs, tidy_the_hansard_csv_files)
+
