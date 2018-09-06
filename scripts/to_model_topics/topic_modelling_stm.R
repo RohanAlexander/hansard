@@ -31,7 +31,7 @@ load("outputs/hansard/all_hansard_words_by_date.Rda") # Takes a while
 
 #### Get a sample of the days ####
 set.seed(123)
-some_random_rows <- sample(1:nrow(all_hansard_words), 2000) # Change the integer to a larger number on the full run through if you want
+some_random_rows <- sample(1:nrow(all_hansard_words), 1000) # Change the integer to a larger number through if you want
 some_days_hansard_words <- all_hansard_words[some_random_rows, ]
 rm(all_hansard_words, some_random_rows)
 # Here - what you want to do for the graph is to aggregate the days by years then run it
@@ -53,14 +53,13 @@ politicians <- read_csv("data/politicians/politicians_by_individuals.csv") %>%
 custom_stop_words <- bind_rows(
   stop_words, # The default list
   data_frame(
-    word = c(politicians, "bhe", "tbe", 'tile', 'tlie', "duncanhughes", "fche", "honorahle", "madam", "brucepage", "archie",
-"showeth",
-"act", "amendment", "amount", "australia", "australian", "bill", "board", "cent", "clause", "commission", "committee", "commonwealth", "countries", "country", "day", "deal", "debate", "department", "desire", "duty", "gentleman", "government", "honorable", "honourable", "house", "increase", "labor", "labour", "leader", "legislation", "matter", "minister", "national", "opposition", "parliament", "party", "people", "policy", "position", "power", "prime", "proposed", "public", "question", "regard", "statement", "support", "system", "time"
+    word = c(politicians,"na", "tax", "ment", "south", "wales", "na", "bhe", "tbe", 'tile', 'tlie', "duncanhughes", "fche", "honorahle", "madam", "brucepage", "archie",
+"showeth", "report", "sir",
+"act", "amendment", "amount", "australia", "australian", "bill", "board", "cent", "clause", "commission", "committee", "commonwealth", "countries", "country", "day", "deal", "debate", "department", "desire", "duty", "gentleman", "government", "honorable", "honourable", "house", "increase", "labor", "labour", "leader", "legislation", "matter", "minister", "national", "opposition", "parliament", "party", "people", "policy", "position", "power", "prime", "proposed", "public", "question", "regard", "statement", "support", "system", "time", "industry", "million"
     ),
     lexicon = rep("custom", length(word))
   )
 )
-
 
 
 
@@ -181,19 +180,49 @@ hansard_tf_idf_year %>%
 
 
 
-# head(some_days_hansard_words)
-some_years_hansard_words <- some_days_hansard_words %>% 
-  mutate(year = year(date)) %>% 
-  group_by(year) %>% 
-  summarise(theWords = toString(words)) %>%
-  ungroup()
+# head(tidy)
+# some_years_hansard_words <- some_days_hansard_words %>% 
+#   mutate(year = year(date)) %>% 
+#   group_by(year) %>% 
+#   summarise(theWords = toString(words)) %>%
+#   ungroup()
 
-# head(some_years_hansard_words)
+head(tidy_hansard)
+
+# tidy_hansard$year %>% unique %>% sort
+
+tidy_hansard <- tidy_hansard %>% 
+  select(year, word)
+
+hansard_dfm <- tidy_hansard %>%
+  count(year, word, sort = TRUE) %>%
+  cast_dfm(year, word, n)
+
+hansardPrevFit <-
+  stm(
+    hansard_dfm,
+    K = 30,
+    init.type = "Spectral"
+  )
 
 
-processed <- textProcessor(some_days_hansard_words$words, metadata = some_days_hansard_words)
 
-processed <- textProcessor(some_years_hansard_words$theWords, metadata = some_years_hansard_words)
+hansardPrevFit20 <-
+  stm(
+    hansard_dfm,
+    K = 15,
+    init.type = "Spectral"
+  )
+
+hansardPrevFit <- hansardPrevFit20
+
+
+
+head(hansard_dfm)
+
+# processed <- textProcessor(some_days_hansard_words$words, metadata = some_days_hansard_words)
+# 
+# processed <- textProcessor(some_years_hansard_words$theWords, metadata = some_years_hansard_words)
 
 plotRemoved(processed$documents, lower.thresh = seq(1, 200, by = 100))
 out <- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)
@@ -235,7 +264,7 @@ td_beta %>%
 
 ## Sweet graph of probability each document is generated from each topic
 td_gamma <- tidy(hansardPrevFit, matrix = "gamma",                    
-                 document_names = some_days_hansard_words$date)
+                 document_names = rownames(hansard_dfm))
 
 ggplot(td_gamma, aes(gamma, fill = as.factor(topic))) +
   geom_histogram(alpha = 0.8, show.legend = FALSE) +
