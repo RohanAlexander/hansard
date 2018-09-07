@@ -21,7 +21,9 @@ Then you can parse the PDFs with parse_each_pdf_and_save_csv_pdftools.R. Then cr
 
 
 ## Notes
-
+- Check a graph of the stop words over time - looking for no change over time
+- Look at network of call outs between politicians. Does it change over time? Does it change at elections? Has it become more partisan (could be done with sentiment analysis of the call out)?
+- Look at whether the politicians have become more national - did WA politicians used to concentrate on WA issues and do that less now?
 - Check that airline crash in the 40s is being accurately accounted for in the politicians data.
 - Check 1948-09-08 - there seems to be two URLs: /parlInfo/download/hansard80/hansardr80/1948-09-08/toc_pdf/19480908_reps_18_198.pdf;fileType=application/pdf#search=%221940s%22 and /parlInfo/download/hansard80/hansardr80/19480908/toc_pdf/19480908_REPS_18_198.pdf;fileType=application/pdf#search=%221940s%22 and also check 1911-12-04 - again seems to be two URLs in the search results: /parlInfo/download/hansard80/hansardr80/1911-12-04/toc_pdf/19111204_reps_4_62.pdf;fileType=application/pdf#search=%221910s%22
 1911-12-04.pdf and /parlInfo/download/hansard80/hansardr80/19111204/toc_pdf/19111204_REPS_4_62.pdf;fileType=application/pdf#search=%221910s%22.
