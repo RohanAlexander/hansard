@@ -1,0 +1,1 @@
+The folders of XML and PDF files are quite big and it clogs up a lot to keep them here. They're on an external drive and so just some random ones have been grabbed out here for testing purposes.

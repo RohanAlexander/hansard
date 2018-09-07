@@ -2,7 +2,7 @@
 # Purpose: Associate a group, based on similar topics, for every statement in Hansard.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 5 September 2018
+# Last updated: 6 September 2018
 # Prerequisites: 
 # Issues:
 
@@ -11,37 +11,27 @@
 # Load libraries
 # devtools::install_github("dgrtwo/drlib")
 library(drlib)
-# library(dplyr)
 library(lubridate)
 # library(modelr) # Used in the kfolds section
-# install.packages("stm")
 library(stm)
-# citation('stm')
 library(tictoc)
 library(tidytext)
 library(tidyverse)
-# library(tm)
-# library(topicmodels)
 library(viridis)
 # update.packages()
 
-# Load Hansard statements
-load("outputs/hansard/all_hansard_words_by_date.Rda") # Takes a while
+# Load Hansard words by day
+load("outputs/for_topic_models/all_hansard_words_by_date.Rda") # Takes a while
 
 
-#### Get a sample of the days ####
+#### Take a sample from the days ####
 set.seed(123)
 some_random_rows <- sample(1:nrow(all_hansard_words), 1000) # Change the integer to a larger number through if you want
 some_days_hansard_words <- all_hansard_words[some_random_rows, ]
 rm(all_hansard_words, some_random_rows)
-# Here - what you want to do for the graph is to aggregate the days by years then run it
-
-# housethat -> house that
-# tbe -> the
-# there seems to be lots of 'tile' and 'tlie' - are these percentile errors?
 
 
-#### Temp fix for dodgy words
+#### Temp fix for dodgy words ####
 # Temp fix for getting rid of politicians names
 politicians <- read_csv("data/politicians/politicians_by_individuals.csv") %>% 
   select(surname) %>% 
@@ -60,7 +50,6 @@ custom_stop_words <- bind_rows(
     lexicon = rep("custom", length(word))
   )
 )
-
 
 
 ## Sweet graph from https://juliasilge.com/blog/sherlock-holmes-stm/
@@ -101,7 +90,7 @@ hansard_tf_idf <- tidy_hansard %>%
   ungroup
 
 
-graph_these <- c("1902-06-17", "1903-07-09", "1904-06-02", "1908-04-02", "1926-02-05", "1928-05-15", "1930-06-20", "1950-09-27", "1965-03-25", "1970-10-28", "1996-05-09", "2002-06-25", "2009-06-24")
+graph_these <- c("1902-06-17", "1904-06-02", "1908-04-02", "1926-02-05", "1928-05-15", "1930-06-20", "1950-09-27", "1965-03-25", "1970-10-28", "1996-05-09", "2002-06-25", "2009-06-24")
 graph_these <- graph_these %>% ymd()
 class(graph_these[1])
 
@@ -110,18 +99,25 @@ class(graph_these[1])
 # some_random_dates
 
 hansard_tf_idf %>%
-  mutate(word = reorder_within(word, tf_idf, date)) %>% 
+  mutate(word = reorder_within(word, tf_idf, date)) %>%
   filter(date %in% graph_these) %>%
   ggplot(aes(word, tf_idf, fill = "date")) +
   theme_minimal() +
-  geom_col(alpha = 0.8, show.legend = FALSE, aes(fill = as.factor(date))) +
-  facet_wrap(~ date, scales = "free", ncol = 3) +
+  geom_col(alpha = 0.8,
+           show.legend = FALSE,
+           aes(fill = as.factor(date))) +
+  facet_wrap( ~ date, scales = "free", ncol = 3) +
   scale_x_reordered() +
   coord_flip() +
-  theme(strip.text=element_text(size=20), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        text = element_text(size=20)) +
+  theme(
+    strip.text = element_text(size = 12),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    text = element_text(size = 12)
+  ) +
   # labs(x = NULL, y = "tf-idf", title = "Highest tf-idf words in Hansard") +
   labs(x = NULL, y = "tf-idf") +
   scale_fill_viridis_d()

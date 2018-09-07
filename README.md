@@ -1,7 +1,6 @@
 # Analysis of Australian Hansard
 
 This contains the scripts and related material that I am putting together for a text analysis of Australian Hansard. The full Hansard dataset doesn't seem to be able to be included in this repo, but please get in touch if you are interested.
-Test if I survived the second great git debacle of 2018.
 
 ## Getting started
 To start, download the XML files of Hansard from 1901 to 1980 from Tim Sherratt at University of Canberra. Unpack them, and then run the get_data_from_xml_to_dataframe.R file to convert to a dataframe. After this you need to try to fix as many of the typos, mistakes, and transcription errors in Hansard as possible, by running clean_hansard_spelling.R. 

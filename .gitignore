@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 .DS_Store
-outputs/hansard/
+outputs/big_files_do_not_push/
+outputs/hansard/each_hansard_xml_based/

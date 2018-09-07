@@ -27,6 +27,26 @@ migration_data <- migration_data %>%
   select(document, topic, gamma, type)
 
 
+
+misc_data$event[1] <- 
+  "WWI
+starts"
+
+misc_data$event[2] <- 
+  "WWII
+starts"
+
+misc_data$event[3] <- 
+  "Vietnam
+War"
+
+misc_data$event[4] <- 
+  "White
+Aust.
+ends"
+
+
+
 # each_days_topics <- each_days_topics %>% 
 #   arrange(document, topic) 
 
@@ -57,14 +77,14 @@ ggplot() +
   geom_smooth(data = td_gamma, mapping = aes(x = document, y = gamma, group = factor(topic), label = factor(topic)), colour = "grey90", se = FALSE) +
   # geom_vline(data = misc_elections_data, aes(xintercept = electionDate), linetype = "dashed") +
   geom_vline(data = misc_data, aes(xintercept = year), linetype = "dashed", color = "grey50") +
-  geom_text_repel(data = misc_data, aes(x = year, y = 0.40, label = event), nudge_x = 5, size = 5) +
-  geom_smooth(data = td_gamma[td_gamma$topic %in% c(6, 14, 16, 17, 20),], mapping = aes(x = document, y = gamma, colour = factor(topic), group = factor(topic), label = factor(topic)), se = FALSE, size = 2) +
+  geom_text_repel(data = misc_data, aes(x = year, y = 0.40, label = event), nudge_x = 5, size = 10) +
+  geom_smooth(data = td_gamma[td_gamma$topic %in% c(6, 14, 16, 17, 20),], mapping = aes(x = document, y = gamma, colour = factor(topic), group = factor(topic), label = factor(topic)), se = FALSE, size = 6) +
   # geom_text() +
   # geom_line() +
   theme_classic() +
   guides(color = guide_legend(title = "Topic")) +
-  theme(    text = element_text(size=20),
-    axis.title.y = element_blank(),
+  theme(    text = element_text(size=40),
+            axis.title.y = element_blank(),
             axis.title.x = element_blank()
   ) +
   scale_colour_viridis_d() +
