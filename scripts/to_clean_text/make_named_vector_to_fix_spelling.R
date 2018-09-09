@@ -12,7 +12,7 @@ library(tidyverse)
 # update.packages()
 
 # Load data
-corrections_table <- read_csv2("data/misc/misspelt_words_with_corrections.csv")
+corrections_table <- read_csv2("inputs/misc/misspelt_words_with_corrections.csv")
 head(corrections_table)
 # str_replace("you're insane 1 rise to say", corrections_table$original[1], corrections_table$corrected[1])
 
@@ -37,7 +37,7 @@ str_replace_all("1 rise in 1he iinportant house", corrections)
 
 
 #### Save the file ####
-save(corrections, file = "outputs/corrections.RData")
+save(corrections, file = "outputs/misc/corrections.RData")
 
 
 

@@ -32,7 +32,6 @@ plan(multiprocess)
 #### Create lists of PDFs to read and file names to save text as ####
 # Get list of Hansard PDF filenames
 # Change the path as required:
-# use_this_path_to_get_pdfs  <- "data/for_testing_hansard_pdf"
 use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
 
 # use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
@@ -100,6 +99,8 @@ get_text_from_PDFs <-
     
     # Fix some minor punctuation issues to make the analysis easier
     # str_count(pdf_document_tibble$text, "\\b- \\b") %>% sum() # Use this if you suspect an issue and it'll give you a count of how many rows are affected
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "’", "'") 
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "•", "-") # Some hyphens are being read in as big dots
     pdf_document_tibble$text <-
