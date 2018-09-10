@@ -3,10 +3,10 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to CSVs of text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 5 September 2018
-# Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /data folder.
+# Last updated: 9 September 2018
+# Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /inputs/for_testing_hansard_pdf folder.
 # To do:
-# - Check if footers need to be replaced
+# - Check which footers need to be replaced
 # - Better identify which page talking starts at
 # - Deal with two columns better - e.g. line 162
 # - Better identify speakers and look within cells
@@ -23,7 +23,7 @@ library(tm)
 # update.packages()
 
 # Get the spell checker
-load("outputs/corrections.RData")
+load("outputs/misc/corrections.RData")
 
 # Set up furrr plan
 plan(multiprocess)
@@ -32,10 +32,11 @@ plan(multiprocess)
 #### Create lists of PDFs to read and file names to save text as ####
 # Get list of Hansard PDF filenames
 # Change the path as required:
-use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
+# use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
+use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
 
-# use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
-use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
+use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
+# use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
 
 file_names <-
   list.files(
@@ -47,11 +48,13 @@ file_names <-
 file_names <- file_names %>% sample()
 file_names
 
-file_names <- sample(file_names, 500) # Just get 1000 of them
+# file_names <- sample(file_names, 500)  # Just get 500 of them
+# get_these <- paste0("/Volumes/Backup/hansard_pdfs/", relevant_dates$allDates, ".pdf")
+# file_names <- file_names[file_names %in% get_these] 
 
-parsed_these_already <- read_csv("parsed_these.csv") %>% pull
-head(parsed_these_already)
-file_names <- file_names[!file_names %in% parsed_these_already]
+# parsed_these_already <- read_csv("parsed_these.csv") %>% pull
+# head(parsed_these_already)
+# file_names <- file_names[!file_names %in% parsed_these_already]
 
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_pdfs, "") %>%
@@ -62,11 +65,10 @@ save_names
 
 # which(save_names == "/Volumes/Backup/hansard_csv/1915-04-23.csv")
 # didntwork <- save_names[118]
-# 
+
 # file_names <- file_names[119:length(file_names)]
 # save_names <- save_names[119:length(save_names)]
-# 
-# 
+
 # write_lines(file_names, "parsed_these.csv")
 
 
@@ -75,14 +77,15 @@ get_text_from_PDFs <-
   function(name_of_input_PDF_file,
            name_of_output_csv_file) {
     
-    ## Read in the document, based on the filename list, and general tidying
-    # name_of_input_PDF_file <- "data/for_testing_hansard_pdf/2017-02-27.pdf" # for testing
+    # Read in the document, based on the filename list, and general tidying
+    # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1998-06-02.pdf" # for testing
+    # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1907-08-14.pdf" # for testing
     
     pdf_document <-
       pdf_text(name_of_input_PDF_file)
     
     # Get the date - it's needed later in the single or double columns
-    date_of_doc <- str_replace(name_of_input_PDF_file, "/Volumes/Backup/hansard_pdfs/", "") %>% 
+    date_of_doc <- basename(name_of_input_PDF_file) %>% # basename gets rid of the path to the file
       str_replace(".pdf", "") %>% 
       ymd()
     
@@ -90,7 +93,7 @@ get_text_from_PDFs <-
     pdf_document_tibble <- tibble(text = pdf_document)
     rm(pdf_document)
 
-    # Add the moment each row is a page of the PDF so adding a column of the row numbers allows you to keep track of the page numbers later on
+    # Now each row is a page of the PDF so adding a column of the row numbers allows you to keep track of the page numbers later on
     pdf_document_tibble$pageNumbers <- 1:nrow(pdf_document_tibble)
     
     # Separate each line (of each page) into it's own row
@@ -98,7 +101,8 @@ get_text_from_PDFs <-
       separate_rows(pdf_document_tibble, text, sep = "\\n")
     
     # Fix some minor punctuation issues to make the analysis easier
-    # str_count(pdf_document_tibble$text, "\\b- \\b") %>% sum() # Use this if you suspect an issue and it'll give you a count of how many rows are affected
+    # str_count(pdf_document_tibble$text, "(?<=[:lower:])I(?=[:space:])") %>% sum() # Use this if you suspect an issue and it'll give you a count of how many rows are affected
+    # which(str_detect(pdf_document_tibble$text, "(?<=[:lower:])I(?=[:space:])")==TRUE) # Use this to tell you what line it's on
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "’", "'") 
     pdf_document_tibble$text <-
@@ -116,7 +120,6 @@ get_text_from_PDFs <-
       str_replace_all(pdf_document_tibble$text, "\\.[:space:]*-", " -")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "~", "-")
-    
 
     # Fix some other issues that just make everything a bit easier
     pdf_document_tibble$text <-
@@ -145,10 +148,7 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "(?<=\\S)Mr", " Mr")
     
-    
-    
-    
-
+  
     ## Identify page headers and footers and remove them
     pdf_document_tibble <- pdf_document_tibble %>%
       group_by(pageNumbers) %>%
@@ -165,27 +165,35 @@ get_text_from_PDFs <-
     
 
     ## Identify front matter and remove it
-    # Primarily identify the start of talking based on the first occurence of 'Mr SPEAKER'. It seems pretty common, but there are some misses (e.g. 1991-01-22). As a backup look for first occurence of "JOINT HOUSE" and then pick the next page.
+    # Primarily identify the start of talking based on the first occurence of 'Mr SPEAKER'. It seems pretty common, but there are some misses (e.g. 1991-01-22). As a backup look for first occurence of "JOINT HOUSE" and then pick the next page. And look for 'took the chair' and pick that page.
     pdf_document_tibble <- pdf_document_tibble %>%
       mutate(firstSpeakerRow = str_detect(text, "SPEAKER"),
-             firstJointHouseRow = str_detect(text, "JOINT HOUSE")) 
+             firstJointHouseRow = str_detect(text, "JOINT HOUSE"),
+             firstTookTheChairRow = str_detect(text, "took the chair"))   # UPDATE THIS SO IT IGNORES CASE
     pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA
     pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == FALSE] <- NA
+    pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == FALSE] <- NA
+    
     # Get the row and corresponding page and then filter to only pages from that page
     row_of_first_SPEAKER <-
       pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == TRUE] %>% which() %>% first()
     row_of_first_JOINTHOUSE <- 
       pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == TRUE] %>% which() %>% first()
+    row_of_first_TookTheChair <- 
+      pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == TRUE] %>% which() %>% first()
+    
     first_page_of_interest_SPEAKER <-
       pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer()
     first_page_of_interest_JOINTHOUSE <-
       pdf_document_tibble[row_of_first_JOINTHOUSE, "pageNumbers"] %>% as.integer()
+    first_page_of_interest_TookTheChair <-
+      pdf_document_tibble[row_of_first_TookTheChair, "pageNumbers"] %>% as.integer()
     pdf_document_tibble <- pdf_document_tibble %>%
-      filter(pageNumbers >= min(first_page_of_interest_SPEAKER, first_page_of_interest_JOINTHOUSE+1, na.rm = TRUE)) %>%
-      select(-firstSpeakerRow, -firstJointHouseRow)
-    rm(first_page_of_interest_SPEAKER, row_of_first_SPEAKER)
+      filter(pageNumbers >= min(first_page_of_interest_SPEAKER, first_page_of_interest_JOINTHOUSE+1, first_page_of_interest_TookTheChair, na.rm = TRUE)) %>%
+      select(-firstSpeakerRow, -firstJointHouseRow, -firstTookTheChairRow)
+    rm(first_page_of_interest_SPEAKER, row_of_first_SPEAKER, row_of_first_TookTheChair)
     
-
+    # write_csv(pdf_document_tibble, "text.csv")
     ## The PDFs until (not including) 2013-11-12 are arranged as two columns on each page and so most rows are two different speeches and those columns need to be separated
     if (date_of_doc < 2013-11-12) {
     # Split it based on the number of characters - can probably finetune this.
@@ -208,22 +216,24 @@ get_text_from_PDFs <-
       )) # Just remove whitespace at the left of the string. Couldn't do it until here because the existence of whitespace on the left of the string was how the right column only lines were identified.
     
     # Right, let's try this - don't @ me - it should work well enough and my supervisor is breathing down my neck
-    # Come back here - there are issues with the parsing here that are affecting the specifics of the statements. It's fit for purpose, but not ideal. Should probably pre-process the text e.g. if letter then two spaces then letter in the first 40 spots then probably change to letter one space letter. Things like that.
-    
+    # Come back here - there are issues with the parsing here that are affecting the specifics of the statements. It's fit for purpose, but not ideal. 
     pdf_document_tibble <- pdf_document_tibble %>% 
       mutate(ordering = 1:nrow(pdf_document_tibble)) # This is important so that the order can be reconstructed later
     
     # Come back and make this to work a little better - throwing away a lot - extra = "merge" - hides them so get rid of that then come back here.
+    ## PLAYGROUND START
     pdf_document_tibble_both <- pdf_document_tibble %>%
       filter(line_type == "both") %>%
+      mutate(text = str_replace(text, "(?<=(.){38,50})[:space:]{2,}", "MONICAHOWLETT"),
+             text = if_else(str_detect(text, "MONICAHOWLETT"), text, str_replace(text, "(?<=(.){42,50})[:space:]", "MONICAHOWLETT"))) %>% 
       separate(
         text,
         c("first_column", "second_column"),
-        sep = "[:space:]{2,}",
+        # sep = "[:space:]{2,}",
+        sep = "MONICAHOWLETT", # Trying this
         remove = FALSE,
         extra = "merge"
       )
-    # write_csv(pdf_document_tibble_both, "testing.csv") # Use this while testing if you want to see what it's looking like
     
     pdf_document_tibble_secondColumnOnly <- pdf_document_tibble %>% 
       filter(line_type == "secondColumnOnly") %>% 
@@ -274,165 +284,195 @@ get_text_from_PDFs <-
       filter(emptyCell == 0) %>%
       select(-emptyCell)
     
-    # # Fix spelling, again
-    # pdf_document_tibble$text <-
-    #   str_replace_all(pdf_document_tibble$text, corrections)
+    #START # Just use this to get everything into one line
+    pdf_document_tibble <- pdf_document_tibble %>%
+      mutate(text = str_replace_all(text, "-$", "MONICA"))
     
-    # Identify speakers - THIS CAN BE IMPROVED e.g. does it look within a string?
-    # This is the way we identify them - amend as appropriate:
+    pdf_document_tibble_colapse <- pdf_document_tibble %>%
+      select(-pageNumbers) %>% 
+      # group_by(speakerGroups) %>%
+      summarise(text = paste(text, collapse = " ")) %>% 
+      mutate(text = str_replace_all(text, "MONICA ", "")) %>% 
+      mutate(text = str_replace_all(text, "[:space:]-(?=[:alpha:])", " - "))
+      
+
+    
+    # write_csv(pdf_document_tibble_colapse, "lookat.csv")
+    #END #
+    
+    # pdf_document_tibble$possibleSpeaker <-
+    #   ifelse(pdf_document_tibble$possibleSpeaker == TRUE, 1, 0)
+    # # Some of the speakers were hard to distinguish - this just adds a maximum that we're going to get
+    # pdf_document_tibble <- pdf_document_tibble %>% 
+    #   mutate(text = if_else(possibleSpeaker == 1, paste(text, "MONICA"), text))
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   mutate(speakerGroups = cumsum(possibleSpeaker))
+    # # Thanks to Mark Needham for this: https://markhneedham.com/blog/2015/06/27/r-dplyr-squashing-multiple-rows-per-group-into-one/
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   group_by(speakerGroups) %>%
+    #   summarise(text = paste(text, collapse = " "),
+    #             pageNumbers = min(pageNumbers),
+    #             title = first(title))
+    
+
+    # #### Undoing this bit for now COME BACK AND IMPROVE ####
+    # 
+    # # Identify speakers - THIS CAN BE IMPROVED e.g. does it look within a string?
+    # # This is the way we identify them - amend as appropriate:
+    # # findSpeakersBasedOnThis <-
+    # #   c("Dr\\.*[:alpha:]{3,}\\.*"
+    # #     "Mr [:upper:] ([:alpha::punct:])-"
+    # #   )
+    # 
+    # # str_detect("Mr KEATING(Blaxland-Prime Minister)-", "Mr [:upper:]+[:punct:][:alpha::punct:][:punct:]-")
+    # 
     # findSpeakersBasedOnThis <-
-    #   c("Dr\\.*[:alpha:]{3,}\\.*"
-    #     "Mr [:upper:] ([:alpha::punct:])-"
+    #   c(
+    #     "Dr [:upper:]{3,}-",
+    #     "Dr [:alpha:]{3,}-",
+    #     "Ms [:upper:]{3,}-",
+    #     "Mr [:alpha:]{3,}[:space:]*-",
+    #     "Mr [:alpha:]{3,}.-",
+    #     "Mr [:upper:]{3,}",
+    #     "Mr [:upper:]\\. [:upper:]{3,}",
+    #     "Mr. [:upper:]{3,} .",
+    #     "Mr. [:upper:]{3,}.",
+    #     "Mr.[:upper:]{3,}.",
+    #     "Mr. [:upper:]{3,}[:space:][:upper:]{3,}.",
+    #     "Dr. [:upper:]{3,}.",
+    #     "Sir [:upper:]{3,}[:space:][:upper:]{3,}.",
+    #     "Colonel [:upper:]{3,}[:punct:]",
+    #     "The Clerk-",
+    #     "The CHAIRMAN",
+    #     "The DEPUTY SPEAKER",
+    #     "The SPEAKER",
+    #     "An Honorable MEMBER",
+    #     "Mrs DEANNE KELLY",
+    #     "Opposition members interjecting-",
+    #     "Honourable members interjecting-",
+    #     "Mr Leo McLeay-",
+    #     "Ms CHESTERS ",
+    #     "' Mr Calwell"
     #   )
-    
-    # UP TO HERE
-    # str_detect("Mr KEATING(Blaxland-Prime Minister)-", "Mr [:upper:]+[:punct:][:alpha::punct:][:punct:]-")
-    
-    findSpeakersBasedOnThis <-
-      c(
-        "Dr [:upper:]{3,}-",
-        "Dr [:alpha:]{3,}-",
-        "Ms [:upper:]{3,}-",
-        "Mr [:alpha:]{3,}[:space:]*-",
-        "Mr [:alpha:]{3,}.-",
-        "Mr [:upper:]{3,}",
-        "Mr [:upper:]\\. [:upper:]{3,}",
-        "Mr. [:upper:]{3,} .",
-        "Mr. [:upper:]{3,}.",
-        "Mr.[:upper:]{3,}.",
-        "Mr. [:upper:]{3,}[:space:][:upper:]{3,}.",
-        "Dr. [:upper:]{3,}.",
-        "Sir [:upper:]{3,}[:space:][:upper:]{3,}.",
-        "Colonel [:upper:]{3,}[:punct:]",
-        "The Clerk-",
-        "The CHAIRMAN",
-        "The DEPUTY SPEAKER",
-        "The SPEAKER",
-        "An Honorable MEMBER",
-        "Mrs DEANNE KELLY",
-        "Opposition members interjecting-",
-        "Honourable members interjecting-",
-        "Mr Leo McLeay-",
-        "Ms CHESTERS ",
-        "' Mr Calwell"
-      )
-    findSpeakersBasedOnThis <-
-      paste(findSpeakersBasedOnThis, collapse = "|")
-
-    # Identify names of debates
-    findTitlesBasedOnThis <-
-      c("^[:upper:]{5,}")
-    findTitlesBasedOnThis <-
-      paste(findTitlesBasedOnThis, collapse = "|")
-    
-    # Add exceptions here
-    capitalisedButNotTitles <- c("RAAF VIP jet", "QUEEN VICTORIA BUILDING NSW 1230", "HEPP", "RDAF", "BARBECURE", "EFTPOS", "COSBOA", "NDIS", "AFP", "ABS", "CSIRO", "ALRC", "ASX", "OECD", "GST", "GDP", "ASB", "ABC", "MPI", "ALP")
-    capitalisedButNotTitles <-
-      paste(capitalisedButNotTitles, collapse = "|")
-    
-    pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(
-        possibleSpeaker = str_detect(text, findSpeakersBasedOnThis),
-        possibleTitle = str_detect(text, findTitlesBasedOnThis),
-        possibleTitle = if_else(str_detect(text, capitalisedButNotTitles), FALSE, possibleTitle),
-        possibleTitle = if_else(possibleSpeaker == TRUE & possibleTitle == TRUE, FALSE, possibleTitle),
-        possibleTitle = ifelse(possibleTitle == TRUE, 'possibleTitle', 'probablyNotATitle')
-      )
-
-    # Want the titles to be in their own column
-    pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(counter = 1:n()) %>%
-      spread(possibleTitle, text)
-    
-    # Some of the titles are spread over multiple rows. We need to be able to push those into just one row. It's not pretty, but it works.
-    pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(
-        lagPossibleTitle = lag(possibleTitle),
-        titleNumber = if_else(!is.na(possibleTitle) & is.na(lagPossibleTitle), 1, 0)) %>%
-      mutate(
-        titleNumberCumulative = cumsum(titleNumber),
-        titleNumberCumulative = ifelse(is.na(possibleTitle), NA, titleNumberCumulative)) %>%
-      select(-lagPossibleTitle)
-    
-    # This is the titles properly fomatted
-    combined_titles <- pdf_document_tibble %>%
-      filter(!is.na(titleNumberCumulative)) %>%
-      group_by(titleNumberCumulative) %>%
-      summarise(possibleTitle = paste(possibleTitle, collapse = " "))
-    
-    # Get rid of the rows that are just the debris of the titles that we don't want
-    pdf_document_tibble <- pdf_document_tibble %>%
-      filter(is.na(titleNumberCumulative) | titleNumber != 0) %>%
-      select(-possibleTitle)
-    
-    # Join the titles back into the main tibble
-    pdf_document_tibble <- pdf_document_tibble %>%
-      left_join(combined_titles, by = "titleNumberCumulative")
-    rm(combined_titles)
-    
-    pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(possibleTitle = lag(possibleTitle)) %>%
-      select(-counter, -titleNumber, -titleNumberCumulative) %>% 
-      rename(text = probablyNotATitle, title = possibleTitle)
-    
-    pdf_document_tibble$title[1] <- "SETUP"
-    
-    pdf_document_tibble <- pdf_document_tibble %>% 
-      filter(!is.na(text)) %>% 
-      mutate(title = str_replace_all(title, '[:punct:]', " "),
-             title = str_squish(title),
-             title = str_to_title(title)) %>% 
-      fill(title) 
-    
-    
-    
-    ## Deal with the speakers
-    pdf_document_tibble$possibleSpeaker <-
-      ifelse(pdf_document_tibble$possibleSpeaker == TRUE, 1, 0)
-    # Some of the speakers were hard to distinguish - this just adds a maximum that we're going to get
-    pdf_document_tibble <- pdf_document_tibble %>% 
-      mutate(text = if_else(possibleSpeaker == 1, paste(text, "MONICA"), text))
-    pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(speakerGroups = cumsum(possibleSpeaker))
-    # Thanks to Mark Needham for this: https://markhneedham.com/blog/2015/06/27/r-dplyr-squashing-multiple-rows-per-group-into-one/
-    pdf_document_tibble <- pdf_document_tibble %>%
-      group_by(speakerGroups) %>%
-      summarise(text = paste(text, collapse = " "),
-                pageNumbers = min(pageNumbers),
-                title = first(title))
-    
-    
-    
-    
-
-    pdf_document_tibble <- pdf_document_tibble %>%
-      separate(text, c("speaker", "theText"), sep = "-|\\):|MONICA|(?<=[:upper:]{2,10})[:]", extra = "merge") %>%
-      mutate(speaker = str_squish(speaker),
-             speaker = str_to_title(speaker))
-    
-    pdf_document_tibble <- pdf_document_tibble %>% 
-      mutate(theText = str_replace_all(theText, "- ", ""), #Deal with hyphens that were across lines
-             theText = str_squish(theText),
-             theText = str_replace_all(theText, "(?<=[:upper:][:lower:]{1,7})[:space:](?=[^a:lower:][:space:])", ""),
-             speaker = str_squish(speaker),
-             title = str_squish(title))
-    
-    # Remove the just-in-case speaker distinguisher
-    pdf_document_tibble$theText <- str_replace_all(pdf_document_tibble$theText, "[:space:]?MONICA[:space:]?", "")
-    # Undo the MCM change
-    pdf_document_tibble$theText <- str_replace_all(pdf_document_tibble$theText, "MC(?=[:upper:]+)", "Mc")
-    # Sometimes in the more recent Hansard the title is being included
-    # pdf_document_tibble$theTexttest <- str_replace_all(pdf_document_tibble$theText, "^([:graph:]+[:space:]){3,}\\(..:..\\):", "")
-    
-    
+    # findSpeakersBasedOnThis <-
+    #   paste(findSpeakersBasedOnThis, collapse = "|")
+    # 
+    # # Identify names of debates
+    # findTitlesBasedOnThis <-
+    #   c("^[:upper:]{5,}")
+    # findTitlesBasedOnThis <-
+    #   paste(findTitlesBasedOnThis, collapse = "|")
+    # 
+    # # Add exceptions here
+    # capitalisedButNotTitles <- c("RAAF VIP jet", "QUEEN VICTORIA BUILDING NSW 1230", "HEPP", "RDAF", "BARBECURE", "EFTPOS", "COSBOA", "NDIS", "AFP", "ABS", "CSIRO", "ALRC", "ASX", "OECD", "GST", "GDP", "ASB", "ABC", "MPI", "ALP")
+    # capitalisedButNotTitles <-
+    #   paste(capitalisedButNotTitles, collapse = "|")
+    # 
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   mutate(
+    #     possibleSpeaker = str_detect(text, findSpeakersBasedOnThis),
+    #     possibleTitle = str_detect(text, findTitlesBasedOnThis),
+    #     possibleTitle = if_else(str_detect(text, capitalisedButNotTitles), FALSE, possibleTitle),
+    #     possibleTitle = if_else(possibleSpeaker == TRUE & possibleTitle == TRUE, FALSE, possibleTitle),
+    #     possibleTitle = ifelse(possibleTitle == TRUE, 'possibleTitle', 'probablyNotATitle')
+    #   )
+    # 
+    # # Want the titles to be in their own column
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   mutate(counter = 1:n()) %>%
+    #   spread(possibleTitle, text)
+    # 
+    # # Some of the titles are spread over multiple rows. We need to be able to push those into just one row. It's not pretty, but it works.
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   mutate(
+    #     lagPossibleTitle = lag(possibleTitle),
+    #     titleNumber = if_else(!is.na(possibleTitle) & is.na(lagPossibleTitle), 1, 0)) %>%
+    #   mutate(
+    #     titleNumberCumulative = cumsum(titleNumber),
+    #     titleNumberCumulative = ifelse(is.na(possibleTitle), NA, titleNumberCumulative)) %>%
+    #   select(-lagPossibleTitle)
+    # 
+    # # This is the titles properly fomatted
+    # combined_titles <- pdf_document_tibble %>%
+    #   filter(!is.na(titleNumberCumulative)) %>%
+    #   group_by(titleNumberCumulative) %>%
+    #   summarise(possibleTitle = paste(possibleTitle, collapse = " "))
+    # 
+    # # Get rid of the rows that are just the debris of the titles that we don't want
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   filter(is.na(titleNumberCumulative) | titleNumber != 0) %>%
+    #   select(-possibleTitle)
+    # 
+    # # Join the titles back into the main tibble
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   left_join(combined_titles, by = "titleNumberCumulative")
+    # rm(combined_titles)
+    # 
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   mutate(possibleTitle = lag(possibleTitle)) %>%
+    #   select(-counter, -titleNumber, -titleNumberCumulative) %>% 
+    #   rename(text = probablyNotATitle, title = possibleTitle)
+    # 
+    # pdf_document_tibble$title[1] <- "SETUP"
+    # 
+    # pdf_document_tibble <- pdf_document_tibble %>% 
+    #   filter(!is.na(text)) %>% 
+    #   mutate(title = str_replace_all(title, '[:punct:]', " "),
+    #          title = str_squish(title),
+    #          title = str_to_title(title)) %>% 
+    #   fill(title) 
+    # 
+    # 
+    # 
+    # ## Deal with the speakers
+    # pdf_document_tibble$possibleSpeaker <-
+    #   ifelse(pdf_document_tibble$possibleSpeaker == TRUE, 1, 0)
+    # # Some of the speakers were hard to distinguish - this just adds a maximum that we're going to get
+    # pdf_document_tibble <- pdf_document_tibble %>% 
+    #   mutate(text = if_else(possibleSpeaker == 1, paste(text, "MONICA"), text))
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   mutate(speakerGroups = cumsum(possibleSpeaker))
+    # # Thanks to Mark Needham for this: https://markhneedham.com/blog/2015/06/27/r-dplyr-squashing-multiple-rows-per-group-into-one/
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   group_by(speakerGroups) %>%
+    #   summarise(text = paste(text, collapse = " "),
+    #             pageNumbers = min(pageNumbers),
+    #             title = first(title))
+    # 
+    # 
+    # 
+    # 
+    # 
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   separate(text, c("speaker", "theText"), sep = "-|\\):|MONICA|(?<=[:upper:]{2,10})[:]", extra = "merge") %>%
+    #   mutate(speaker = str_squish(speaker),
+    #          speaker = str_to_title(speaker))
+    # 
+    # pdf_document_tibble <- pdf_document_tibble %>% 
+    #   mutate(theText = str_replace_all(theText, "- ", ""), #Deal with hyphens that were across lines
+    #          theText = str_squish(theText),
+    #          theText = str_replace_all(theText, "(?<=[:upper:][:lower:]{1,7})[:space:](?=[^a:lower:][:space:])", ""),
+    #          speaker = str_squish(speaker),
+    #          title = str_squish(title))
+    # 
+    # # Remove the just-in-case speaker distinguisher
+    # pdf_document_tibble$theText <- str_replace_all(pdf_document_tibble$theText, "[:space:]?MONICA[:space:]?", "")
+    # # Undo the MCM change
+    # pdf_document_tibble$theText <- str_replace_all(pdf_document_tibble$theText, "MC(?=[:upper:]+)", "Mc")
+    # # Sometimes in the more recent Hansard the title is being included
+    # # pdf_document_tibble$theTexttest <- str_replace_all(pdf_document_tibble$theText, "^([:graph:]+[:space:]){3,}\\(..:..\\):", "")
+    # 
+    #### 
 
 
     # Fix spelling
-    pdf_document_tibble$theText <- str_replace_all(pdf_document_tibble$theText, corrections)
-    pdf_document_tibble$speaker <- str_replace_all(pdf_document_tibble$speaker, corrections)
-    pdf_document_tibble$title <- str_replace_all(pdf_document_tibble$title, corrections)
+    # pdf_document_tibble$theText <- str_replace_all(pdf_document_tibble$theText, corrections)
+    # pdf_document_tibble$speaker <- str_replace_all(pdf_document_tibble$speaker, corrections)
+    # pdf_document_tibble$title <- str_replace_all(pdf_document_tibble$title, corrections)
     
-    
+    #Fix the spelling while it's cut down
+    pdf_document_tibble$text <-  str_replace_all(pdf_document_tibble$text, corrections)
+
     # write_csv(pdf_document_tibble, "testing.csv") # Use this while testing if you want to see what it's looking like
 
     # Save file

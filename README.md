@@ -21,6 +21,7 @@ Then you can parse the PDFs with parse_each_pdf_and_save_csv_pdftools.R. Then cr
 
 
 ## Notes
+- There's only one PDF in 1980 - 1980-12-04. WTF? I think that I forgot to get them. Also 1960 is a bit sparse - first one is in 1960-10-19. Notwithstanding that, the graph of the dates is interesting - in the early days they seemed to sit in a quite bunched up way. But these days spread it out more.
 - Check a graph of the stop words over time - looking for no change over time
 - Look at network of call outs between politicians. Does it change over time? Does it change at elections? Has it become more partisan (could be done with sentiment analysis of the call out)?
 - Look at whether the politicians have become more national - did WA politicians used to concentrate on WA issues and do that less now?
