@@ -7,19 +7,19 @@ election_dates <- read_csv("inputs/misc/misc_elections_data.csv") %>% filter(!is
 
 hansard_dates$sitting <- 1
 
-hansard_dates_test <- hansard_dates[6000:7500,]
-hansard_dates$class <- c(rep(0, nrow(hansard_dates)/2), rep(1, nrow(hansard_dates)/2))
+# hansard_dates_test <- hansard_dates[6000:7500,]
+# hansard_dates$class <- c(rep(0, nrow(hansard_dates)/2), rep(1, nrow(hansard_dates)/2))
 
 
 ggplot(data = hansard_dates,
        mapping = aes(x = hansardDates)) +
   geom_bar() +
-  geom_vline(
-    data = election_dates,
-    aes(xintercept = electionDate),
-    linetype = "dashed",
-    color = "grey50"
-  ) +
+  # geom_vline(
+  #   data = election_dates,
+  #   aes(xintercept = electionDate),
+  #   linetype = "dashed",
+  #   color = "grey50"
+  # ) +
   theme_classic() +
   theme(axis.title.y = element_blank(), # GET RID OF THE Y AXIS LABELS AND TICKS
         axis.ticks.y =  element_blank()) +
@@ -31,9 +31,12 @@ ggplot(data = hansard_dates,
 # Maybe split the data by 30 year panels?
 
 
+hansard_dates_by_year <- hansard_dates %>% 
+  mutate(year = year(hansardDates)) %>% 
+  group_by(year) %>% 
+  summarise(countByYear = n())
 
-
-
+write_csv(hansard_dates_by_year, "counts_by_year.csv")
   
 
  

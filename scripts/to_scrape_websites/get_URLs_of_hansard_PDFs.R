@@ -460,6 +460,18 @@ pages <- c("http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=y
            "http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=46;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221970s%22;resCount=Default",
            "http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=47;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221970s%22;resCount=Default")
 
+
+
+pages <- c("http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=0;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221980s%22%20Year%3A%221980%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=1;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221980s%22%20Year%3A%221980%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=2;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221980s%22%20Year%3A%221980%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=3;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221980s%22%20Year%3A%221980%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=4;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221960s%22%20Year%3A%221960%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=3;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221960s%22%20Year%3A%221960%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=2;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221960s%22%20Year%3A%221960%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=1;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221960s%22%20Year%3A%221960%22;resCount=Default",
+"http://parlinfo.aph.gov.au/parlInfo/search/summary/summary.w3p;adv=yes;orderBy=_fragment_number,doc_date-rev;page=0;query=Dataset%3Ahansardr,hansardr80%20Decade%3A%221960s%22%20Year%3A%221960%22;resCount=Default")
+
 # pages <- pages[1:2] # for testing
 # pages <- pages[3:length(pages)]
 
@@ -484,4 +496,4 @@ my_data <- map(pages, ~ getter(.x))
 
 # Combine all the results and write to a csv
 hansard_pdfs <- bind_rows(my_data)
-write_csv(hansard_pdfs, "links19506070s.csv")
+write_csv(hansard_pdfs, "linksmissing1960and1980.csv")

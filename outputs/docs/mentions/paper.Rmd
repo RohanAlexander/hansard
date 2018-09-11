@@ -1,0 +1,17 @@
+---
+title: 'Slide into my mentions: Who gets incumbancy advantage in Australia?'
+author: "Rohan Alexander"
+date: "10/09/2018"
+abstract: "I examine Australian hansards to create measures of a politician's importance within parliament. I then show these measures are positively correlated with incumbancy advantage."
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+Measuring the advantage of incumbency has been of interest to scholars since the second election. Bias makes it difficult to 
+
+Who gets kicked out at an election? Do people at the centre get kicked out? Measure those at the centre by those that have high mentions. 

@@ -1,0 +1,39 @@
+---
+title: 'Nobody expects the Spanish Inquisition: How events drive topics in Australian parliaments'
+author: "Rohan Alexander"
+date: "10/09/2018"
+abstract: "I examine Australian hansard records "
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+
+What events changed the course of topics in Parliament, and what was the pattern before? Eg What did we miss out on because of 9/11 or the assassination? Combine them with the average length that it takes to get legislation through to be specific about what stopped. Similarly, how does the topics change after a change of government? Eg What could have happened if Kevin 07 didn’t kick Howard out.
+
+# Data
+Hansards are available for all six Australian states and the Commonwealth although the period varies (Table 1). Do we just focus on the lower houses?
+
+| Parliament | House | Years used | Notes |
+|:------|-----:|---------:|------:|
+| Commonwealth | House of Representatives | 1901 - 2017 | - |
+
+
+
+
+# Political events
+>*When you change the government, you change the country.* Paul Keating
+
+
+
+# External events
+>*Events, dear boy, events.* Attributed to Harold Macmillan
+
+# Summary
+What could happen if we had longer terms. Eg GST needed multiple generations of politicians but carbon tax couldn’t because it was one generation. 
+
