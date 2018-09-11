@@ -22,15 +22,11 @@ Then you can parse the PDFs with parse_each_pdf_and_save_csv_pdftools.R. Then cr
 
 ## Notes
 - Graph of the dates is interesting - in the early days they seemed to sit in a quite bunched up way. But these days spread it out more.
-- Have a look at the PDF for: 10 SEPTEMBER 1992. Do we have it? What's the content?
+- Replace the PDF for: 1985-08-23.pdf, 1992-09-10.pdf, 1996-12-13.pdf, 1938-11-23.pdf
 - Check a graph of the stop words over time - looking for no change over time
 - Look at network of call outs between politicians. Does it change over time? Does it change at elections? Has it become more partisan (could be done with sentiment analysis of the call out)?
 - Look at whether the politicians have become more national - did WA politicians used to concentrate on WA issues and do that less now?
 - Check that airline crash in the 40s is being accurately accounted for in the politicians data.
-- Check 1948-09-08 - there seems to be two URLs: /parlInfo/download/hansard80/hansardr80/1948-09-08/toc_pdf/19480908_reps_18_198.pdf;fileType=application/pdf#search=%221940s%22 and /parlInfo/download/hansard80/hansardr80/19480908/toc_pdf/19480908_REPS_18_198.pdf;fileType=application/pdf#search=%221940s%22 and also check 1911-12-04 - again seems to be two URLs in the search results: /parlInfo/download/hansard80/hansardr80/1911-12-04/toc_pdf/19111204_reps_4_62.pdf;fileType=application/pdf#search=%221910s%22
-1911-12-04.pdf and /parlInfo/download/hansard80/hansardr80/19111204/toc_pdf/19111204_REPS_4_62.pdf;fileType=application/pdf#search=%221910s%22.
-- (30 August): The stemming is happening at the text to csv conversion. I don't think this makes sense. Change it to happen as part of the topic modelling because will make it easier to construct custom dictionary.
-
 - In the list of parties, the acronym LIB had been used for the Commonwealth Liberal Party of Deakin, Cook etc in 1910s. This was also the acronym used for the Liberal Party of Australia of Menzies etc from the 1940s. Although the parties are related, it's a bit confusing. Has been left as it was, but might be worth changing to avoid confusion?
 
 To update:

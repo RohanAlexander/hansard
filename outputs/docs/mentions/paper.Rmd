@@ -1,7 +1,7 @@
 ---
-title: 'Slide into my mentions: Who gets incumbancy advantage in Australia?'
+title: 'Slide into my mentions, please: Who gets incumbancy advantage in Australia?'
 author: "Rohan Alexander"
-date: "10/09/2018"
+date: "11/09/2018"
 abstract: "I examine Australian hansards to create measures of a politician's importance within parliament. I then show these measures are positively correlated with incumbancy advantage."
 output: html_document
 ---
@@ -12,6 +12,33 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 # Introduction
-Measuring the advantage of incumbency has been of interest to scholars since the second election. Bias makes it difficult to 
+Understanding the incumbency advantage has been of interest since at least the second election. But biases makes it difficult to estimate. Various approaches have been used to account for this, but they tend to treat incumbents as interchangeable [BE MORE SPECIFIC HERE]. 
 
-Who gets kicked out at an election? Do people at the centre get kicked out? Measure those at the centre by those that have high mentions. 
+In this paper I use Australian hansard records to produce a measure of centrality for each incumbent that I interact with incumbency status in a simple Gelman and King (1990) style model. 
+
+In contrast to Eggers, et al., (2015) who focuses on 1987-2007 and only at a Commonwealth House of Representatives level, I find that [INSERT RESULTS HERE]. 
+
+<!-- Who gets kicked out at an election? Do people at the centre get kicked out? Measure those at the centre by those that have high mentions.  -->
+
+# Data
+## Centrality
+To construct measures of centrality, or importance, I use the Hansard records for the Australian Commonwealth, and the six states over the period that they are available. The availability of this data is summarised in Table 1.
+
+[INSERT TABLE 1]
+
+For more information on this dataset please see the Appendix.
+
+
+## Elections
+
+
+# Model
+Following Gelamn and 
+
+# Results
+
+
+# Summary and conclusions
+
+
+
