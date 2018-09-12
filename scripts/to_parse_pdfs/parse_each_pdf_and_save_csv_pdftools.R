@@ -3,7 +3,7 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to CSVs of text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 9 September 2018
+# Last updated: 12 September 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /inputs/for_testing_hansard_pdf folder.
 # To do:
 # - Check which footers need to be replaced

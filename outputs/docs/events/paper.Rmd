@@ -10,7 +10,7 @@ output:
     number_sections: true
 bibliography: ../bibliography.bib
 abstract: |
-  We use a structural text model to explore the impact of various events on what was said in Australian state and Commonwealth parliaments from the year they were established (mid-1800s for most of the states, and 1901 for the Commonwealth) through to 2017. We find that 1) [TBD]; 2) [TBD]; and 3) [TBD].
+  We use a structural text model to explore the impact of various events on what was said in Australian state and Commonwealth parliaments from the mid-1800s through to 2017. We find that 1) changes of government where the party in power also changes, result in significant changes in topics discussed in parliament, but when the party does not change the topics are unchanged; 2) polling results do not have a significant effect; 3) economic changes, such as financial crises have a significant effect; and 4) other events, such as an unexpected attack tend not to have a prolonged change. 
 
 ---
 
@@ -22,7 +22,7 @@ library(tidyverse)
 
 
 # Introduction
-New governments often go out of their way to be different to the governments they replace. For instance, consider Kevin Rudd's apology to Indigenous Australians which supported by all living Prime Ministers apart from his immediate predecessor. Similarly, significant events can alter the course of a government. For instance, consider the change in the Howard government after the 9/11 attacks. However it is not so clear which events drive changes in topics, for instance, do they change when the government is replaced by another of its own party? And which events are temporary, for instance when an economic crisis abates, do the topics return to pre-crisis levels?
+New governments often go out of their way to be different to the governments they replace. For instance, Kevin Rudd's apology to Indigenous Australians was supported by all living former Prime Ministers apart from his immediate predecessor. Similarly,  Similarly, significant events can alter the course of a government. For instance, consider the change in the Howard government after the 9/11 attacks. However it is not so clear which events drive changes in topics, for instance, do they change when the government is replaced by another of its own party? And which events are temporary, for instance when an economic crisis abates, do the topics return to pre-crisis levels?
 
 In this paper we use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 to model the topics of discussion in Australian parliaments. The advantage of this model is that it allows for topics to be correlated between sitting days, which then allows us to test for changes in topics at various events. The events that we focus on are changes in: 1) government; 2) the political environment (as defined by polling or other results); 3) economic conditions; and 4) the significant events (such as the 9/11 attacks or the Bali Bombings).
 
