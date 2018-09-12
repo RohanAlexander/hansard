@@ -2,12 +2,13 @@
 # Purpose: This is a function that will us regular expressions to fix some spelling. It will be called a bunch of text files.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 27 August 2018
-# Prerequisites: A two column csv with the misspelling and the replacement (generate that last one by using clean_hansard_spelling.R or whatever)
+# Last updated: 12 September 2018
+# Prerequisites: A two column csv with the misspelling and the replacement (generate the start of that last one by using clean_hansard_spelling.R or whatever and then manual)
 
 
 #### Set up workspace ####
 # Load libraries
+library(stringi)
 library(tidyverse)
 # update.packages()
 

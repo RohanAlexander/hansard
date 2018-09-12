@@ -17,13 +17,20 @@ library(furrr)
 # devtools::install_github("DavisVaughan/furrr")
 library(lubridate)
 library(pdftools)
+library(stringi)
 library(tidyverse)
 library(tictoc)
 library(tm)
 # update.packages()
 
 # Get the spell checker
-load("outputs/misc/corrections.RData")
+fix_wrong_spellings <- read_csv2("inputs/misc/misspelt_words_with_corrections.csv") %>% 
+  mutate(numberOfCharacters = nchar(original)) %>% 
+  arrange(desc(numberOfCharacters)) %>% 
+  select(-numberOfCharacters)
+
+
+# load("outputs/misc/corrections.RData")
 
 # Set up furrr plan
 plan(multiprocess)
@@ -288,7 +295,7 @@ get_text_from_PDFs <-
     pdf_document_tibble <- pdf_document_tibble %>%
       mutate(text = str_replace_all(text, "-$", "MONICA"))
     
-    pdf_document_tibble_colapse <- pdf_document_tibble %>%
+    pdf_document_tibble <- pdf_document_tibble %>%
       select(-pageNumbers) %>% 
       # group_by(speakerGroups) %>%
       summarise(text = paste(text, collapse = " ")) %>% 
@@ -471,8 +478,14 @@ get_text_from_PDFs <-
     # pdf_document_tibble$title <- str_replace_all(pdf_document_tibble$title, corrections)
     
     #Fix the spelling while it's cut down
-    pdf_document_tibble$text <-  str_replace_all(pdf_document_tibble$text, corrections)
-
+    pdf_document_tibble$text <-
+      stri_replace_all_regex(
+        pdf_document_tibble$text,
+        "\\b" %s+% fix_wrong_spellings$original %s+% "\\b",
+        fix_wrong_spellings$corrected,
+        vectorize_all = FALSE
+      )
+    
     # write_csv(pdf_document_tibble, "testing.csv") # Use this while testing if you want to see what it's looking like
 
     # Save file
@@ -490,7 +503,7 @@ get_text_from_PDFs <-
 
 safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
 
-tic("Furrr walk2 progress")
+tic("Furrr walk2 stringr")
 future_walk2(file_names, save_names, ~ safely_get_text_from_PDFs(.x, .y), .progress = TRUE)
 toc()
 
