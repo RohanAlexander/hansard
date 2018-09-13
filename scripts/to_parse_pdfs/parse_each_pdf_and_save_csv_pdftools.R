@@ -86,7 +86,7 @@ get_text_from_PDFs <-
     
     # Read in the document, based on the filename list, and general tidying
     # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1998-06-02.pdf" # for testing
-    # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1907-08-14.pdf" # for testing
+    # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1948-09-28.pdf" # for testing
     
     pdf_document <-
       pdf_text(name_of_input_PDF_file)
@@ -155,6 +155,20 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "(?<=\\S)Mr", " Mr")
     
+    # Fix related to the Speaker taking the chair
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "SPEAKEB", "SPEAKER")
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "ohair", "chair")
+    
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "took the. chair", "took the chair")
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "took tlie chair", "took the chair")
+
+    
+    
+
   
     ## Identify page headers and footers and remove them
     pdf_document_tibble <- pdf_document_tibble %>%
@@ -195,8 +209,16 @@ get_text_from_PDFs <-
       pdf_document_tibble[row_of_first_JOINTHOUSE, "pageNumbers"] %>% as.integer()
     first_page_of_interest_TookTheChair <-
       pdf_document_tibble[row_of_first_TookTheChair, "pageNumbers"] %>% as.integer()
+
+    first_page_of_interest_JOINTHOUSE <- (first_page_of_interest_JOINTHOUSE + 1)  %>% as.integer()
+
+    filter_from_here <- case_when(!is.na(first_page_of_interest_TookTheChair) ~ first_page_of_interest_TookTheChair,
+                                  !is.na(first_page_of_interest_SPEAKER) ~ first_page_of_interest_SPEAKER,
+                                TRUE ~ first_page_of_interest_JOINTHOUSE
+                                )
+    
     pdf_document_tibble <- pdf_document_tibble %>%
-      filter(pageNumbers >= min(first_page_of_interest_SPEAKER, first_page_of_interest_JOINTHOUSE+1, first_page_of_interest_TookTheChair, na.rm = TRUE)) %>%
+      filter(pageNumbers >= filter_from_here) %>%
       select(-firstSpeakerRow, -firstJointHouseRow, -firstTookTheChairRow)
     rm(first_page_of_interest_SPEAKER, row_of_first_SPEAKER, row_of_first_TookTheChair)
     
