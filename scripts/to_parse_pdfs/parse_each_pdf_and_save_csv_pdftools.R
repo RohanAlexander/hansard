@@ -3,7 +3,7 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to CSVs of text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 12 September 2018
+# Last updated: 13 September 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /inputs/for_testing_hansard_pdf folder.
 # To do:
 # - Check which footers need to be replaced
@@ -22,22 +22,16 @@ library(tidyverse)
 library(tictoc)
 library(tm)
 # update.packages()
-
 # Get the spell checker
 fix_wrong_spellings <- read_csv2("inputs/misc/misspelt_words_with_corrections.csv") %>% 
   mutate(numberOfCharacters = nchar(original)) %>% 
   arrange(desc(numberOfCharacters)) %>% 
   select(-numberOfCharacters)
-
-
-# load("outputs/misc/corrections.RData")
-
-# Set up furrr plan
+# Set up furrr
 plan(multiprocess)
 
 
 #### Create lists of PDFs to read and file names to save text as ####
-# Get list of Hansard PDF filenames
 # Change the path as required:
 # use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
 use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
@@ -45,6 +39,7 @@ use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
 use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
 # use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
 
+# Get list of Hansard PDF filenames
 file_names <-
   list.files(
     path = use_this_path_to_get_pdfs,
@@ -52,31 +47,13 @@ file_names <-
     recursive = TRUE,
     full.names = TRUE
   )
-file_names <- file_names %>% sample()
-file_names
-
-# file_names <- sample(file_names, 500)  # Just get 500 of them
-# get_these <- paste0("/Volumes/Backup/hansard_pdfs/", relevant_dates$allDates, ".pdf")
-# file_names <- file_names[file_names %in% get_these] 
-
-# parsed_these_already <- read_csv("parsed_these.csv") %>% pull
-# head(parsed_these_already)
-# file_names <- file_names[!file_names %in% parsed_these_already]
+file_names <- file_names %>% sample() # Randomise the order
 
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_pdfs, "") %>%
   str_replace(".pdf", ".csv")
 
 save_names <- paste0(use_this_path_to_save_csv_files, save_names)
-save_names
-
-# which(save_names == "/Volumes/Backup/hansard_csv/1915-04-23.csv")
-# didntwork <- save_names[118]
-
-# file_names <- file_names[119:length(file_names)]
-# save_names <- save_names[119:length(save_names)]
-
-# write_lines(file_names, "parsed_these.csv")
 
 
 #### Create the function that will be applied to the files ####
@@ -84,14 +61,11 @@ get_text_from_PDFs <-
   function(name_of_input_PDF_file,
            name_of_output_csv_file) {
     
-    # Read in the document, based on the filename list, and general tidying
-    # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1998-06-02.pdf" # for testing
-    # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1948-09-28.pdf" # for testing
+    # Read in the document, based on the filename list
+    # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1971-10-05.pdf" # uncomment for testing
+    pdf_document <- pdf_text(name_of_input_PDF_file)
     
-    pdf_document <-
-      pdf_text(name_of_input_PDF_file)
-    
-    # Get the date - it's needed later in the single or double columns
+    # Get the date based on the filename
     date_of_doc <- basename(name_of_input_PDF_file) %>% # basename gets rid of the path to the file
       str_replace(".pdf", "") %>% 
       ymd()
@@ -100,7 +74,7 @@ get_text_from_PDFs <-
     pdf_document_tibble <- tibble(text = pdf_document)
     rm(pdf_document)
 
-    # Now each row is a page of the PDF so adding a column of the row numbers allows you to keep track of the page numbers later on
+    # Each row is now a page of the PDF so adding a column of the row numbers allows you to keep track of the page numbers later on
     pdf_document_tibble$pageNumbers <- 1:nrow(pdf_document_tibble)
     
     # Separate each line (of each page) into it's own row
@@ -115,11 +89,12 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "•", "-") # Some hyphens are being read in as big dots
     pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
+    
+    pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "—", "-") # I'm as pedantic as the next person about dash, hyphen, em dash usage, but this is not the place.
     pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "(?<=[:space:][:upper:])[:space:](?=[:upper:][:space:])", "") # This one is picking up annoying spaces e.g. R O H A N should be Rohan. The regular expression is a bit wild, but each bit in round brackets is looking either side of the space and then removing that space as appropriate - see 'Look Arounds' in the stringr cheatsheet. There's a function - kerning - in the textclean package which does a similar task, but it seems to have an error that binds it to the next word if that's capitalised. Thanks Monica, also https://stackoverflow.com/questions/31280327/remove-extra-white-space-from-between-letters-in-r-using-gsub
+      str_replace_all(pdf_document_tibble$text, "(?<=[:space:][:upper:])[:space:](?=[:upper:][:space:])", "") # This one is picking up annoying spaces e.g. R O H A N should be Rohan. The regular expression is a bit wild, but each bit in round brackets is looking either side of the space and then removing that space as appropriate - see 'Look Arounds' in the stringr cheatsheet. There's a function - kerning - in the textclean package which does a similar task, but it seems to have an error that binds it to the next word if that's capitalised. Thanks Monica and also https://stackoverflow.com/questions/31280327/remove-extra-white-space-from-between-letters-in-r-using-gsub
     # These next ones are just to make search and replacements work more consistently
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "-[:space:]{2}", "- ") # A dash followed by two spaces should be changed to a dash followed by one space
@@ -160,15 +135,22 @@ get_text_from_PDFs <-
       str_replace_all(pdf_document_tibble$text, "SPEAKEB", "SPEAKER")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "ohair", "chair")
-    
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "SruAKEK", "SPEAKER")
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "SJ-BAKJSB", "SPEAKER")
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "Mx: SI-BAKER", "MR SPEAKER")
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "Mr SFEAKEB.", "MR SPEAKER")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "took the. chair", "took the chair")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "took tlie chair", "took the chair")
-
-    
-    
-
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "took tiie chair", "took the chair")
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "took 'the chair", "took the chair")
   
     ## Identify page headers and footers and remove them
     pdf_document_tibble <- pdf_document_tibble %>%
@@ -190,10 +172,12 @@ get_text_from_PDFs <-
     pdf_document_tibble <- pdf_document_tibble %>%
       mutate(firstSpeakerRow = str_detect(text, "SPEAKER"),
              firstJointHouseRow = str_detect(text, "JOINT HOUSE"),
-             firstTookTheChairRow = str_detect(text, "took the chair"))   # UPDATE THIS SO IT IGNORES CASE
+             firstTookTheChairRow = str_detect(text, "took the chair"),
+             firstTheChairAtRow = str_detect(text, "the chair at"))  
     pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA
     pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == FALSE] <- NA
     pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == FALSE] <- NA
+    pdf_document_tibble$firstTheChairAtRow[pdf_document_tibble$firstTheChairAtRow == FALSE] <- NA
     
     # Get the row and corresponding page and then filter to only pages from that page
     row_of_first_SPEAKER <-
@@ -202,6 +186,8 @@ get_text_from_PDFs <-
       pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == TRUE] %>% which() %>% first()
     row_of_first_TookTheChair <- 
       pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == TRUE] %>% which() %>% first()
+    row_of_first_TheChairAt <- 
+      pdf_document_tibble$firstTheChairAtRow[pdf_document_tibble$firstTheChairAtRow == TRUE] %>% which() %>% first()
     
     first_page_of_interest_SPEAKER <-
       pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer()
@@ -209,10 +195,13 @@ get_text_from_PDFs <-
       pdf_document_tibble[row_of_first_JOINTHOUSE, "pageNumbers"] %>% as.integer()
     first_page_of_interest_TookTheChair <-
       pdf_document_tibble[row_of_first_TookTheChair, "pageNumbers"] %>% as.integer()
-
+    first_page_of_interest_TheChairAt <-
+      pdf_document_tibble[row_of_first_TheChairAt, "pageNumbers"] %>% as.integer()
+    
     first_page_of_interest_JOINTHOUSE <- (first_page_of_interest_JOINTHOUSE + 1)  %>% as.integer()
 
     filter_from_here <- case_when(!is.na(first_page_of_interest_TookTheChair) ~ first_page_of_interest_TookTheChair,
+                                  !is.na(first_page_of_interest_TheChairAt) ~ first_page_of_interest_TheChairAt,
                                   !is.na(first_page_of_interest_SPEAKER) ~ first_page_of_interest_SPEAKER,
                                 TRUE ~ first_page_of_interest_JOINTHOUSE
                                 )
@@ -222,27 +211,28 @@ get_text_from_PDFs <-
       select(-firstSpeakerRow, -firstJointHouseRow, -firstTookTheChairRow)
     rm(first_page_of_interest_SPEAKER, row_of_first_SPEAKER, row_of_first_TookTheChair)
     
-    # write_csv(pdf_document_tibble, "text.csv")
+    # write_csv(pdf_document_tibble, "test.csv") Just for testing
+    
     ## The PDFs until (not including) 2013-11-12 are arranged as two columns on each page and so most rows are two different speeches and those columns need to be separated
     if (date_of_doc < 2013-11-12) {
     # Split it based on the number of characters - can probably finetune this.
     pdf_document_tibble <- pdf_document_tibble %>%
-      # mutate(line_number = 1:nrow(pdf_document_tibble)) %>%
       mutate(
         line_type = case_when(
-          str_detect(text, "^\\s{40,}") == TRUE ~ "secondColumnOnly", # If there is at least 40 spaces in a row at the start then it's only got content in the second column
+          str_detect(text, "^\\s{26,}") == TRUE ~ "secondColumnOnly", # If there is at least 26 spaces in a row at the start then it's only got content in the second column. 26 is the minimum to make 
           nchar(text) < 48 ~ "firstColumnOnly", # If there is less than 48 characters then it's only got content in the first column
           TRUE ~ "both" # Otherwise there is content in both columns
         )
       )
-    # write_csv(pdf_document_tibble, "testing.csv") # Use this while testing if you want to see what it's looking like
-    
-    pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(text = if_else(
-        line_type %in% c("both", "firstColumnOnly"),
-        str_trim(text, side = c("left")),
-        text
-      )) # Just remove whitespace at the left of the string. Couldn't do it until here because the existence of whitespace on the left of the string was how the right column only lines were identified.
+    # write_csv(pdf_document_tibble, "test.csv") # Just for testing
+
+    # # 13 September - TRY NOT DOING THIS    
+    # pdf_document_tibble <- pdf_document_tibble %>%
+    #   mutate(text = if_else(
+    #     line_type %in% c("both", "firstColumnOnly"),
+    #     str_trim(text, side = c("left")),
+    #     text
+    #   )) # Just remove whitespace at the left of the string. Couldn't do it until here because the existence of whitespace on the left of the string was how the right column only lines were identified.
     
     # Right, let's try this - don't @ me - it should work well enough and my supervisor is breathing down my neck
     # Come back here - there are issues with the parsing here that are affecting the specifics of the statements. It's fit for purpose, but not ideal. 
@@ -253,7 +243,7 @@ get_text_from_PDFs <-
     ## PLAYGROUND START
     pdf_document_tibble_both <- pdf_document_tibble %>%
       filter(line_type == "both") %>%
-      mutate(text = str_replace(text, "(?<=(.){38,50})[:space:]{2,}", "MONICAHOWLETT"),
+      mutate(text = str_replace(text, "(?<=(.){37,60})[:space:]{2,}", "MONICAHOWLETT"), # The start needs to be at most 37 because of 1901-06-27. The end needs to be pushed over because of 1971-10-05.
              text = if_else(str_detect(text, "MONICAHOWLETT"), text, str_replace(text, "(?<=(.){42,50})[:space:]", "MONICAHOWLETT"))) %>% 
       separate(
         text,
@@ -507,8 +497,8 @@ get_text_from_PDFs <-
         fix_wrong_spellings$corrected,
         vectorize_all = FALSE
       )
-    
-    # write_csv(pdf_document_tibble, "testing.csv") # Use this while testing if you want to see what it's looking like
+    # stri_replace_all_regex("Woul d W ould", "\\bW[:space:]?o[:space:]?u[:space:]?l[:space:]?d\\b", "Would")
+    # write_csv(pdf_document_tibble, "test.csv") # Use this while testing if you want to see what it's looking like
 
     # Save file
     # write_csv(doc_tibble, "name_of_output_csv_file")
