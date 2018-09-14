@@ -33,11 +33,11 @@ plan(multiprocess)
 
 #### Create lists of PDFs to read and file names to save text as ####
 # Change the path as required:
-# use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
-use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
+use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
+# use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
 
-use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
-# use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
+# use_this_path_to_save_csv_files  <- "outputs/hansard/hansard_csv_files"
+use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
 
 # Get list of Hansard PDF filenames
 file_names <-
@@ -48,6 +48,19 @@ file_names <-
     full.names = TRUE
   )
 file_names <- file_names %>% sample() # Randomise the order
+
+# Use this to get and remove the ones already done
+file_names_already_done <-
+  list.files(
+    path = use_this_path_to_save_csv_files,
+    pattern = "*.csv",
+    recursive = TRUE,
+    full.names = FALSE
+  ) %>% 
+  str_replace(".csv", ".pdf")
+file_names_already_done <-  paste0(use_this_path_to_get_pdfs, "/", file_names_already_done)
+file_names <- file_names[!(file_names %in% file_names_already_done)]
+rm(file_names_already_done)
 
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_pdfs, "") %>%
@@ -514,6 +527,12 @@ get_text_from_PDFs <-
 # toc()
 
 safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
+
+# file_names <- file_names[1:10]
+# save_names <- save_names[1:10]
+# file_names <- file_names[1:(length(file_names)/2)]
+# save_names <- save_names[1:(length(save_names)/2)]
+
 
 tic("Furrr walk2 stringr")
 future_walk2(file_names, save_names, ~ safely_get_text_from_PDFs(.x, .y), .progress = TRUE)

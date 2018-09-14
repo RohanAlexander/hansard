@@ -21,6 +21,7 @@ Then you can parse the PDFs with parse_each_pdf_and_save_csv_pdftools.R. Then cr
 
 
 ## Notes
+- Maybe this PDF is corrupted - no CSV output - 1918-06-14.
 - Graph of the dates is interesting - in the early days they seemed to sit in a quite bunched up way. But these days spread it out more.
 - Replace the PDF for: 1985-08-23.pdf, 1992-09-10.pdf, 1996-12-13.pdf, 1938-11-23.pdf
 - Check a graph of the stop words over time - looking for no change over time
