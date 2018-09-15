@@ -3,7 +3,7 @@
 # Purpose: Associate a group, based on similar topics, for every statement in Hansard that is either the last two weeks before an electin or the first two weeks.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 9 September 2018
+# Last updated: 15 September 2018
 # Prerequisites: 
 # Issues:
 
