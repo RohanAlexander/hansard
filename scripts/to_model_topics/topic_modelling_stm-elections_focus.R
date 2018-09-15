@@ -25,62 +25,11 @@ library(viridis)
 plan(multiprocess)
 
 # Load Hansard words by day
-load("outputs/big_files_do_not_push/all_hansard_words_by_date.Rda") # Takes a while
+load("outputs/big_files_do_not_push/all_hansard_words_by_date.Rda") # Takes 30 sec or so
 # Load the election dates
 election_dates <- read_csv("inputs/misc/misc_elections_data.csv")
 # Load the Hansard dates
 hansard_dates <- read_csv("inputs/misc/hansard_dates.csv")
-
-
-#### Identify the dates that are the 10 days of sitting immediately before and after an election ####
-all_dates <- tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) # First make a list of all the dates from Federation
-all_dates <- all_dates %>%
-  mutate(
-    electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
-    hansardDate = if_else(allDates %in% hansard_dates$hansardDates, 1, 0)
-  ) %>%
-  filter(electionDate == 1 | hansardDate == 1) %>% # Reduce that of all dates since Federation to only those that we have a Hansard for or that had an election
-  mutate(
-    tenAfterElectionDay = lag(electionDate, n = 10),
-    elevenBeforeElectionDay = lead(electionDate, n = 11)
-  ) %>% # Use eleven because we're going to get rid of 11 onward in order to get the ten
-  mutate(
-    elevenBeforeElectionDay = na_if(elevenBeforeElectionDay, 0),
-    tenAfterElectionDay = na_if(tenAfterElectionDay, 0)
-  )
-
-all_dates$elevenBeforeElectionDay[all_dates$elevenBeforeElectionDay == 1] <- 2
-
-relevant_dates <- all_dates %>%
-  mutate(tenAfterElectionDay = if_else(
-    !is.na(elevenBeforeElectionDay),
-    elevenBeforeElectionDay,
-    tenAfterElectionDay
-  )) %>%
-  fill(tenAfterElectionDay, .direction = "up") %>%
-  mutate(tenAfterElectionDay = na_if(tenAfterElectionDay, 2)) %>%
-  mutate(dateOfInterest = tenAfterElectionDay) %>%
-  select(-tenAfterElectionDay,-elevenBeforeElectionDay,-hansardDate) %>%
-  filter(electionDate == 0) %>%
-  filter(dateOfInterest == 1) %>%
-  mutate(beforeAfter = c(rep(c(
-    rep(1, 10), rep(0, 10)
-  ), 44), rep(1, 10))) %>%  # this is a bit dodgy just making it 0 if before an election and 1 if the ten after the election
-  mutate(electionNumber = c(c(1, 0,0,0,0,0,0,0,0,0), rep(c(1, 0,0,0,0,0,0,0,0,0, 0, 0,0,0,0,0,0,0,0,0), 44))) %>% 
-  mutate(electionNumber = cumsum(electionNumber))
-
-head(relevant_dates)
-
-         
-         
-# write_csv(relevant_dates, "test.csv")
-rm(all_dates, election_dates, hansard_dates)
-relevant_dates$allDates
-
-# Filter to just the dates that are the date nearest each side of an election
-head(all_hansard_words)
-some_days_hansard_words <- all_hansard_words[which(all_hansard_words$date %in% relevant_dates$allDates), ]
-rm(all_hansard_words)
 
 
 #### Temp fix for dodgy words ####
@@ -103,39 +52,54 @@ custom_stop_words <- bind_rows(
   )
 )
 
+
+#### Prepare for topic modelling ####
 # Put each word on its own row - from https://juliasilge.com/blog/sherlock-holmes-stm/
-tidy_hansard <- some_days_hansard_words %>%
+# Best to split it up so you don't have memory issues
+all_hansard_words <- all_hansard_words %>% 
+  mutate(grouper = sample(1:10, nrow(all_hansard_words), rep = TRUE))
+
+tidy_hansard_pieces <- function(name_of_input_tibble){
+  name_of_input_tibble %>% # takes a minute or two
   mutate(line = row_number()) %>%
   unnest_tokens(word, words) %>%
   anti_join(custom_stop_words) 
+}
 
-head(tidy_hansard)
+tidy_hansard <- all_hansard_words %>% 
+  split(.$grouper) %>% 
+  map_dfr(tidy_hansard_pieces, .id = NULL)
 
+rm(all_hansard_words, tidy_hansard_pieces)
 
 # Construct the TF-IDF measures on a day basis
 # By day
+# This takes about 10 minutes or so depending on the specifics - BYO book
 hansard_tf_idf <- tidy_hansard %>%
   count(date, word, sort = TRUE) %>% # Construct them by day
   bind_tf_idf(word, date, n) %>%
   arrange(-tf_idf) %>%
   group_by(date) %>%
-  top_n(10) %>%
+  top_n(100) %>%
   ungroup
 
+head(hansard_tf_idf)
 # Can graph that if you want
+rm(hansard_tf_idf)
 
 
 #### Topic modelling ####
+head(tidy_hansard)
 tidy_hansard <- tidy_hansard %>% 
   select(date, word)
 
 hansard_dfm <- tidy_hansard %>%
   count(date, word, sort = TRUE) %>%
-  filter(n > 10) %>% 
+  filter(n > 100) %>% # Here we remove any word that doesn't occur at least 100 times
   cast_dfm(date, word, n)
   
 many_models <-
-  data_frame(K = c(20, 40, 50, 60, 70, 80, 100)) %>% 
+  data_frame(K = c(20, 40, 60, 80, 100)) %>% 
   mutate(topic_model = future_map(K, ~ stm(hansard_dfm, K = ., verbose = TRUE)))
 
 heldout <- make.heldout(hansard_dfm)
@@ -186,16 +150,21 @@ topic_model <- k_result %>%
   pull(topic_model) %>% 
   .[[1]]
 
+# Just run a quick one here for the results for the draft - DELETE START
+justOne <- stm(hansard_dfm, K = 100, verbose = TRUE)
+topic_model <- justOne
+rm(justOne)
+# DELETE END
+
 topic_model
 
 td_beta <- tidy(topic_model)
-
 td_beta
 
 td_gamma <- tidy(topic_model, matrix = "gamma",
                  document_names = rownames(hansard_dfm))
-
 td_gamma
+# write_csv(td_gamma, "test_gammas.csv")
 
 library(ggthemes)
 
@@ -217,34 +186,26 @@ gamma_terms <- td_gamma %>%
   mutate(topic = paste0("Topic ", topic),
          topic = reorder(topic, gamma))
 
-
-
 gamma_terms %>%
   select(topic, gamma, terms) %>%
   knitr::kable(digits = 3, 
         col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
 
 
-
-
-
-
-
 ## Sweet graph of probability each document is generated from each topic
-td_gamma <- tidy(topic_model, matrix = "gamma",                    
-                 document_names = rownames(hansard_dfm))
+td_gamma$document <- ymd(td_gamma$document)
+head(td_gamma)
 
-ggplot(td_gamma, aes(gamma, fill = as.factor(topic))) +
-  geom_histogram(alpha = 0.8, show.legend = FALSE) +
-  facet_wrap(~ topic, ncol = 3) +
-  labs(title = "Distribution of document probabilities for each topic",
-       subtitle = "Each topic is associated with 1-3 stories",
-       y = "Number of stories", x = expression(gamma))
+td_gamma %>% 
+  filter(gamma >= 0.001) %>% # Get rid of the zeros while testing
+  ggplot(aes(x = document, y = gamma)) +
+  geom_point() +
+  theme_classic() +
+  labs(title = "Distribution of topic probabilities for each day",
+       y = "Date", 
+       x = "Probability")
 
-
-
-write_csv(td_gamma, path = "outputs/td_gamma.csv")
-
+ggsave("outputs/figures/td_gamma.pdf")
 
 # Try to get summary stats by whether before or after election
 td_gamma$document <- td_gamma$document %>% ymd()
@@ -507,3 +468,65 @@ Sys.time()
 perplexity(example_lda_12)
 perplexity(example_lda_20)
 perplexity(example_lda_50)
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### Identify the dates that are the 10 days of sitting immediately before and after an election ####
+all_dates <- tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) # First make a list of all the dates from Federation
+all_dates <- all_dates %>%
+  mutate(
+    electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
+    hansardDate = if_else(allDates %in% hansard_dates$hansardDates, 1, 0)
+  ) %>%
+  filter(electionDate == 1 | hansardDate == 1) %>% # Reduce that of all dates since Federation to only those that we have a Hansard for or that had an election
+  mutate(
+    tenAfterElectionDay = lag(electionDate, n = 10),
+    elevenBeforeElectionDay = lead(electionDate, n = 11)
+  ) %>% # Use eleven because we're going to get rid of 11 onward in order to get the ten
+  mutate(
+    elevenBeforeElectionDay = na_if(elevenBeforeElectionDay, 0),
+    tenAfterElectionDay = na_if(tenAfterElectionDay, 0)
+  )
+
+all_dates$elevenBeforeElectionDay[all_dates$elevenBeforeElectionDay == 1] <- 2
+
+relevant_dates <- all_dates %>%
+  mutate(tenAfterElectionDay = if_else(
+    !is.na(elevenBeforeElectionDay),
+    elevenBeforeElectionDay,
+    tenAfterElectionDay
+  )) %>%
+  fill(tenAfterElectionDay, .direction = "up") %>%
+  mutate(tenAfterElectionDay = na_if(tenAfterElectionDay, 2)) %>%
+  mutate(dateOfInterest = tenAfterElectionDay) %>%
+  select(-tenAfterElectionDay,-elevenBeforeElectionDay,-hansardDate) %>%
+  filter(electionDate == 0) %>%
+  filter(dateOfInterest == 1) %>%
+  mutate(beforeAfter = c(rep(c(
+    rep(1, 10), rep(0, 10)
+  ), 44), rep(1, 10))) %>%  # this is a bit dodgy just making it 0 if before an election and 1 if the ten after the election
+  mutate(electionNumber = c(c(1, 0,0,0,0,0,0,0,0,0), rep(c(1, 0,0,0,0,0,0,0,0,0, 0, 0,0,0,0,0,0,0,0,0), 44))) %>% 
+  mutate(electionNumber = cumsum(electionNumber))
+
+head(relevant_dates)
+
+
+
+# write_csv(relevant_dates, "test.csv")
+rm(all_dates, election_dates, hansard_dates)
+relevant_dates$allDates
+
+# Filter to just the dates that are the date nearest each side of an election
+head(all_hansard_words)
+some_days_hansard_words <- all_hansard_words[which(all_hansard_words$date %in% relevant_dates$allDates), ]
+rm(all_hansard_words)

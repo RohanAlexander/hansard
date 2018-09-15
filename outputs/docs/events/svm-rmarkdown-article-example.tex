@@ -40,11 +40,20 @@
 
 \usepackage{longtable,booktabs}
 
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 
 \title{Nobody expects the Spanish Inquisition: Which events drive topic change
-in Australian parliaments? \thanks{Thank you to X, Y, Z and Y for their helpful comments, guidance and
-suggestions. \textbf{Version as of}: September 13, 2018;
-\textbf{Comments welcomed}:
+in Australian parliaments? \thanks{Thank you to John Tang, Zach Ward, Tim Hatton and Martine Mariotti for
+their helpful comments, guidance and suggestions. \textbf{Version as
+of}: September 15, 2018; \textbf{Comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}}  }
 
 
@@ -172,16 +181,17 @@ have a prolonged change.
 
 \noindent  \section{Introduction}\label{introduction}
 
-New governments often go to some trouble to be different to the
+New governments often go to some trouble to be different from the
 governments they replace. For instance, Kevin Rudd's apology to
-Indigenous Australians was supported by all living former Prime
-Ministers apart from his immediate predecessor. Similarly, Similarly,
+Indigenous Australians was not supported by John Howard, and one of Tony
+Abbott's first acts was to repeal Rudd's carbon tax. Similarly,
 significant events can alter the course of a government. For instance,
-consider the change in the Howard government after the 9/11 attacks.
-However it is not so clear which events drive changes in topics, for
-instance, do they change when the government is replaced by another of
-its own party? And which events are temporary, for instance when an
-economic crisis abates, do the topics return to pre-crisis levels?
+consider the change in the Howard government after the 9/11 attacks or
+the 2002 Bali bombings. However it is not so clear which events drive
+changes in topics, for instance, do they change when the government is
+replaced by another of its own party? And which events are temporary,
+for instance when an economic crisis abates, do the topics return to
+pre-crisis levels?
 
 In this paper we use the Structural Topic Model (STM) of
 \citet{RobertsStewartAiroldi2016} to model the topics of discussion in
@@ -203,31 +213,46 @@ patterns that may otherwise be overlooked.
 
 \section{Data}\label{data}
 
-Following the example of the UK, a text-based record of what was said in
-Australian parliaments called Hansard has been regularly made available
-since their establishment. While Hansard is not necessarily verbatim, it
-is considered close enough for text-as-data purposes. For instance,
-\citet{Mollin2008} found that in the case of the UK Hansard the
-differences would only affect specialised linguistic analysis.
-\citet{Edwards2016} examined Australia, New Zealand and the UK, and
-found that changes were usually made by those responsible for creating
-the Hansard record, instead of the parliamentarians. Both these findings
-provide reassurance that differences between Hansard and a verbatim
-record would not be meaningful for this paper.
+Following the example of the UK a text record called Hansard of what was
+said in Australian parliaments has been made available since their
+establishment.\footnote{While Hansard is not necessarily verbatim, it is
+  considered close enough for text-as-data purposes. For instance,
+  \citet{Mollin2008} found that in the case of the UK Hansard the
+  differences would only affect specialised linguistic analysis.
+  \citet{Edwards2016} examined Australia, New Zealand and the UK, and
+  found that changes were usually made by those responsible for creating
+  the Hansard record, instead of the parliamentarians. Both these
+  findings provide reassurance that differences between Hansard and a
+  verbatim record would not be meaningful for this paper.} Hansard
+records are an increasingly popular source of data as new methods and
+reduced computational costs make larger-scale analysis easier. For
+instance, the digitisation of the Canadian Hansard,
+\citet{BeelenEtc2017}, allowed \citet{Whyte2017} to examine whether
+parliamentary disruptions in Canada increased between 1926 and 2015. In
+the UK, \citet{Duthie2016} analysed Hansard records to examine which
+politicians made supportive or aggressive statements toward other
+politicians between 1979 and 1990, and \citet{Willis2017} examined how
+politicians understood climate change. In New Zealand,
+\citet{Curran2017} modelled the topics discussed between 2003 and 2016,
+and \citet{Graham2016} examined unparliamentary language between 1890
+and 1950.
 
-The parliaments generally make their hansard records available online in
-PDF formats that can be processed by text readers such as
-\citet{Ooms2018pdftools}. Some records such as the early days of the New
-South Wales parliament have yet to be put through a professional OCR
-process, although the Google Tesseract engine as implemented by
-\citet{Ooms2018tesseract} can be used to provide a useful first-pass if
-necessary. Hansard records that are still images are not used in this
-analysis (see the Appendix for more details).
+Australian Hansard records have been analysed for various purposes, but
+usually not at scale. For instance, \citet{Rasiah2010} examines Hansard
+records for the Australian House of Representatives to examine whether
+politicians attempted to evade questions about Iraq during February and
+March 2003. \citet{GansLeigh2012} examined Australian Hansard records by
+hand to associate mentions by politicians of certain public
+intellectuals with neutral or positive sentiment.
 
-Hansard records are available for all six Australian states and the
-Commonwealth although the period varies (Table 1). Here we focus on the
-lower houses although a similar analysis is possible in a bicameral
-setting.
+The Australian parliaments generally make their Hansard records
+available online as PDFs that can be downloaded. The Federal parliament
+additionally makes XML records available for years between 1901 and 1980
+as well as from 1997. There are roughly 65,000 \textbf{(UPDATE)} hansard
+records available across the chambers of the state and federal
+parliaments (Table 1) \textbf{(UPDATE NUMBERING)}. As with any
+larger-scale data process, there are many issues with this dataset of
+PDFs and the known ones are detailed in the Appendix.
 
 \begin{longtable}[]{@{}lrrr@{}}
 \toprule
@@ -244,13 +269,15 @@ Western Australia & ? & ? - 2017 & -\tabularnewline
 \bottomrule
 \end{longtable}
 
-We start with the PDFs that have been through an OCR process (or
-compiled more recently using software that makes them readable by
-default) as supplied by various parliaments (see the Appendix for
-specific sources). We then use the \texttt{PDFtools} R package of
-\citet{Ooms2018pdftools} to extract these as text-based CSV records, and
-clean the records using functions from the \texttt{Tidyverse} R package
-of \citet{WickhamHadleyTidyverse}, the \texttt{Tidytext} R package of
+The PDFs were processed using the \texttt{PDFtools} R package of
+\citet{Ooms2018pdftools}. A small proportion of the Hansard records had
+not been put through a professional OCR process and although the Google
+Tesseract engine as implemented by \citet{Ooms2018tesseract} provided
+some useful data, these were not used in this analysis.
+
+to extract these as text-based CSV records, and clean the records using
+functions from the \texttt{Tidyverse} R package of
+\citet{WickhamHadleyTidyverse}, the \texttt{Tidytext} R package of
 \citet{SilgeRobinson2016} and the {[}INSERT OTHERS{]}. The result is a
 
 \section{Model}\label{model}
@@ -299,6 +326,9 @@ first document may be comprised mostly of the first few topics; the
 other document may be mostly about the final few topics (Figure
 @ref(fig:topicsoverdocuments)).
 
+\includegraphics{svm-rmarkdown-article-example_files/figure-latex/topicsoverdocuments-1.pdf}
+\includegraphics{svm-rmarkdown-article-example_files/figure-latex/topicsoverdocuments-2.pdf}
+
 Similarly, each topic could be considered a probability distribution
 over terms. To choose the terms used in each document the speaker picks
 terms from each topic in the appropriate proportion. For instance, if
@@ -306,6 +336,10 @@ there were ten terms, then one topic could be defined by giving more
 weight to terms related to immigration; and some other topic may give
 more weight to terms related to the economy (Figure
 @ref(fig:topicsoverterms)).
+
+\begin{figure}
+\includegraphics[width=.49\linewidth]{svm-rmarkdown-article-example_files/figure-latex/topicsoverterms-1} \includegraphics[width=.49\linewidth]{svm-rmarkdown-article-example_files/figure-latex/topicsoverterms-2} \caption{Probability distributions over terms}\label{fig:topicsoverterms}
+\end{figure}
 
 Following \citet{BleiLafferty2009}, \citet{blei2012} and
 \citet{GriffithsSteyvers2004}, the process by which a document is
@@ -523,6 +557,20 @@ within findings based on other methods.
 
 \section{Appendix}\label{appendix}
 
+\subsection{Document sources}\label{document-sources}
+
+Where from?
+
+Which years are being used (not non-OCRd)
+
+\subsection{Dataset issues}\label{dataset-issues}
+
+Which PDFs are missing or have no content, etc.
+
+\subsection{PDF to CSV issues}\label{pdf-to-csv-issues}
+
+Insert graph of stop words over time.
+
 \subsection{Selection of number of
 topics}\label{selection-of-number-of-topics}
 
@@ -533,12 +581,6 @@ event. The results in the main section of the paper are for the nearest
 ten days either side of an event. Here are show that the results are
 essentially the same if the nearest one, two, five, and twenty days
 either side of an event.
-
-\subsection{Document sources}\label{document-sources}
-
-Where from?
-
-Which years are being used (not non-OCRd)
 
 \newpage
 
