@@ -51,9 +51,10 @@
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 
 \title{Nobody expects the Spanish Inquisition: Which events drive topic change
-in Australian parliaments? \thanks{Thank you to John Tang, Zach Ward, Tim Hatton and Martine Mariotti for
-their helpful comments, guidance and suggestions. \textbf{Version as
-of}: September 15, 2018; \textbf{Comments welcome}:
+in Australian parliaments? \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
+Wang, Matt Jacob, Jill Sheppard and Matthew Kerby for their helpful
+suggestions. \textbf{Version as of}: September 16, 2018;
+\textbf{Comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}}  }
 
 
@@ -183,102 +184,185 @@ have a prolonged change.
 
 New governments often go to some trouble to be different from the
 governments they replace. For instance, Kevin Rudd's apology to
-Indigenous Australians was not supported by John Howard, and one of Tony
-Abbott's first acts was to repeal Rudd's carbon tax. Similarly,
-significant events can alter the course of a government. For instance,
-consider the change in the Howard government after the 9/11 attacks or
-the 2002 Bali bombings. However it is not so clear which events drive
-changes in topics, for instance, do they change when the government is
-replaced by another of its own party? And which events are temporary,
-for instance when an economic crisis abates, do the topics return to
-pre-crisis levels?
+Indigenous Australians was not supported by John Howard and then one of
+Tony Abbott's first acts was to repeal Rudd's carbon tax. Similarly,
+significant events such as the 9/11 attacks or the Great Recession have
+often altered the course of a government. However it is not so clear
+which events drive changes, for how long these changes persist, and what
+was given up due to the change.
 
-In this paper we use the Structural Topic Model (STM) of
-\citet{RobertsStewartAiroldi2016} to model the topics of discussion in
-Australian parliaments. The advantage of this model is that it allows
-for topics to be correlated between sitting days, which then allows us
-to test for changes in topics at various events. The events that we
-focus on are changes in: 1) government; 2) the political environment (as
-defined by polling or other results); 3) economic conditions; and 4) the
-significant events (such as the 9/11 attacks or the Bali Bombings).
+In this paper we examine text records of what was said in Australian
+state and federal parliaments from the mid-1800s through to 2017. We use
+the Structural Topic Model (STM) of \citet{RobertsStewartAiroldi2016} to
+impose structure such as correlation between days. We then construct a
+\textbf{{[}XYZ{]}} model to examine changes at various types of events,
+including: changes in government; changes in the political environment
+(as defined by polling or other results); changes in economic
+conditions; and other significant events (such as the 9/11 attacks or
+the Bali bombings).
 
-We find {[}INSERT RESULTS{]}. We also explored the other direction (the
-impact of what was said in parliaments on events) but it was difficult
-to find significant effects.
+We find \textbf{{[}INSERT RESULTS{]}}.
 
-Our work fits into {[}WHATEVER IT FITS INTO{]}. While using text as data
-has well-known shortcomings, it allows larger-scale analysis that would
-not be viable using less-automated approaches and hence can identify
-patterns that may otherwise be overlooked.
+Our paper applies a topic model to a dataset of larger-scale
+parliamentary text records from multiple Australian parliaments. A
+forecasting model is then used to construct a counterfactual. Our work
+fits into a growing literature that considers text as a input to more
+usual quantitative techniques, rather than requiring separate analysis.
+While using text as data has well-known shortcomings, it allows
+larger-scale analysis that would not be viable using less-automated
+approaches and so it can identify patterns that may otherwise be
+overlooked.
 
 \section{Data}\label{data}
 
-Following the example of the UK a text record called Hansard of what was
-said in Australian parliaments has been made available since their
-establishment.\footnote{While Hansard is not necessarily verbatim, it is
-  considered close enough for text-as-data purposes. For instance,
+\subsection{Parliamentary text data}\label{parliamentary-text-data}
+
+Following the example of the UK a daily text record called Hansard of
+what was said in Australian parliaments has been made available since
+their establishment.\footnote{While Hansard is not necessarily verbatim,
+  it is considered close enough for text-as-data purposes. For instance,
   \citet{Mollin2008} found that in the case of the UK Hansard the
   differences would only affect specialised linguistic analysis.
   \citet{Edwards2016} examined Australia, New Zealand and the UK, and
   found that changes were usually made by those responsible for creating
-  the Hansard record, instead of the parliamentarians. Both these
-  findings provide reassurance that differences between Hansard and a
-  verbatim record would not be meaningful for this paper.} Hansard
-records are an increasingly popular source of data as new methods and
-reduced computational costs make larger-scale analysis easier. For
-instance, the digitisation of the Canadian Hansard,
+  the Hansard record, instead of the parliamentarians.} Hansard records
+and their equivalents are an increasingly popular source of data as new
+methods and reduced computational costs make larger-scale analysis
+easier. For instance, the digitisation of the Canadian Hansard,
 \citet{BeelenEtc2017}, allowed \citet{Whyte2017} to examine whether
-parliamentary disruptions in Canada increased between 1926 and 2015. In
-the UK, \citet{Duthie2016} analysed Hansard records to examine which
-politicians made supportive or aggressive statements toward other
-politicians between 1979 and 1990, and \citet{Willis2017} examined how
-politicians understood climate change. In New Zealand,
+parliamentary disruptions in Canada increased between 1926 and 2015 and
+\citet{RheaultCochran2018} to examine ideology and party polarisation in
+Britain and Canada. In the UK, \citet{Duthie2016} analysed Hansard
+records to examine which politicians made supportive or aggressive
+statements toward other politicians between 1979 and 1990 and
+\citet{PetersonSpirling2018} examined polarisation. In New Zealand,
 \citet{Curran2017} modelled the topics discussed between 2003 and 2016,
 and \citet{Graham2016} examined unparliamentary language between 1890
-and 1950.
+and 1950. And in the US \citet{GentzkowShapiroTaddy2018} examine
+congressional speech records from 1873 to 2016 to find that partisanship
+has risen in the past few decades.
 
 Australian Hansard records have been analysed for various purposes, but
-usually not at scale. For instance, \citet{Rasiah2010} examines Hansard
-records for the Australian House of Representatives to examine whether
-politicians attempted to evade questions about Iraq during February and
-March 2003. \citet{GansLeigh2012} examined Australian Hansard records by
-hand to associate mentions by politicians of certain public
+usually not at larger-scale. For instance, \citet{Rasiah2010} examined
+Hansard records for the Australian House of Representatives to examine
+whether politicians attempted to evade questions about Iraq during
+February and March 2003. And \citet{GansLeigh2012} examined Australian
+Hansard records to associate mentions by politicians of certain public
 intellectuals with neutral or positive sentiment.
 
-The Australian parliaments generally make their Hansard records
-available online as PDFs that can be downloaded. The Federal parliament
-additionally makes XML records available for years between 1901 and 1980
-as well as from 1997. There are roughly 65,000 \textbf{(UPDATE)} hansard
-records available across the chambers of the state and federal
-parliaments (Table 1) \textbf{(UPDATE NUMBERING)}. As with any
-larger-scale data process, there are many issues with this dataset of
-PDFs and the known ones are detailed in the Appendix.
+Australian parliaments generally make their daily Hansard records
+available online as PDFs and these are considered the official release.
+There is a more limited set of XML records available in some
+cases.\footnote{Tim Sherratt makes these XML records available as a
+  single download and also presents them in a website
+  (\url{http://historichansard.net/}) that can be used to explore
+  Commonwealth Hansard records from 1901 to 1980. Commonwealth XML
+  records from 1998 to 2014 are available from Andrew Turpin's website,
+  and from 2006 through today from Open Australia's website.} There are
+65,000 \textbf{{[}UPDATE{]}} Hansard records available across the state
+and federal parliaments (Table 1) \textbf{{[}UPDATE NUMBERING{]}}. As
+with any larger-scale data process, there are various issues with some
+of the PDFs and the known ones are detailed in the Appendix.
 
 \begin{longtable}[]{@{}lrrr@{}}
 \toprule
-Parliament & House & Years used & Notes\tabularnewline
+Parliament & House & Years used & Number of records\tabularnewline
 \midrule
 \endhead
-Commonwealth & House of Representatives & 1901 - 2017 & -\tabularnewline
-Queensland & ? & 1861 - 2017 & -\tabularnewline
-New South Wales & ? & ? - 2017 & -\tabularnewline
-Victoria & ? & ? - 2017 & -\tabularnewline
-Tasmania & ? & ? - 2017 & -\tabularnewline
-South Australia & ? & ? - 2017 & -\tabularnewline
-Western Australia & ? & ? - 2017 & -\tabularnewline
+Commonwealth & House of Representatives & 1901 - 2017 &
+7,873\tabularnewline
+& Senate & 1901 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
+Queensland & Legislative Assembly & 1860 - 2017 &
+\textbf{{[}TBD{]}}\tabularnewline
+& Legislative Council & 1860 - 1922 & \textbf{{[}TBD{]}}\tabularnewline
+New South Wales\footnote{The NSW Legislative Council was established
+  earlier than 1856, however the earlier Hansard records have not been
+  through an independent OCR process and were not used in this paper.
+  However, the Google Tesseract OCR engine as implemented by
+  \citet{Ooms2018tesseract} provided useful data and these could be used
+  in the future.} & Legislative Assembly & 1856 - 2017 &
+\textbf{{[}TBD{]}}\tabularnewline
+& Legislative Council & 1856 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
+Victoria & Legislative Assembly & 1856 - 2017 &
+\textbf{{[}TBD{]}}\tabularnewline
+& Legislative Council & 1851 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
+Tasmania\footnote{\textbf{{[}Update this, depending on final Tassie
+  records{]}}.} & House of Assembly & 1856 - 2017 &
+\textbf{{[}TBD{]}}\tabularnewline
+& Legislative Council & 1856 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
+South Australia\footnote{\textbf{{[}Update this, depending on final SA
+  records{]}}.} & House of Assembly & 1857 - 2017 &
+\textbf{{[}TBD{]}}\tabularnewline
+& Legislative Council & 1840 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
+Western Australia\footnote{\textbf{{[}Update this, depending on final WA
+  records{]}}.} & Legislative Assembly & 1890 - 2017 &
+\textbf{{[}TBD{]}}\tabularnewline
+& Legislative Council & 1832 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
 \bottomrule
 \end{longtable}
 
-The PDFs were processed using the \texttt{PDFtools} R package of
-\citet{Ooms2018pdftools}. A small proportion of the Hansard records had
-not been put through a professional OCR process and although the Google
-Tesseract engine as implemented by \citet{Ooms2018tesseract} provided
-some useful data, these were not used in this analysis.
+The formatting of the Hansard records changes between the different
+parliaments and over time. We use R scripts to convert the PDFs into
+daily text records.\footnote{An example of the workflow and some
+  reduced-detail scripts are provided in the Appendix. The full set of
+  scripts are available on request.} These scripts are primarily based
+on: the \texttt{PDFtools} package of \citet{Ooms2018pdftools}; the
+\texttt{tidyverse} package of \citet{Wickham2017}; the \texttt{tm}
+package of \citet{FeinererHornik2018}; the \texttt{lubridate} package of
+\citet{GrolemundWickham2011}; and the \texttt{stringi} package of
+\citet{Gagolewski2018}. The functions of those packages are supported
+by: the \texttt{furrr} package of \citet{VaughanDancho2018}; and the
+\texttt{tictoc} package of \citet{Izrailev2014}. Some error is
+introduced at this stage because many of the records are in a two-column
+format that need to be separated, and the PDF parsing is not always
+accurate especially for older records. An example of the latter issue is
+that `the' is often parsed as `thc'. These errors are fixed when they
+occur at scale and can be identified.
 
-to extract these as text-based CSV records, and clean the records using
-functions from the \texttt{Tidyverse} R package of
-\citet{WickhamHadleyTidyverse}, the \texttt{Tidytext} R package of
-\citet{SilgeRobinson2016} and the {[}INSERT OTHERS{]}. The result is a
+\textbf{{[}ADD PICTURE OF HANSARD RECORD AND THE SUBSEQUENT TEXT
+RECORD?{]}}
+
+These daily records are the main data used in this paper, however the
+daily records are also further divided into individual-level records.
+Sometimes these are just short interjections or notes that are not
+specific to any particular politician, such as `Honourable members
+interjecting'. Interjections are interesting in their own right, for
+instance \citet{Whyte2017} analysed them in a Canadian context for the
+period 1926 to 2015 to find that female MPs were more likely to be
+interrupted than male MPs, but do not usually contribute much to
+defining the topics being discussed that day.
+
+Usually the disaggregation into individual-level records is done by
+identifying politicians' names in particular patterns. For instance,
+when the Hansard record is trying to indicate that a person is speaking,
+as opposed to being mentioned (for more on the political effect of being
+mentioned see \citet{Alexander2018}), often the name is in upper case
+(e.g. `Mr WHITLAM' or `Mr MENZIES'); followed by a dash or colon; or are
+next to some title within brackets. There is substantial variation in
+how the person making a statement is identified. Again some error is
+introduced at this stage because of inconsistencies over time and
+between the parliaments, as well as the errors introduced during the PDF
+parsing stage. There is considerable variance but on average each daily
+record had 250 \textbf{{[}UPDATE{]}} individual-level records, resulting
+in roughly 15 million rows \textbf{{[}UPDATE{]}} across the state and
+federal parliaments.
+
+\subsection{Parliamentary meta data}\label{parliamentary-meta-data}
+
+TALK ABOUT THE ADDITIONAL DATA
+
+In general,
+
+\subsection{Topic pre-processing}\label{topic-pre-processing}
+
+There is much more on topic modelling in the next section because topics
+are the main data analysed in this paper, but here we briefly discuss
+the pre-processing steps of creating the topics.
+
+records, and clean the records using functions from the
+\texttt{Tidyverse} R package of \citet{Wickham2017}, the
+\texttt{Tidytext} R package of \citet{SilgeRobinson2016} and the
+{[}INSERT OTHERS{]}. The result is a
 
 \section{Model}\label{model}
 
@@ -566,6 +650,10 @@ Which years are being used (not non-OCRd)
 \subsection{Dataset issues}\label{dataset-issues}
 
 Which PDFs are missing or have no content, etc.
+
+\subsection{Example workflow}\label{example-workflow}
+
+Example of the workflow from PDF to text
 
 \subsection{PDF to CSV issues}\label{pdf-to-csv-issues}
 
