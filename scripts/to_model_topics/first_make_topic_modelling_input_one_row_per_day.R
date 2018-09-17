@@ -1,25 +1,20 @@
 #### Preamble ####
-# Purpose: This file takes Australian Hansard csv files and it converts them to a tidied tibble of text that can be analysed. The words are lowered and punctuation is removed, but stop words are not removed and they are not stemmed.
+# Purpose: This file takes Australian Hansard csv files and it converts them to a tidied tibble of text that can be analysed. The words are lowered and punctuation is removed, but stop words are not removed and they are not stemmed here.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 5 September 2018
-# Prerequisites: You need a folder of csv files e.g. the outputs of parse_each_pdf_and_save_csv_pdftools.R 
+# Last updated: 16 September 2018
+# Prerequisites: You need a folder of csv files e.g. the output of parse_each_pdf_and_save_csv_pdftools.R 
 # To do:
-# - Well, everything
+# - 
 
 
 #### Set up workspace ####
-# library(stringi)
-# library(stringr)
-# library(corpus)
 library(furrr)
 library(hunspell)
 library(lubridate)
-# library(SnowballC)
 library(tictoc)
 library(tidytext)
 library(tidyverse)
-# library(tm)
 # update.packages()
 
 
