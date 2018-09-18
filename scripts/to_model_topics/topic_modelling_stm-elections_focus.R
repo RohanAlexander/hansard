@@ -3,7 +3,7 @@
 # Purpose: Associate a group, based on similar topics, for every statement in Hansard that is either the last two weeks before an electin or the first two weeks.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 15 September 2018
+# Last updated: 17 September 2018
 # Prerequisites: 
 # Issues:
 
@@ -150,11 +150,51 @@ topic_model <- k_result %>%
   pull(topic_model) %>% 
   .[[1]]
 
-# Just run a quick one here for the results for the draft - DELETE START
+
+
+#### Just run a quick one here for the results for the draft - DELETE START
+# Identify which hansard date is the first after an election
+all_dates <- tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) # First make a list of all the dates from Federation
+all_dates <- all_dates %>%
+  mutate(
+    electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
+    hansardDate = if_else(allDates %in% all_hansard_words$date, 1, 0)
+  ) %>%
+  filter(electionDate == 1 | hansardDate == 1) %>%  # Reduce that of all dates since Federation to only those that we have a Hansard for or that had an election
+  mutate(firstHansardAfterElection = lag(electionDate)) %>% 
+  select(allDates, firstHansardAfterElection) %>% 
+  filter(firstHansardAfterElection == 1)
+
+all_hansard_words <- all_hansard_words %>% 
+  left_join(all_dates, by = c("date" = "allDates"))
+
+all_hansard_words$firstHansardAfterElection[is.na(all_hansard_words$firstHansardAfterElection)] <- 0
+  
+processed_Hansard <- textProcessor(all_hansard_words$words, metadata = all_hansard_words)
+
+# HERE
+
+out <- prepDocuments(processed_Hansard$documents, processed_Hansard$vocab, processed_Hansard$meta, lower.thresh = 15)
+
+
+
+
+
+tidy_hansard <- tidy_hansard %>%
+  count(date, word, sort = TRUE) %>%
+  filter(n > 100)  # Here we remove any word that doesn't occur at least 100 times
+head(tidy_hansard)
+library(quanteda)
+?quanteda
+
+
+
 justOne <- stm(hansard_dfm, K = 100, verbose = TRUE)
 topic_model <- justOne
 rm(justOne)
-# DELETE END
+
+#### DELETE END
+
 
 topic_model
 
@@ -486,7 +526,7 @@ all_dates <- tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'd
 all_dates <- all_dates %>%
   mutate(
     electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
-    hansardDate = if_else(allDates %in% hansard_dates$hansardDates, 1, 0)
+    hansardDate = if_else(allDates %in% all_hansard_words$date, 1, 0)
   ) %>%
   filter(electionDate == 1 | hansardDate == 1) %>% # Reduce that of all dates since Federation to only those that we have a Hansard for or that had an election
   mutate(

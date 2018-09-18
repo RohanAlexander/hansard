@@ -53,7 +53,7 @@
 \title{Nobody expects the Spanish Inquisition: Which events drive topic change
 in Australian parliaments? \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
 Wang, Matt Jacob, Jill Sheppard and Matthew Kerby for their helpful
-suggestions. \textbf{Version as of}: September 16, 2018;
+suggestions. \textbf{Version as of}: September 17, 2018;
 \textbf{Comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
@@ -172,14 +172,15 @@ in Australian parliaments?},
 
     \vskip 8.5pt % \small 
 
-\noindent We use a structural text model to explore the effect of various events
-on what was said in Australian state and federal parliaments from the
-mid-1800s through to 2017. We find that: 1) changes of government are
-associated with topic changes only when there is also a change in the
-party in power; 2) polling results appear dissociated from parliamentary
-topics; 3) economic changes, such as financial crises have a significant
-effect; and 4) other events, such as an unexpected attack tend not to
-have a prolonged change.
+\noindent We use a structural text model to explore what was said in Australian
+state and federal parliaments from the mid-1800s through to 2017. We
+then examine the effect of various events using a discrete choice model.
+We find that: 1) changes of government are associated with topic changes
+only when there is also a change in the party in power; 2) polling
+results appear dissociated from parliamentary topics; 3) economic
+changes, such as financial crises have a significant effect; and 4)
+other events, such as an unexpected attack tend not to have a prolonged
+change.
 
 
 \vskip 8.5pt \noindent \emph{Keywords}: text analysis, politics, Australia \par
@@ -208,24 +209,24 @@ was given up due to the change.
 In this paper we examine text records of what was said in Australian
 state and federal parliaments from the mid-1800s through to 2017. We use
 the Structural Topic Model (STM) of \citet{RobertsStewartAiroldi2016} to
-impose structure such as correlation between days. We then construct a
-\textbf{{[}XYZ{]}} model to examine changes at various types of events,
-including: changes in government; changes in the political environment
-(as defined by polling or other results); changes in economic
-conditions; and other significant events (such as the 9/11 attacks or
-the Bali bombings).
+impose structure such as correlation between days and changes over time,
+and for dimension reduction. We then use a discrete choice model to
+examine changes at various types of events, including: changes in
+government; changes in the political environment (as defined by polling
+or other results); changes in economic conditions; and other significant
+events (such as the 9/11 attacks or the Bali bombings).
 
 We find \textbf{{[}INSERT RESULTS{]}}.
 
 Our paper applies a topic model to a dataset of larger-scale
-parliamentary text records from multiple Australian parliaments. A
-forecasting model is then used to construct a counterfactual. Our work
-fits into a growing literature that considers text as a input to more
-usual quantitative techniques, rather than requiring separate analysis.
-While using text as data has well-known shortcomings, it allows
-larger-scale analysis that would not be viable using less-automated
-approaches and so it can identify patterns that may otherwise be
-overlooked.
+parliamentary text records from multiple Australian parliaments. Our use
+of a discrete choice model allows us construct a counterfactual. Our
+work fits into a growing literature that considers text as a input to
+more usual quantitative techniques, rather than requiring separate
+analysis. While using text as data has well-known shortcomings, it
+allows larger-scale analysis that would not be viable using
+less-automated approaches and so it can identify patterns that may
+otherwise be overlooked.
 
 \section{Data}\label{data}
 
@@ -286,9 +287,8 @@ Parliament & House & Years used & Number of records\tabularnewline
 Commonwealth & House of Representatives & 1901 - 2017 &
 7,873\tabularnewline
 & Senate & 1901 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
-Queensland & Legislative Assembly & 1860 - 2017 &
-\textbf{{[}TBD{]}}\tabularnewline
-& Legislative Council & 1860 - 1922 & \textbf{{[}TBD{]}}\tabularnewline
+Queensland & Legislative Assembly & 1860 - 2017 & 9,699\tabularnewline
+& Legislative Council & 1860 - 1922 & 4,156\tabularnewline
 New South Wales\footnote{The NSW Legislative Council was established
   earlier than 1856, however the earlier Hansard records have not been
   through an independent OCR process and were not used in this paper.
