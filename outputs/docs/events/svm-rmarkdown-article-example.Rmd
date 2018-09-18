@@ -13,7 +13,7 @@ author:
   affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "We use a structural text model to explore what was said in Australian state and federal parliaments from the mid-1800s through to 2017. We then examine the effect of various events using a discrete choice model. We find that: 1) changes of government are associated with topic changes only when there is also a change in the party in power; 2) polling results appear dissociated from parliamentary topics; 3) economic changes, such as financial crises have a significant effect; and 4) other events, such as an unexpected attack tend not to have a prolonged change."
+abstract: "We use a structural text model to categorise what was said in Australian state and federal parliaments from the mid-1800s through to 2017. We then examine the effect of various events using a discrete choice model. We find that: 1) changes of government are associated with topic changes only when there is also a change in the party in power; 2) polling results are dissociated from parliamentary topics; 3) economic changes, such as financial crises have a significant and persistent effect; and 4) other events, such as an unexpected attack tend not to have a prolonged change."
 keywords: "text analysis, politics, Australia"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
@@ -33,9 +33,9 @@ library(tidyverse)
 
 
 # Introduction
-New governments often go to some trouble to be different to the governments they replace. For instance, Kevin Rudd's apology to Indigenous Australians was not supported by John Howard and then one of Tony Abbott's first acts was to repeal Rudd's carbon tax. Similarly, significant events such as the 9/11 attacks or the Great Recession have often altered the course of a government. However it is not so clear which events drive changes, for how long these changes persist, and what was given up due to the change.
+New governments often go to some trouble to be different to the governments they replace. For instance, Kevin Rudd's apology to Indigenous Australians was not supported by his predecessor John Howard, and then one of Tony Abbott's first acts was to repeal predecessor Kevin Rudd's carbon tax. Similarly, significant events such as the 9/11 attacks or the Great Recession have often altered the course of a government. However it is not so clear which events drive changes, for how long these changes persist, and what was given up due to the change.
 
-In this paper we examine text records of what was said in Australian state and federal parliaments from the mid-1800s through to 2017. We use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 to impose structure such as correlation between days and changes over time, and for dimension reduction. We then use a discrete choice model to examine changes at various types of events, including: changes in government; changes in the political environment (as defined by polling or other results); changes in economic conditions; and other significant events (such as the 9/11 attacks or the Bali bombings).
+In this paper we examine text records of what was said in Australian state and federal parliaments from the mid-1800s through to 2017. We use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 for dimensionality reduction and to impose structure such as correlation between days and changes over time. We then use a discrete choice model to examine changes at various types of events, including: changes in government; changes in the political environment (as defined by polling or other results); changes in economic conditions; and other significant events (such as the 9/11 attacks or the Bali bombings).
 
 We find **[INSERT RESULTS]**. 
 
@@ -121,7 +121,7 @@ The additional information from the handbooks had many errors and it was supplem
 
 
 # Model
-The main model that we use in this paper is the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. The basis of this type of topic modelling is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section a brief overview of both the LDA model and the STM approach is provided and then the specifics of how we consider events in this setting are discussed.
+The main model that we use in this paper is the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. The basis of this type of topic modelling is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section a brief overview of both the LDA model and the STM approach is provided. In a similar way to @MuellerRauh2018 we consider the outputs of the topic model as reduced dimension inputs. In our case they are inputs to a discrete choice model, and so we then discuss that model.
 
 ## Latent Dirichlet Allocation
 When the text data is being modelled at the day level then each day's Hansard record needs to be classified by its topic. Although more- or less-fine levels of analysis are possible. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. One way to get consistent estimates of the topics discussed in Hansard is to use the LDA method of @Blei2003latent, for instance as implemented by the R package 'topicmodels' by @Grun2011.
