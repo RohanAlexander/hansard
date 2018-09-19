@@ -6,14 +6,14 @@ output:
     fig_caption: true
     latex_engine: pdflatex
     template: svm-latex-ms.tex
-title: "Nobody expects the Spanish Inquisition: Which events drive topic change in Australian parliaments?"
+title: "Nobody expects the Spanish Inquisition: The effect of events on Australian parliamentary discussion"
 thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Jill Sheppard and Matthew Kerby for their helpful suggestions. **Version as of**: `r format(Sys.time(), '%B %d, %Y')`; **Comments welcome**: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "We use a structural text model to categorise what was said in Australian state and federal parliaments from the mid-1800s through to 2017. We then examine the effect of various events using a discrete choice model. We find that: 1) changes of government are associated with topic changes only when there is also a change in the party in power; 2) polling results are dissociated from parliamentary topics; 3) economic changes, such as financial crises have a significant and persistent effect; and 4) other events, such as an unexpected attack tend not to have a prolonged change."
+abstract: "Government policy is partly driven by the topics that are discussed in parliament. Conversely, those same topics can indicate a government's priorities. But major events--both expected, such as an election, and unexpected, such as a recession or terrorist attack--can affect the course of parliamentary debate. In this paper, we systematically analyse how parliamentary debate has changed in response to different types of events in Australian history. We compile a dataset of what was said in Australian state and federal parliaments from the mid-1800s through to 2017 based on available public records. We use a structural text model to reduce the dimensionality of the text and to impose prior knowledge such as correlation between days and changes over time. We then examine the effect of various events using a discrete choice model. We find that: 1) changes of government are associated with topic changes only when there is also a change of the party in power; and 2) economic events, such as financial crises, have significant and persistent effects. Our findings have implications for how we think about the longer-term trajectory of government policy as the media cycle becomes increasingly focused on short-term events."
 keywords: "text analysis, politics, Australia"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
