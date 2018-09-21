@@ -3,7 +3,7 @@
 # Purpose: Associate a group, based on similar topics, for every statement in Hansard that is either the last two weeks before an electin or the first two weeks.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 17 September 2018
+# Last updated: 20 September 2018
 # Prerequisites: 
 # Issues:
 
@@ -74,7 +74,7 @@ rm(all_hansard_words, tidy_hansard_pieces)
 
 # Construct the TF-IDF measures on a day basis
 # By day
-# This takes about 10 minutes or so depending on the specifics - BYO book
+# This takes about 10 minutes or so depending on the specifics - BYO book and tea
 hansard_tf_idf <- tidy_hansard %>%
   count(date, word, sort = TRUE) %>% # Construct them by day
   bind_tf_idf(word, date, n) %>%
@@ -95,12 +95,57 @@ tidy_hansard <- tidy_hansard %>%
 
 hansard_dfm <- tidy_hansard %>%
   count(date, word, sort = TRUE) %>%
-  filter(n > 100) %>% # Here we remove any word that doesn't occur at least 100 times
+  filter(n > 100) %>% # Remove any word that doesn't occur at least 100 times
   cast_dfm(date, word, n)
+
+
+#### Side project to try to get meta data in START
+# https://stackoverflow.com/questions/47652890/stm-how-to-keep-metadata-when-converting-from-tm-to-stm-document-term-matrix
+library(quanteda)
+
+hansard_dfm <- tidy_hansard %>%
+  count(date, word, sort = TRUE) %>%
+  filter(n > 10) %>% 
+  group_by(date) %>% 
+  summarise(textid_field = paste(word, collapse = " ")) %>% 
+  rename(docid_field = date)
+
+# creates the corpus with document variables except for the "text"
+text_corpus3 <- corpus(hansard_dfm, text_field = "textid_field")
+
+# convert to document-feature matrix - cleaning options can be added
+# see ?tokens
+chat_DTM3 <- dfm(text_corpus3)
+
+# similar to tm::removeSparseTerms()
+DTM3 <- dfm_trim(chat_DTM3, sparsity = 0.990)
+
+# convert to STM format
+DTM_st <- convert(DTM3, to = "stm")
+
+# then it's all there
+docsTM <- DTM_st$documents 
+vocabTM <- DTM_st$vocab    
+metaTM <- DTM_st$meta
+head(metaTM)
+
+test <- stm(documents = DTM_st$documents, vocab = DTM_st$vocab, K = 100, max.em.its = 75, init.type = "Spectral")
+
+td_gamma <- tidy(test, matrix = "gamma",
+                 document_names = DTM_st$meta$docid_field)
+td_gamma
+
+write_csv(td_gamma, "test_gammas.csv")
+
+## NEED TO PUT THE TESTING IN THERE SOMEWHERE
+
+#### END
+
+head(hansard_dfm)
   
 many_models <-
   data_frame(K = c(20, 40, 60, 80, 100)) %>% 
-  mutate(topic_model = future_map(K, ~ stm(hansard_dfm, K = ., verbose = TRUE)))
+  mutate(topic_model = future_map(K, ~ stm(hansard_dfm, K = ., verbose = TRUE, .progress = TRUE)))
 
 heldout <- make.heldout(hansard_dfm)
 

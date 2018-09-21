@@ -7,7 +7,7 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "Nobody expects the Spanish Inquisition: The effect of events on Australian parliamentary discussion"
-thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Jill Sheppard and Matthew Kerby for their helpful suggestions. **Version as of**: `r format(Sys.time(), '%B %d, %Y')`; **Comments welcome**: rohan.alexander@anu.edu.au."
+thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Leslie Root, Jill Sheppard and Matthew Kerby for their helpful suggestions. **Version as of**: `r format(Sys.time(), '%B %d, %Y')`; **Comments welcome**: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto
@@ -33,7 +33,7 @@ library(tidyverse)
 
 
 # Introduction
-New governments often go to some trouble to be different to the governments they replace. For instance, Kevin Rudd's apology to Indigenous Australians was not supported by his predecessor John Howard, and then one of Tony Abbott's first acts was to repeal predecessor Kevin Rudd's carbon tax. Similarly, significant events such as the 9/11 attacks or the Great Recession have often altered the course of a government. However it is not so clear which events drive changes, for how long these changes persist, and what was given up due to the change.
+New governments often go to some trouble to be different to the governments they replace. For instance, Kevin Rudd's apology to Indigenous Australians was not supported by his predecessor John Howard, and then one of Tony Abbott's first acts was to repeal his predecessor Kevin Rudd's carbon tax. Similarly, significant events such as the 9/11 attacks or the Great Recession have often altered the course of a government. However it is not so clear which events drive changes, for how long these changes persist, and what was given up due to the change.
 
 In this paper we examine text records of what was said in Australian state and federal parliaments from the mid-1800s through to 2017. We use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 for dimensionality reduction and to impose structure such as correlation between days and changes over time. We then use a discrete choice model to examine changes at various types of events, including: changes in government; changes in the political environment (as defined by polling or other results); changes in economic conditions; and other significant events (such as the 9/11 attacks or the Bali bombings).
 
@@ -50,9 +50,9 @@ Following the example of the UK a daily text record called Hansard of what was s
 
 [^Verbatimfootnote]: While Hansard is not necessarily verbatim, it is considered close enough for text-as-data purposes. For instance, @Mollin2008 found that in the case of the UK Hansard the differences would only affect specialised linguistic analysis. @Edwards2016 examined Australia, New Zealand and the UK, and found that changes were usually made by those responsible for creating the Hansard record, instead of the parliamentarians. 
 
-Australian Hansard records have been analysed for various purposes, but usually not at larger-scale. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment.
+Australian Hansard records have been analysed for various purposes, but usually at a more-specific level than we do here. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment. 
 
-Australian parliaments generally make their daily Hansard records available online as PDFs and these are considered the official release. There is a more limited set of XML records available in some cases.[^XMLfootnote] There are 65,000 **[UPDATE]** Hansard records available across the state and federal parliaments (Table 1) **[UPDATE NUMBERING]**. As with any larger-scale data process, there are various issues with some of the PDFs and the known ones are detailed in the Appendix.
+Australian parliaments generally make their daily Hansard records available online as PDFs and these are considered the official release. There is a more limited set of XML records available in some cases.[^XMLfootnote] There are 65,000 **[UPDATE]** Hansard records publicly available across the state and federal parliaments (Table 1) **[UPDATE NUMBERING]**. As with any larger-scale data process, there are various issues with some of the PDFs and the known ones are detailed in the Appendix.
 
 [^XMLfootnote]: Tim Sherratt makes these XML records available as a single download and also presents them in a website (http://historichansard.net/) that can be used to explore Commonwealth Hansard records from 1901 to 1980. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through today from Open Australia’s website. 
 
@@ -96,32 +96,15 @@ Text usually needs to be pre-processed before topic models can be used. The spec
 ## Additional information
 Data from other sources are useful to complement the parliamentary text data. For instance, although the name, party, and division represented are contained in Hansard records they are inconsistent. Also non-Hansard information about the politicians can inform the analysis. This includes: date of birth and date of death; sex; date of entry to parliament and exit from parliament; some aspects of their pre- and post-parliamentary career; some aspects of their parliamentary career, such as ministry appointments; and electoral information such as primary and two-party-preferred results.
 
-The main sources for this additional supplementary information are the handbooks supplied by the various parliaments (Table 2). 
-
-| Parliament  | House  | Source |
-|:------|-----:|---------:|
-| Commonwealth      | House of Representatives | Parliamentary Handbok |
-|                   | Senate                   | **[TBD]** |
-| Queensland        | Legislative Assembly     |  **[TBD]** |
-|                   | Legislative Council      | **[TBD]** |
-| New South Wales   | Legislative Assembly     | **[TBD]** |
-|                   | Legislative Council      | **[TBD]** |
-| Victoria          | Legislative Assembly     | **[TBD]** |
-|                   | Legislative Council      | **[TBD]** |
-| Tasmania          | House of Assembly        | **[TBD]** |
-|                   | Legislative Council      |  **[TBD]** |
-| South Australia   | House of Assembly        | **[TBD]** |
-|                   | Legislative Council      | **[TBD]** |
-| Western Australia | Legislative Assembly     | **[TBD]** |
-|                   | Legislative Council      | **[TBD]** |
-
-The additional information from the handbooks had many errors and it was supplemented by data from the Australian Dictionary of Biography and Wikipedia.[^seeMyAdditionalData]
+The main sources for this additional supplementary information are the handbooks supplied by the various parliaments. However these had many errors and were supplemented by data from the Australian Dictionary of Biography and Wikipedia.[^seeMyAdditionalData]
 
 [^seeMyAdditionalData]: An example of the additional information is provided in the Appendix. The datasets are available on request.
 
 
 # Model
-The main model that we use in this paper is the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. The basis of this type of topic modelling is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section a brief overview of both the LDA model and the STM approach is provided. In a similar way to @MuellerRauh2018 we consider the outputs of the topic model as reduced dimension inputs. In our case they are inputs to a discrete choice model, and so we then discuss that model.
+The main models that we use in this paper are the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage, and a discrete choice model as implemented by the \texttt{XXXX} R package of **XYZ**. Theoretically we could have directly used the text as an input to the discrete choice model, but this is intractable due to computer memory and storage constraints. Instead, in a similar way to @MuellerRauh2018, we use the topics that the text is about as an input to another model, which in our case is a discrete choice model. 
+
+The basis of the STM is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section we provide a brief overview of both the LDA model and the STM.  we consider the outputs of the topic model as reduced dimension inputs. In our case they are inputs to a discrete choice model, and so we then discuss that model.
 
 ## Latent Dirichlet Allocation
 When the text data is being modelled at the day level then each day's Hansard record needs to be classified by its topic. Although more- or less-fine levels of analysis are possible. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. One way to get consistent estimates of the topics discussed in Hansard is to use the LDA method of @Blei2003latent, for instance as implemented by the R package 'topicmodels' by @Grun2011.

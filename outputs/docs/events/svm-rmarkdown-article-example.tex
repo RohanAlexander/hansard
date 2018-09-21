@@ -53,7 +53,7 @@
 \title{Nobody expects the Spanish Inquisition: The effect of events on
 Australian parliamentary discussion \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
 Wang, Matt Jacob, Jill Sheppard and Matthew Kerby for their helpful
-suggestions. \textbf{Version as of}: September 18, 2018;
+suggestions. \textbf{Version as of}: September 20, 2018;
 \textbf{Comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
@@ -209,8 +209,8 @@ increasingly focused on short-term events.
 New governments often go to some trouble to be different to the
 governments they replace. For instance, Kevin Rudd's apology to
 Indigenous Australians was not supported by his predecessor John Howard,
-and then one of Tony Abbott's first acts was to repeal predecessor Kevin
-Rudd's carbon tax. Similarly, significant events such as the 9/11
+and then one of Tony Abbott's first acts was to repeal his predecessor
+Kevin Rudd's carbon tax. Similarly, significant events such as the 9/11
 attacks or the Great Recession have often altered the course of a
 government. However it is not so clear which events drive changes, for
 how long these changes persist, and what was given up due to the change.
@@ -267,12 +267,13 @@ congressional speech records from 1873 to 2016 to find that partisanship
 has risen in the past few decades.
 
 Australian Hansard records have been analysed for various purposes, but
-usually not at larger-scale. For instance, \citet{Rasiah2010} examined
-Hansard records for the Australian House of Representatives to examine
-whether politicians attempted to evade questions about Iraq during
-February and March 2003. And \citet{GansLeigh2012} examined Australian
-Hansard records to associate mentions by politicians of certain public
-intellectuals with neutral or positive sentiment.
+usually at a more-specific level than we do here. For instance,
+\citet{Rasiah2010} examined Hansard records for the Australian House of
+Representatives to examine whether politicians attempted to evade
+questions about Iraq during February and March 2003. And
+\citet{GansLeigh2012} examined Australian Hansard records to associate
+mentions by politicians of certain public intellectuals with neutral or
+positive sentiment.
 
 Australian parliaments generally make their daily Hansard records
 available online as PDFs and these are considered the official release.
@@ -283,10 +284,11 @@ cases.\footnote{Tim Sherratt makes these XML records available as a
   Commonwealth Hansard records from 1901 to 1980. Commonwealth XML
   records from 1998 to 2014 are available from Andrew Turpin's website,
   and from 2006 through today from Open Australia's website.} There are
-65,000 \textbf{{[}UPDATE{]}} Hansard records available across the state
-and federal parliaments (Table 1) \textbf{{[}UPDATE NUMBERING{]}}. As
-with any larger-scale data process, there are various issues with some
-of the PDFs and the known ones are detailed in the Appendix.
+65,000 \textbf{{[}UPDATE{]}} Hansard records publicly available across
+the state and federal parliaments (Table 1) \textbf{{[}UPDATE
+NUMBERING{]}}. As with any larger-scale data process, there are various
+issues with some of the PDFs and the known ones are detailed in the
+Appendix.
 
 \begin{longtable}[]{@{}lrrr@{}}
 \toprule
@@ -391,49 +393,29 @@ such as ministry appointments; and electoral information such as primary
 and two-party-preferred results.
 
 The main sources for this additional supplementary information are the
-handbooks supplied by the various parliaments (Table 2).
-
-\begin{longtable}[]{@{}lrr@{}}
-\toprule
-Parliament & House & Source\tabularnewline
-\midrule
-\endhead
-Commonwealth & House of Representatives & Parliamentary
-Handbok\tabularnewline
-& Senate & \textbf{{[}TBD{]}}\tabularnewline
-Queensland & Legislative Assembly & \textbf{{[}TBD{]}}\tabularnewline
-& Legislative Council & \textbf{{[}TBD{]}}\tabularnewline
-New South Wales & Legislative Assembly &
-\textbf{{[}TBD{]}}\tabularnewline
-& Legislative Council & \textbf{{[}TBD{]}}\tabularnewline
-Victoria & Legislative Assembly & \textbf{{[}TBD{]}}\tabularnewline
-& Legislative Council & \textbf{{[}TBD{]}}\tabularnewline
-Tasmania & House of Assembly & \textbf{{[}TBD{]}}\tabularnewline
-& Legislative Council & \textbf{{[}TBD{]}}\tabularnewline
-South Australia & House of Assembly & \textbf{{[}TBD{]}}\tabularnewline
-& Legislative Council & \textbf{{[}TBD{]}}\tabularnewline
-Western Australia & Legislative Assembly &
-\textbf{{[}TBD{]}}\tabularnewline
-& Legislative Council & \textbf{{[}TBD{]}}\tabularnewline
-\bottomrule
-\end{longtable}
-
-The additional information from the handbooks had many errors and it was
-supplemented by data from the Australian Dictionary of Biography and
-Wikipedia.\footnote{An example of the additional information is provided
-  in the Appendix. The datasets are available on request.}
+handbooks supplied by the various parliaments. However these had many
+errors and were supplemented by data from the Australian Dictionary of
+Biography and Wikipedia.\footnote{An example of the additional
+  information is provided in the Appendix. The datasets are available on
+  request.}
 
 \section{Model}\label{model}
 
-The main model that we use in this paper is the Structural Topic Model
+The main models that we use in this paper are the Structural Topic Model
 (STM) as implemented by the \texttt{stm} R package of
-\citet{RobertsStewartAiroldiRPackage}. The basis of this type of topic
-modelling is the Latent Dirichlet Allocation (LDA) model of
-\citet{Blei2003latent}. In this section a brief overview of both the LDA
-model and the STM approach is provided. In a similar way to
-\citet{MuellerRauh2018} we consider the outputs of the topic model as
-reduced dimension inputs. In our case they are inputs to a discrete
-choice model, and so we then discuss that model.
+\citet{RobertsStewartAiroldiRPackage}, and a discrete choice model as
+implemented by the \texttt{XXXX} R package of \textbf{XYZ}.
+Theoretically we could have directly used the text as an input to the
+discrete choice model, but this is intractable due to computer memory
+and storage constraints. Instead, in a similar way to
+\citet{MuellerRauh2018}, we use the topics that the text is about as an
+input to another model, which in our case is a discrete choice model.
+
+The basis of the STM is the Latent Dirichlet Allocation (LDA) model of
+\citet{Blei2003latent}. In this section we provide a brief overview of
+both the LDA model and the STM. we consider the outputs of the topic
+model as reduced dimension inputs. In our case they are inputs to a
+discrete choice model, and so we then discuss that model.
 
 \subsection{Latent Dirichlet
 Allocation}\label{latent-dirichlet-allocation}
