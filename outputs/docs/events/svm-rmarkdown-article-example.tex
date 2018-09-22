@@ -52,8 +52,8 @@
 
 \title{Nobody expects the Spanish Inquisition: The effect of events on
 Australian parliamentary discussion \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
-Wang, Matt Jacob, Jill Sheppard and Matthew Kerby for their helpful
-suggestions. \textbf{Version as of}: September 20, 2018;
+Wang, Matt Jacob, Leslie Root, Jill Sheppard and Matthew Kerby for their
+helpful suggestions. \textbf{Version as of}: September 22, 2018;
 \textbf{Comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
@@ -562,16 +562,14 @@ document (\citet{blei2012}, p.~7):
 
 The initial practical step when implementing LDA given a collection of
 documents is to remove `stop words'. These are words that are common,
-but that don't typically help to define topics. There is a general list
-of stop words such as: ``a''; ``a's''; ``able''; ``about'';
-``above''\ldots{} An additional list of words that are commonly found in
-Hansard, but likely don't help define topics is added to the general
-list. These additions include words such as: ``act''; ``amendment'';
-``amount''; ``australia''; ``australian''; ``bill''\ldots{} A full list
-can be found in Appendix \ref{hansard-stop-word}. We also remove
-punctuation and capitalisation. The documents need to then be
-transformed into a document-term-matrix. This is essentially a table
-with a column of the number of times each term appears in each document.
+but that don't typically help to define topics. There is a common list
+of stop words such as: ``a''; ``an''; and ``and''. However the exact
+list used depends on research of focus. In the case of Australian
+Hansard, these are words such as: ``australia''; ``australian''; and
+``bill''. Punctuation and capitalisation is also typically removed. The
+documents then need to then be transformed into a document-term-matrix.
+This is essentially a table with a column of the number of times each
+term appears in each document.
 
 After the dataset is ready, the R package `topicmodels' by
 \citet{Grun2011} can be used to implement LDA and approximate the
@@ -629,9 +627,76 @@ section.
 
 \subsection{Structural Topic Model}\label{structural-topic-model}
 
-\subsubsection{Overview and example}\label{overview-and-example}
+The distinguishing aspect of the Structural Topic Model (STM) of
+\citet{RobertsStewartAiroldi2016} is that it includes additional
+information about documents. For instance, in general we usually have
+some information about the author and date of a document. In the case of
+Hansard, we know who was speaking and the date. STM allows this
+additional information to affect the construction of topics, though
+influencing either topical prevalence or topical content. That said, the
+assumption that there is some document generation process is the same as
+the LDA method, it is just that this process now includes metadata.
 
-{[}TBD{]}
+The STM is set-up to most easily include metadata to do with prevalence
+and content. Prevalence relates to the topic proportions in each
+document. For instance, we expect that topics related to the reasons for
+Federation such as tariffs and trade should be more prevalent in those
+earlier years than later. Similarly, we may expect topics to do with
+terrorism to be more prevalent in recent years than in earlier ones.
+Content relates to the words that make up each topic. For instance,
+there are changes in the use of language over the period for which we
+have data, and it would be better for these to not be responsible for
+defining different topics rather than being part of the same topic.
+
+The document generation process of \citet{Blei2003latent} discussed
+earlier is modified slightly by \citet{RobertsStewartAiroldi2016}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The proportion of a document dedicated to a topic is drawn ``from a
+  logistic-normal generalised linear model based on a vector of document
+  covariates \(X_d\)'':
+  \[\theta_d|X_d\gamma\sigma \sim logisticnormal(\mu = X_d\gamma, \sigma)\]
+  ``where \(X_d\) is a 1-by-p vector, \(\gamma\) is a p-by-K - 1 matrix
+  of coefficients and \(\sigma\) is K-1 by K-1 covariance matrix.''
+  \textbf{THIS IS ALL QUOTES. NEED TO REWRITE.}
+\item
+  Given a document-level content covariate
+\end{enumerate}
+
+HERE
+
+Following \citet{BleiLafferty2009}, \citet{blei2012} and
+\citet{GriffithsSteyvers2004}, the process by which a document is
+generated is more formally considered to be:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  There are For each topic, decide the terms that the topic uses by
+  randomly drawing distributions over the terms. The distribution over
+  the terms for the \(k\)th topic is \(\beta_k\). Typically a topic
+  would be a small number of terms and so the Dirichlet distribution
+  with hyperparameter \(0<\eta<1\) is used:
+  \(\beta_k \sim \mbox{Dirichlet}(\eta)\).\footnote{The Dirichlet
+    distribution is a variation of the beta distribution that is
+    commonly used as a prior for categorical and multinomial variables.
+    If there are just two categories, then the Dirichlet and the beta
+    distributions are the same. In the special case of a symmetric
+    Dirichlet distribution, \(\eta=1\), it is equivalent to a uniform
+    distribution. If \(\eta<1\), then the distribution is sparse and
+    concentrated on a smaller number of the values, and this number
+    decreases as \(\eta\) decreases. A hyperparameter is a parameter of
+    a prior distribution.} Strictly, \(\eta\) is actually a vector of
+  hyperparameters, one for each \(K\), but in practice they all tend to
+  be the same value.
+\end{enumerate}
+
+STM can be implented using the stm R package of
+\citet{RobertsStewartAiroldiRPackage}.
 
 Note that each of the states and the Commonwealth are treated
 independently here. Future work could expand the model to better
@@ -677,6 +742,8 @@ Major event such as 9/11 attacks, or economic change.
 
 \section{Summary and conclusions}\label{summary-and-conclusions}
 
+In this paper we examined
+
 What could happen if we had longer terms. Eg GST needed multiple
 generations of politicians but carbon tax couldn't because it was one
 generation.
@@ -686,6 +753,8 @@ to more detailed analysis such as qualitative methods and case studies.
 We consider the results presented in this paper, as well as many of
 those results of the larger text-as-data research program, as fitting
 within findings based on other methods.
+
+Future work - examine how it chagned during Federation
 
 \newpage
 
@@ -700,6 +769,418 @@ Which years are being used (not non-OCRd)
 \subsection{Dataset issues}\label{dataset-issues}
 
 Which PDFs are missing or have no content, etc.
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+\begin{minipage}[b]{0.02\columnwidth}\raggedright\strut
+year\strut
+\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
+I have this number in Reps\strut
+\end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright\strut
+They say this number in Senate\strut
+\end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright\strut
+They say this number in Reps\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
+Difference in Reps\strut
+\end{minipage} & \begin{minipage}[b]{0.11\columnwidth}\raggedright\strut
+Comment\strut
+\end{minipage} & \begin{minipage}[b]{0.31\columnwidth}\raggedright\strut
+Source\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1902\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+106\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+93\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+107\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+Positive means I am missing some\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\url{https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1908\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+93\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+84\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+91\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-2\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+Negative means I have too many\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1909\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+97\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+71\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+98\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1918\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+87\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+68\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+86\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1920\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+113\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+76\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+114\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1921\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+92\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+79\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+93\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1934\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+36\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+22\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+35\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1935\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+54\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+37\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+55\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1942\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+44\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+36\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+45\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1948\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+89\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+39\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+90\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1951\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+55\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+40\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+56\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1955\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+53\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+36\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+52\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1974\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+64\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+64\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+62\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-2\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1985\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+65\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+74\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+66\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1991\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+66\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+83\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+67\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1992\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+76\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+44\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-16\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1993\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+47\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+53\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+46\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1994\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+69\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+80\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+68\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1995\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+71\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+78\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+70\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1997\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+79\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+82\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+76\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-3\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+1998\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+56\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+57\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+54\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+-2\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+2000\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+71\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+71\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+73\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+2002\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+68\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+69\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+2003\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+74\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+64\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+75\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+2004\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+58\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+49\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+59\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
+2012\strut
+\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
+63\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+57\strut
+\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
+67\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
+\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
+\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
 
 \subsection{Example workflow}\label{example-workflow}
 
