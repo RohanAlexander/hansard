@@ -28,9 +28,17 @@ endnote: no
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(kableExtra)
+library(knitr)
 library(tidyverse)
-```
 
+elections <- read_csv(here::here("inputs/misc/misc_elections_data.csv"), col_types = cols())
+governments <- read_csv(here::here("inputs/misc/change_of_pm.csv"), col_types = cols())
+keyEconomicDates <- read_csv(here::here("inputs/misc/key_dates-economic.csv"), col_types = cols())
+keyOtherDates <- read_csv(here::here("inputs/misc/key_dates-other.csv"), col_types = cols())
+
+```
 
 # Introduction
 New governments often go to some trouble to be different to the governments they replace. For instance, Kevin Rudd's apology to Indigenous Australians was not supported by his predecessor John Howard, and then one of Tony Abbott's first acts was to repeal his predecessor Kevin Rudd's carbon tax. Similarly, significant events such as the 9/11 attacks or the Great Recession have often altered the course of a government. However it is not so clear which events drive changes, for how long these changes persist, and what was given up due to the change.
@@ -50,7 +58,7 @@ Following the example of the UK a daily text record called Hansard of what was s
 
 [^Verbatimfootnote]: While Hansard is not necessarily verbatim, it is considered close enough for text-as-data purposes. For instance, @Mollin2008 found that in the case of the UK Hansard the differences would only affect specialised linguistic analysis. @Edwards2016 examined Australia, New Zealand and the UK, and found that changes were usually made by those responsible for creating the Hansard record, instead of the parliamentarians.
 
-Australian Hansard records have been analysed for various purposes. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment.
+Australian Hansard records have been analysed for various purposes, usually at smaller-scale. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment.
 
 Australian parliaments generally make their daily Hansard records available online as PDFs and these are considered the official release. There is a more limited set of XML records available in some cases.[^XMLfootnote] There are 65,000 **[UPDATE]** Hansard records publicly available across the state and federal parliaments (Table 1) **[UPDATE NUMBERING]**. As with any larger-scale data process, there are various issues with some of the PDFs and the known ones are detailed in the Appendix.
 
@@ -183,12 +191,13 @@ The distinguishing aspect of the Structural Topic Model (STM) of @RobertsStewart
 
 The STM is set-up to most easily include metadata to do with prevalence and content. Prevalence relates to the topic proportions in each document. For instance, we expect that topics related to the reasons for Federation such as tariffs and trade should be more prevalent in those earlier years than later. Similarly, we may expect topics to do with terrorism to be more prevalent in recent years than in earlier ones. Content relates to the words that make up each topic. For instance, there are changes in the use of language over the period for which we have data, and it would be better for these to not be responsible for defining different topics rather than being part of the same topic.
 
-The document generation process of @Blei2003latent discussed earlier is modified slightly by @RobertsStewartAiroldi2016:
+Again, the assumed process that generates the documents is the key aspect as this will be reversed to estimate the topics. The document generation process of @Blei2003latent discussed earlier, is only slightly modified by @RobertsStewartAiroldi2016 for the STM:
 
 1. The proportion of a document dedicated to a topic is drawn "from a logistic-normal generalised linear model based on a vector of document covariates $X_d$":
-$$\theta_d|X_d\gamma\sigma \sim logisticnormal(\mu = X_d\gamma, \sigma)$$
+$$\theta_d|X_d\gamma\sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \sigma)$$
 "where $X_d$ is a 1-by-p vector, $\gamma$ is a p-by-K - 1 matrix of coefficients and $\sigma$ is K-1 by K-1 covariance matrix." **THIS IS ALL QUOTES. NEED TO REWRITE.**
-2. Given a document-level content covariate
+2. **THIS IS ALL QUOTES. NEED TO REWRITE.** Given a document-level content covariate $y_d$, form the document-specific distribution over words representing each topic ($k$) using the baseline word distribution $m$, the topic specific deviation, $\kappa_k^{(t)}$, the covariate group deviation, $\kappa_{y_d}^{(c)}$, and the interaction between the two, $\kappa_{y_{d}k}^{(i)}$:
+$$\beta_{d,k}\sim exp(m+\kappa^{(t)}_{k} + \kappa_{y_d}^{(c)} + \kappa_{y_{d}k}^{(i)}) $$
 
 HERE
 
@@ -201,19 +210,56 @@ Following @BleiLafferty2009, @blei2012 and @GriffithsSteyvers2004, the process b
 
 STM can be implented using the stm R package of @RobertsStewartAiroldiRPackage.
 
+```{r pressure, echo=FALSE, fig.cap="A caption", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/all_topics_usable.png"))
+```
+
+<!-- ![alt text](here::here(/outputs/figures/all_topics_usable.png)) -->
 
 
 
 Note that each of the states and the Commonwealth are treated independently here. Future work could expand the model to better understand, and allow, for correlation between them.
 
 ### Considering events
-We consider the effect of political, economic, and other events on Australian parliamentary discussion. Political events are those related to a change of government or an election. Economic events are defined by substantial changes in various economic measures, such as the onset of the Great Depression or the Great Recession. Other events are those such as the 9/11 attacks, or the Bali Bombing. The list of events that we consider is detailed in Table 2 **[UPDATE TABLE NUMBERING]**.
+We consider the effect of political, economic, and other events on Australian parliamentary discussion. Political events are those related to a change of government or an election (Tables \@ref(tab:governments) and \@ref(tab:elections)). Economic events are defined by substantial changes in various economic measures, such as the onset of the Great Depression or the Great Recession (Table \@ref(tab:economicevents)). Other events are those such as the 9/11 attacks, or the Bali Bombing (Table \@ref(tab:otherevents)). The list of events that we consider is detailed in .
 
 
+```{r governments, echo = FALSE, results = 'asis'}
+
+governments %>% 
+  kable(booktabs = T, caption = "Change in governments") %>%
+  kable_styling(font_size = 8)
+
+```
 
 
+```{r elections, echo = FALSE, results = 'asis'}
+
+elections %>% 
+  filter(election == 1) %>% 
+  select(year, electionDate, electionWinner) %>% 
+  kable("latex", booktabs = T, caption = "Elections") %>%
+  kable_styling(font_size = 8)
+
+```
 
 
+```{r economicevents, echo = FALSE, results = 'asis'}
+
+keyEconomicDates %>% 
+  kable(booktabs = T, caption = "Key economic events") %>%
+  kable_styling(font_size = 8)
+
+```
+
+
+```{r otherevents, echo = FALSE, results = 'asis'}
+
+keyOtherDates %>% 
+  kable(booktabs = T, caption = "Key other events") %>%
+  kable_styling(font_size = 8)
+
+```
 
 # Results
 ## Political events
