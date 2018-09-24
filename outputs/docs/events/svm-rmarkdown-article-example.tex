@@ -52,9 +52,9 @@
 
 \title{Nobody expects the Spanish Inquisition: The effect of events on
 Australian parliamentary discussion \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
-Wang, Matt Jacob, Leslie Root, Jill Sheppard and Matthew Kerby for their
-helpful suggestions. \textbf{Version as of}: September 22, 2018;
-\textbf{Comments welcome}:
+Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, and Chris
+Cochrane for their helpful suggestions. \textbf{Version as of}: 23
+September 2018; \textbf{comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
 
@@ -266,11 +266,10 @@ and 1950. And in the US \citet{GentzkowShapiroTaddy2018} examine
 congressional speech records from 1873 to 2016 to find that partisanship
 has risen in the past few decades.
 
-Australian Hansard records have been analysed for various purposes, but
-usually at a more-specific level than we do here. For instance,
-\citet{Rasiah2010} examined Hansard records for the Australian House of
-Representatives to examine whether politicians attempted to evade
-questions about Iraq during February and March 2003. And
+Australian Hansard records have been analysed for various purposes. For
+instance, \citet{Rasiah2010} examined Hansard records for the Australian
+House of Representatives to examine whether politicians attempted to
+evade questions about Iraq during February and March 2003. And
 \citet{GansLeigh2012} examined Australian Hansard records to associate
 mentions by politicians of certain public intellectuals with neutral or
 positive sentiment.
@@ -356,7 +355,7 @@ interjecting'. Interjections are interesting in their own right, for
 instance \citet{Whyte2017} analysed them in a Canadian context for the
 period 1926 to 2015 to find that female MPs were more likely to be
 interrupted than male MPs, but do not usually contribute much to
-defining the topics being discussed that day.
+defining the topics being discussed.
 
 Usually the disaggregation into individual-level records is done by
 identifying politicians' names in particular patterns. For instance,
@@ -404,12 +403,12 @@ Biography and Wikipedia.\footnote{An example of the additional
 The main models that we use in this paper are the Structural Topic Model
 (STM) as implemented by the \texttt{stm} R package of
 \citet{RobertsStewartAiroldiRPackage}, and a discrete choice model as
-implemented by the \texttt{XXXX} R package of \textbf{XYZ}.
-Theoretically we could have directly used the text as an input to the
-discrete choice model, but this is intractable due to computer memory
-and storage constraints. Instead, in a similar way to
-\citet{MuellerRauh2018}, we use the topics that the text is about as an
-input to another model, which in our case is a discrete choice model.
+implemented by the \texttt{XXXX} R package of \textbf{XYZ}. In theory we
+could have directly used the text as an input to the discrete choice
+model, but this is intractable due to computer memory and storage
+constraints. Instead, in a similar way to \citet{MuellerRauh2018}, we
+use the topics that the text is about as an input to another model,
+which in our case is a discrete choice model.
 
 The basis of the STM is the Latent Dirichlet Allocation (LDA) model of
 \citet{Blei2003latent}. In this section we provide a brief overview of
@@ -420,24 +419,25 @@ discrete choice model, and so we then discuss that model.
 \subsection{Latent Dirichlet
 Allocation}\label{latent-dirichlet-allocation}
 
-When the text data is being modelled at the day level then each day's
-Hansard record needs to be classified by its topic. Although more- or
-less-fine levels of analysis are possible. Sometimes Hansard records
-includes titles that make the topic clear. But not every statement has a
-title and the titles do not always define topics in a well-defined and
-consistent way, especially over longer time periods. One way to get
-consistent estimates of the topics discussed in Hansard is to use the
-LDA method of \citet{Blei2003latent}, for instance as implemented by the
-R package `topicmodels' by \citet{Grun2011}.
+Although more- or less-fine levels of analysis are possible, but here we
+are primarily interested in considering a day's topics. This means that
+each day's Hansard record needs to be classified by its topics.
+Sometimes Hansard records includes titles that make the topic clear. But
+not every statement has a title and the titles do not always define
+topics in a well-defined and consistent way, especially over longer time
+periods. One way to get consistent estimates of the topics discussed in
+Hansard is to use the LDA method of \citet{Blei2003latent}, for instance
+as implemented by the R package `topicmodels' by \citet{Grun2011}.
 
 The key assumption behind the LDA method is that each day's text, `a
 document', in Hansard is made by speakers who decide the topics they
 would like to talk about in that document, and then choose words,
 `terms', that are appropriate to those topics. A topic could be thought
-of as a collection of terms, and a document as a collection of topics.
-The topics are not specified \emph{ex ante}; they are an outcome of the
+of as a collection of terms, and a document as a collection of topics,
+where these collections are defined by probability distributions. The
+topics are not specified \emph{ex ante}; they are an outcome of the
 method. In this sense, this approach can be considered unsupervised
-machine learning. Terms are not necessarily unique to a particular
+statistical learning. Terms are not necessarily unique to a particular
 topic, and a document could be about more than one topic. This provides
 more flexibility than other approaches such as a strict word count
 method. The goal is to have the words found in each day's Hansard group
@@ -571,9 +571,9 @@ documents then need to then be transformed into a document-term-matrix.
 This is essentially a table with a column of the number of times each
 term appears in each document.
 
-After the dataset is ready, the R package `topicmodels' by
+After the dataset is ready, the R \texttt{topicmodels} package of
 \citet{Grun2011} can be used to implement LDA and approximate the
-posterior. It does this using Gibbs sampling or the variational
+posterior. It can do this using Gibbs sampling or the variational
 expectation-maximization algorithm. Following
 \citet{SteyversGriffiths2006} and \citet{Darling2011}, the Gibbs
 sampling process attempts to find a topic for a particular term in a

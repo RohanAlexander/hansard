@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 22 September 2018
+# Last updated: 23 September 2018
 # Prerequisites:
 # Issues:
 
@@ -84,7 +84,7 @@ tidy_hansard <- all_hansard_words %>%
   split(.$grouper) %>%
   map_dfr(tidy_hansard_pieces, .id = NULL)
 
-rm(all_hansard_words, tidy_hansard_pieces, custom_stop_words, politicians)
+rm(tidy_hansard_pieces, custom_stop_words, politicians)
 
 # Construct the TF-IDF measures on a day basis
 # By day
@@ -122,6 +122,17 @@ tidy_hansard_reduced <- tidy_hansard %>%
 # Create a corpus with document variables except for the "text"
 hansard_corpus <- corpus(tidy_hansard_reduced, text_field = "textid_field")
 
+# Add metadata
+all_hansard_words_test <- all_hansard_words %>% 
+  filter(date %in% tidy_hansard_reduced$docid_field)
+
+tidy_hansard_reduced <- tidy_hansard_reduced %>% 
+  left_join(all_hansard_words_test, by = c("docid_field" = "date")) %>% 
+  select(-words, -grouper)
+
+docvars(hansard_corpus, "electionCounter") <- tidy_hansard_reduced$electionCounter
+summary(hansard_corpus)
+
 # Convert that corpus to a document-feature matrix - cleaning options can be added
 hansard_dfm <- dfm(hansard_corpus)
 
@@ -142,14 +153,14 @@ names(hansard_dfm)
 # Clean up
 rm(tidy_hansard_reduced, hansard_corpus, docsTM, vocabTM, metaTM)
 
-# HERE
+#HERE
 
 test <-
   stm(
     documents = hansard_dfm$documents,
     vocab = hansard_dfm$vocab,
     K = 100,
-    prevalence =~ docid_field,
+    prevalence =~ docid_field + electionCounter,
     data = hansard_dfm$meta,
     max.em.its = 75,
     init.type = "Spectral"
@@ -167,6 +178,9 @@ td_gamma %>%
   ggplot(aes(x = document, y = gamma)) +
   geom_point() +
   theme_classic() 
+
+prep <- estimateEffect( ~ docid_field + electionCounter, test, meta = hansard_dfm$meta, uncertainty = "Global")
+summary(prep), topics = 1)
 
 ## NEED TO PUT THE TESTING IN THERE SOMEWHERE
 
