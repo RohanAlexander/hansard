@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 23 September 2018
+# Last updated: 25 September 2018
 # Prerequisites:
 # Issues:
 
@@ -155,23 +155,23 @@ rm(tidy_hansard_reduced, hansard_corpus, docsTM, vocabTM, metaTM)
 
 #HERE
 
-test <-
+model_prevalence_is_spline <-
   stm(
     documents = hansard_dfm$documents,
     vocab = hansard_dfm$vocab,
     K = 100,
-    prevalence =~ docid_field + electionCounter,
+    prevalence =~ s(as.numeric(docid_field)),
     data = hansard_dfm$meta,
     max.em.its = 75,
     init.type = "Spectral"
   )
 
-td_gamma <- tidy(test,
+td_gamma <- tidy(model_prevalence_is_spline,
                  matrix = "gamma",
                  document_names = hansard_dfm$meta$docid_field)
 td_gamma
 
-write_csv(td_gamma, "test_gammas.csv")
+write_csv(td_gamma, "gammas_model_prevalence_is_spline.csv")
 
 td_gamma %>% 
   mutate(document = ymd(document)) %>% 
