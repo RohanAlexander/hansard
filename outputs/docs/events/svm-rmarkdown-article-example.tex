@@ -53,7 +53,7 @@
 \title{Nobody expects the Spanish Inquisition: The effect of events on
 Australian parliamentary discussion \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
 Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, and Chris
-Cochrane for their helpful suggestions. \textbf{Version as of}: 25
+Cochrane for their helpful suggestions. \textbf{Version as of}: 26
 September 2018; \textbf{comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
@@ -183,9 +183,9 @@ Australian state and federal parliaments from the mid-1800s through to
 2017 based on available public records. We use a structural text model
 to reduce the dimensionality of the text and to impose prior knowledge
 such as correlation between days and changes over time. We then examine
-the effect of various events using a discrete choice model. We find
-that: 1) changes of government are associated with topic changes only
-when there is also a change of the party in power; and 2) economic
+the effect of various events using a simple discrete choice model. We
+find that: 1) changes of government are associated with topic changes
+only when there is also a change of the party in power; and 2) economic
 events, such as financial crises, have significant and persistent
 effects. Our findings have implications for how we think about the
 longer-term trajectory of government policy as the media cycle becomes
@@ -230,7 +230,7 @@ We find \textbf{{[}INSERT RESULTS{]}}.
 Our paper applies a topic model to a dataset of larger-scale
 parliamentary text records from multiple Australian parliaments. Our use
 of a discrete choice model allows us construct a counterfactual. Our
-work fits into a growing literature that considers text as a input to
+work fits into a growing literature that considers text as an input to
 more usual quantitative techniques, rather than requiring separate
 analysis. While using text as data has well-known shortcomings, it
 allows larger-scale analysis that would not be viable using
@@ -280,16 +280,16 @@ An example of what a page of Hansard looks like is included in Appendix
 \textbf{{[}ADD NUMBERING{]}}. There is a more limited set of XML records
 available in some cases.\footnote{Tim Sherratt makes these XML records
   available as a single download and also presents them in a website
-  (historichansard.net/) that can be used to explore Commonwealth
-  Hansard records from 1901 to 1980. Commonwealth XML records from 1998
-  to 2014 are available from Andrew Turpin's website, and from 2006
-  through to today from Open Australia's website. The records can also
-  be downloaded from the Australian Hansard website.} There are 65,000
-\textbf{{[}UPDATE{]}} Hansard records publicly available across the
-state and federal parliaments (Table 1) \textbf{{[}UPDATE NUMBERING{]}}.
-As with any larger-scale data process, there are various issues with
-some of the PDFs and the known ones are detailed in Appendix
-\textbf{{[}ADD NUMBERING{]}}.
+  (\url{http://historichansard.net/}) that can be used to explore
+  Commonwealth Hansard records from 1901 to 1980. Commonwealth XML
+  records from 1998 to 2014 are available from Andrew Turpin's website,
+  and from 2006 through to today from Open Australia's website. The
+  records can also be downloaded from the Australian Hansard website.}
+There are 65,000 \textbf{{[}UPDATE{]}} Hansard records publicly
+available across the state and federal parliaments (Table 1)
+\textbf{{[}UPDATE NUMBERING{]}}. As with any larger-scale data process,
+there are various issues with some of the PDFs and the known ones are
+detailed in Appendix \textbf{{[}ADD NUMBERING{]}}.
 
 \begin{longtable}[]{@{}lrrr@{}}
 \toprule
@@ -312,16 +312,13 @@ New South Wales\footnote{The NSW Legislative Council was established
 Victoria & Legislative Assembly & 1856 - 2017 &
 \textbf{{[}TBD{]}}\tabularnewline
 & Legislative Council & 1851 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
-Tasmania\footnote{\textbf{{[}Update this, depending on final Tassie
-  records{]}}.} & House of Assembly & 1856 - 2017 &
+Tasmania & House of Assembly & 1856 - 2017 &
 \textbf{{[}TBD{]}}\tabularnewline
 & Legislative Council & 1856 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
-South Australia\footnote{\textbf{{[}Update this, depending on final SA
-  records{]}}.} & House of Assembly & 1857 - 2017 &
+South Australia & House of Assembly & 1857 - 2017 &
 \textbf{{[}TBD{]}}\tabularnewline
 & Legislative Council & 1840 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
-Western Australia\footnote{\textbf{{[}Update this, depending on final WA
-  records{]}}.} & Legislative Assembly & 1890 - 2017 &
+Western Australia & Legislative Assembly & 1890 - 2017 &
 \textbf{{[}TBD{]}}\tabularnewline
 & Legislative Council & 1832 - 2017 & \textbf{{[}TBD{]}}\tabularnewline
 \bottomrule
@@ -378,8 +375,7 @@ and to change all the words to lower case. Then the sentences are
 deconstructed and each word considered individually. In addition to the
 packages already mentioned, in this step the R scripts to do this use
 the \texttt{tidytext} R package of \citet{SilgeRobinson2016}.
-\textbf{NEED TO bundle\_ngrams i.e.~olive oil should be olive\_oil, not
-considered separately.}
+\textbf{{[}Need to bundle\_ngrams i.e.~olive oil is olive\_oil{]}}
 
 \subsection{Additional information}\label{additional-information}
 
@@ -653,52 +649,68 @@ terrorism to be more prevalent in recent years. Content relates to the
 words that make up each topic. For instance, there are changes in the
 use of language over the period for which we have data, and it would be
 better for these to not be responsible for defining different topics
-rather than being part of the same topic.
+rather than being part of the same topic. The prevalence meta-data for
+the \(d\)th document are in \(X_d\), which has one column for each
+aspect. For instance, if there were 10 documents and each had a date and
+an author, then \(X\) would be \(10\times 2\). Similarly, the content
+meta-data are
 
-Again, the assumed process that generates the documents is the key
+As with LDA, the process assumed to generate the documents is the key
 aspect as this will be reversed to estimate the topics. The document
 generation process of \citet{Blei2003latent} discussed earlier, is
 slightly modified by \citet{RobertsStewartAiroldi2016} for the STM:
 
-\textbf{THIS NEEDS WORK START}
-
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
-  The proportion of a document dedicated to a topic, stored in the
-  vector \(\theta_d\), is drawn from a logistic-normal distribution,
+  As with LDA, the topic distributions, that is, the proportion of a
+  document dedicated to a topic, for the \(d\)th document are
+  \(\theta_d\), and \(\theta\) is a vector with length \(D\). In
+  contrast to LDA, this is a drawn from a logistic-normal distribution,
   parameterised such that the mean of that distribution, \(\mu\), is
-  affected by a document covariates, \(X_d\), following
-  \citet{RobertsStewartTingley2018}:
-  \[\theta_d|X_d\gamma\sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)\]
-  ``where \(X_d\) is a 1-by-p vector, \(\gamma\) is a p-by-K - 1 matrix
-  of coefficients and \(\sigma\) is K-1 by K-1 covariance matrix.'' This
-  is in contrast to the Dirichlet distribution that characterises LDA.
+  affected by a vector of document covariates, \(X_d\) (following
+  \citet{RobertsStewartTingley2018}, p.3):
+  \[\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)\]
 \item
-  \textbf{THIS IS ALL QUOTES. NEED TO REWRITE.} Given a document-level
-  content covariate \(y_d\), form the document-specific distribution
-  over words representing each topic (\(k\)) using the baseline word
-  distribution \(m\), the topic specific deviation, \(\kappa_k^{(t)}\),
-  the covariate group deviation, \(\kappa_{y_d}^{(c)}\), and the
-  interaction between the two, \(\kappa_{y_{d}k}^{(i)}\):
-  \[\beta_{d,k}\propto exp(m+\kappa^{(t)}_{k} + \kappa_{y_d}^{(c)} + \kappa_{y_{d}k}^{(i)}) \]
+  To decide the distribution over terms for each topic, \(\beta_{d,k}\),
+  start with some baseline distribution over the terms, \(m\).
+  Topic-\(k\)-specific deviations from this are controlled by
+  \(\kappa_k^{(t)}\), deviations due to the document meta-data are
+  controlled by \(\kappa_{y_d}^{(c)}\), and the interaction between
+  these two deviations is controlled by \(\kappa_{y_d,k}^{(i)}\):
+  \[\beta_{d,k}\propto \mbox{exp}\left(m+\kappa^{(t)}_{k} + \kappa_{y_d}^{(c)} + \kappa_{y_{d}k}^{(i)}\right) \]
+\item
+  Then if there are \(n\) terms in the \(d\)th document, then to choose
+  the \(n\)th term, \(w_{d,n}\):
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \tightlist
+  \item
+    Randomly choose a topic for that term from the document-specific
+    multinomial distribution over topics.
+  \item
+    Randomly choose a term from the topic-specific multinomial
+    distribution over terms.
+  \end{enumerate}
 \end{enumerate}
 
-\textbf{THIS NEEDS WORK END}
-
-We implement the STM on the daily-level parliamentary text data
-described earlier using the \texttt{stm} R package of
+We primarily implement the STM on the daily-level parliamentary text
+data described earlier using the \texttt{stm} R package of
 \citet{RobertsStewartAiroldiRPackage}. We consider both topic prevalence
-and content to be functions of time. The choice of how many topics to
-use in the model is a situation-specific compromise. We use standard
-diagnostic techniques to decide on 80 topics, and more detail on this
-process is available in Appendix \textbf{{[}ADD NUMBERING{]}}.
+and content to be functions of time. The choice of the number of topics
+to use in the model is a situation-specific compromise. We use standard
+diagnostic techniques to decide on 80 \textbf{{[}UPDATE{]}} topics. More
+detail on this process is available in Appendix \textbf{{[}ADD
+NUMBERING{]}}.
 
-One way to summarise the results of the topic model is to \textbf{????}
+The illustrate the output of an STM, Figure @ref(fig:example\_topics))
+shows the estimated proportion of each day summarised by ten topics for
+the House of Representatives for 1901 through to 2017. \textbf{{[}RUN
+AND GRAPH AN ACTUAL 10-TOPIC MODEL - THESE DATA ARE JUST SUMMED.{]}}
 
 \begin{figure}
-\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/all_topics_usable} \caption{A caption}\label{fig:pressure}
+\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/topics_example} \caption{Estimated 10-topic-proportion}(\#fig:example_topics)
 \end{figure}
 
 Note that each of the states and the Commonwealth are treated
@@ -707,14 +719,24 @@ understand, and allow, for correlation between them.
 
 \subsubsection{Considering events}\label{considering-events}
 
-We consider the effect of political, economic, and other events on
-Australian parliamentary discussion. Political events are those related
-to a change of government or an election. Economic events are defined by
-substantial changes in various economic measures, such as the onset of
-the Great Depression or the Great Recession. Other events are those such
-as the 9/11 attacks, or the Bali Bombing. The full list of events that
-we consider is detailed in Appendix \textbf{{[}ADD NUMBERING{]}}. We
-consider events in two ways. The first is in the change in the word
+We are interested in the effect of political, economic, and other events
+on Australian parliamentary discussion. Political events are those
+related to a change of government or an election. Economic events are
+defined by substantial changes in various economic measures, such as the
+onset of the Great Depression or the Great Recession. Other events are
+those such as the 9/11 attacks, or the Bali Bombing. The full list of
+events that we consider is detailed in Appendix \textbf{{[}ADD
+NUMBERING{]}}.
+
+There is a large number of ways to statistically consider the effect of
+events. Options that would take advantage of the time series nature of
+our data include: autoregressive moving average (ARMA) models which are
+commonly used in finance to test for structural breaks
+\textbf{{[}REFERENCE?{]}}; or splines could be fit with specific knot
+placements and then cross validation used to compare the RSS with a more
+general splines model.
+
+We consider events in two ways. The first is in the change in the word
 usage before and after events and the second is in changes in the
 topics.
 
@@ -724,7 +746,7 @@ for words that are rarely used across all documents, but commonly used
 in a document. For instance, in Australian parliamentary text records
 `the' is commonly used in many documents and so the fact that it is used
 in any particular document is not usual. However, `aboriginal' is less
-common across, and so if it was especially prevelant in a particular
+common across, and so if it was especially prevalent in a particular
 document that may distinguish that document.
 
 When we consider events using tf-idf, we gather terms from more than one
@@ -777,7 +799,7 @@ We consider the results presented in this paper, as well as many of
 those results of the larger text-as-data research program, as fitting
 within findings based on other methods.
 
-Future work - examine how it chagned during Federation
+Future work - examine how it changed during Federation
 
 \newpage
 

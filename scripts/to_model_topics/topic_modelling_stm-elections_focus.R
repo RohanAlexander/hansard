@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 25 September 2018
+# Last updated: 26 September 2018
 # Prerequisites:
 # Issues:
 
