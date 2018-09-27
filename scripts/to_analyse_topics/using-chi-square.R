@@ -22,7 +22,7 @@ library(tidyverse)
 # Load the election dates
 election_dates <- read_csv("inputs/misc/misc_elections_data.csv")
 # Load topics
-topics <- read_csv("outputs/big_files_do_not_push/test_gammas.csv")
+topics <- read_csv("outputs/big_files_do_not_push/gammas_model_prevalence_is_spline.csv")
 head(election_dates)
 head(topics)
 
@@ -35,6 +35,8 @@ all_dates <-
 
 topics <- topics %>% 
   left_join(all_dates, by = c("document" = "allDates"))
+
+head(topics)
 
 rm(all_dates, election_dates)
 
@@ -58,6 +60,6 @@ tbl %>% class()
 
 ggplot(topics_test, aes(x = topic, y = ave_gamma, colour = electionCounter))+
   geom_point()
+rmultinom(10, size = 12, prob = c(0.1,0.2,0.8))
 
-
-chisq.test(topics_test[1:90,])
+chisq.test(topics_test[1:5,])

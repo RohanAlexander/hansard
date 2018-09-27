@@ -209,17 +209,15 @@ Note that each of the states and the Commonwealth are treated independently here
 ### Considering events
 We are interested in the effect of political, economic, and other events on Australian parliamentary discussion. Political events are those related to a change of government or an election. Economic events are defined by substantial changes in various economic measures, such as the onset of the Great Depression or the Great Recession. Other events are those such as the 9/11 attacks, or the Bali Bombing. The full list of events that we consider is detailed in Appendix **[ADD NUMBERING]**.
 
-There are many ways to statistically consider the effect of events. Options that would take advantage of the time series nature of our data include: autoregressive moving average (ARMA) models which are commonly used in finance to test for structural breaks  **[REFERENCE?]**; or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model. Alternatively, the time series aspect could be ignored, and then the topics could be 
+There are many ways to statistically consider the effect of events. One way would be to ignore the time series aspect and just group the topic proportions by each event and then run multinomial tests for whether the groups are different. Another would be to consider some type of multinomial logistic regression. Options that would take advantage of the time series nature of our data include: autoregressive moving average (ARMA) models which are commonly used in finance to test for structural breaks  **[REFERENCE?]**; or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model. 
 
 
 
-We consider events in two ways. The first is in the change in the word usage before and after events and the second is in changes in the topics. 
+<!-- We consider events in two ways. The first is in the change in the word usage before and after events and the second is in changes in the topics.  -->
 
-Differences in word usage can be evaluated using the term frequency-inverse document frequency (tf-idf) measure. It will be higher for words that are rarely used across all documents, but commonly used in a document. For instance, in Australian parliamentary text records 'the' is commonly used in many documents and so the fact that it is used in any particular document is not usual. However, 'aboriginal' is less common across, and so if it was especially prevalent in a particular document that may distinguish that document.
+<!-- Differences in word usage can be evaluated using the term frequency-inverse document frequency (tf-idf) measure. It will be higher for words that are rarely used across all documents, but commonly used in a document. For instance, in Australian parliamentary text records 'the' is commonly used in many documents and so the fact that it is used in any particular document is not usual. However, 'aboriginal' is less common across, and so if it was especially prevalent in a particular document that may distinguish that document. -->
 
-When we consider events using tf-idf, we gather terms from more than one day. We define groups of days that are roughly analogous to sitting periods. If there is more than a week between a day then we define a new group, otherwise the day is in the existing group. We use various measures **(Text2vec R package has some? or some other package)** to define a baseline measure of how different each group is, and then test for whether groups separated by our events are significantly different to this baseline.
-
-Changes in topics also help define how ...
+<!-- When we consider events using tf-idf, we gather terms from more than one day. We define groups of days that are roughly analogous to sitting periods. If there is more than a week between a day then we define a new group, otherwise the day is in the existing group. We use various measures **(Text2vec R package has some? or some other package)** to define a baseline measure of how different each group is, and then test for whether groups separated by our events are significantly different to this baseline. -->
 
 
 
