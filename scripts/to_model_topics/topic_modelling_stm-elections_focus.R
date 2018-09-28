@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 26 September 2018
+# Last updated: 27 September 2018
 # Prerequisites:
 # Issues:
 
@@ -23,28 +23,16 @@ library(tidyverse)
 # library(viridis)
 # update.packages()
 
-plan(multiprocess)
+# plan(multiprocess)
 
 # Load Hansard words by day
 load("outputs/big_files_do_not_push/all_hansard_words_by_date.Rda") # Takes 30 sec or so
-# Load the election dates
+# Load the metadata
 election_dates <- read_csv("inputs/misc/misc_elections_data.csv")
-# Load the Hansard dates
 hansard_dates <- read_csv("inputs/misc/hansard_dates.csv")
-
-
-#### Create some date dummies ####
-# Create a dummy that increments when there's an election
-all_dates <-
-  tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) %>%  # Make a column of all the dates from Federation
-  mutate(electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
-         electionDate = cumsum(electionDate)) %>% 
-  rename(electionCounter = electionDate)
-
-all_hansard_words <- all_hansard_words %>% 
-  left_join(all_dates, by = c("date" = "allDates"))
-
-rm(all_dates, election_dates, hansard_dates)
+governmentChanges <- read_csv("inputs/misc/change_of_pm.csv", col_types = cols())
+keyEconomicDates <- read_csv("inputs/misc/key_dates-economic.csv", col_types = cols())
+keyOtherDates <- read_csv("inputs/misc/key_dates-other.csv", col_types = cols())
 
 
 #### Temp fix for dodgy words ####
@@ -84,32 +72,33 @@ tidy_hansard <- all_hansard_words %>%
   split(.$grouper) %>%
   map_dfr(tidy_hansard_pieces, .id = NULL)
 
-rm(tidy_hansard_pieces, custom_stop_words, politicians)
+rm(tidy_hansard_pieces, custom_stop_words, politicians, all_hansard_words)
 
-# Construct the TF-IDF measures on a day basis
-# By day
-# This takes about 10 minutes or so depending on the specifics - BYO book and cup of tea
-hansard_tf_idf <- tidy_hansard %>%
-  count(date, word, sort = TRUE) %>% # Construct them by day
-  bind_tf_idf(word, date, n) %>%
-  arrange(-tf_idf) %>%
-  group_by(date) %>%
-  top_n(100) %>%
-  ungroup
-
-head(hansard_tf_idf)
-# Can graph that if you want
-rm(hansard_tf_idf)
+# # Construct the TF-IDF measures on a day basis
+# # By day
+# # This takes about 10 minutes or so depending on the specifics - BYO book and cup of tea
+# hansard_tf_idf <- tidy_hansard %>%
+#   count(date, word, sort = TRUE) %>% # Construct them by day
+#   bind_tf_idf(word, date, n) %>%
+#   arrange(-tf_idf) %>%
+#   group_by(date) %>%
+#   top_n(100) %>%
+#   ungroup
+# 
+# head(hansard_tf_idf)
+# # Can graph that if you want
+# rm(hansard_tf_idf)
 
 
 #### Topic modelling ####
 head(tidy_hansard)
+
 tidy_hansard <- tidy_hansard %>%
   select(date, word)
 
 # The issue with using, the corpus construction function in the STM package is that it's really slow. But at the same time, the metadata is needed, so can't just use code from Julia Silge (maybe you can, but I don't know what to change). Anyway, this way works (cf STM alternative) and keeps metadata (cf Julia Silge code). If the dataset is smaller then use the STM function. If you don't need the metadata then use Julia Silge's code. Sure, this way is clumsy, but I need results for the paper draft and I can make this better later. Based on:
 # https://stackoverflow.com/questions/47652890/stm-how-to-keep-metadata-when-converting-from-tm-to-stm-document-term-matrix
-
+head(tidy_hansard)
 # Reduce the number of words that we have to deal with
 tidy_hansard_reduced <- tidy_hansard %>%
   count(date, word, sort = TRUE) %>% # Create counts, by day, of how many times each word appears
@@ -119,19 +108,51 @@ tidy_hansard_reduced <- tidy_hansard %>%
   summarise(textid_field = paste(word, collapse = " ")) %>%
   rename(docid_field = date)
 
+head(tidy_hansard_reduced)
+rm(tidy_hansard)
+
+
+# Add metadata
+all_dates <-
+  tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) %>%  # Make a column of all the dates from Federation
+  mutate(electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
+         electionDate = cumsum(electionDate),
+         governmentChangeDate = if_else(allDates %in% governmentChanges$end, 1, 0),
+         governmentChangeDate = cumsum(governmentChangeDate),
+         keyEconomicChange = if_else(allDates %in% keyEconomicDates$theDate, 1, 0),
+         keyEconomicChange = cumsum(keyEconomicChange),
+         keyOtherChange = if_else(allDates %in% keyOtherDates$theDate, 1, 0),
+         keyOtherChange = cumsum(keyOtherChange)) %>% 
+  rename(electionCounter = electionDate)
+head(all_dates)
+
+tidy_hansard_reduced <- tidy_hansard_reduced %>% 
+  left_join(all_dates, by = c("docid_field" = "allDates"))
+
+tidy_hansard_reduced <- tidy_hansard_reduced %>% 
+  mutate(electionCounter = as.integer(electionCounter),
+         governmentChangeDate = as.integer(governmentChangeDate),
+         keyEconomicChange = as.integer(keyEconomicChange),
+         keyOtherChange = as.integer(keyOtherChange),
+         year = year(docid_field),
+         year = as.integer(year)
+  )
+head(tidy_hansard_reduced)
+
+rm(all_dates, election_dates, hansard_dates, governmentChanges, keyEconomicDates, keyOtherDates)
+
 # Create a corpus with document variables except for the "text"
 hansard_corpus <- corpus(tidy_hansard_reduced, text_field = "textid_field")
 
 # Add metadata
-all_hansard_words_test <- all_hansard_words %>% 
-  filter(date %in% tidy_hansard_reduced$docid_field)
+# all_hansard_words_test <- all_hansard_words %>% 
+#   filter(date %in% tidy_hansard_reduced$docid_field)
+# tidy_hansard_reduced <- tidy_hansard_reduced %>% 
+#   left_join(all_hansard_words_test, by = c("docid_field" = "date")) %>% 
+#   select(-words, -grouper)
 
-tidy_hansard_reduced <- tidy_hansard_reduced %>% 
-  left_join(all_hansard_words_test, by = c("docid_field" = "date")) %>% 
-  select(-words, -grouper)
-
-docvars(hansard_corpus, "electionCounter") <- tidy_hansard_reduced$electionCounter
-summary(hansard_corpus)
+# docvars(hansard_corpus, "electionCounter") <- tidy_hansard_reduced$electionCounter
+# summary(hansard_corpus)
 
 # Convert that corpus to a document-feature matrix - cleaning options can be added
 hansard_dfm <- dfm(hansard_corpus)
@@ -140,31 +161,48 @@ hansard_dfm <- dfm(hansard_corpus)
 hansard_dfm <- dfm_trim(hansard_dfm, sparsity = 0.990)
 
 # Convert to STM format
-hansard_dfm <- convert(hansard_dfm, to = "stm")
+hansard_stm <- convert(hansard_dfm, to = "stm")
 
 # Then all the aspects that we need for STM are there
-docsTM <- hansard_dfm$documents
-vocabTM <- hansard_dfm$vocab
-metaTM <- hansard_dfm$meta
+docsTM <- hansard_stm$documents
+vocabTM <- hansard_stm$vocab
+metaTM <- hansard_stm$meta
 head(metaTM)
-# head(hansard_dfm)
-names(hansard_dfm)
+# head(hansard_stm)
+names(hansard_stm)
+
+
+#
+test <- convert(hansard_dfm, to = "data.frame")
+write_csv(test, "corpus.csv")
+
+library(tm)
+writeCorpus(hansard_corpus, "test")
+mytf7 <- ?corpus("corpus.csv", textfield = "inaugSpeech")
+
+summary(corpus(mytf7), 5)
+?dfm()
+
+#
 
 # Clean up
 rm(tidy_hansard_reduced, hansard_corpus, docsTM, vocabTM, metaTM)
 
-#HERE
 
+# 
 model_prevalence_is_spline <-
   stm(
-    documents = hansard_dfm$documents,
-    vocab = hansard_dfm$vocab,
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
     K = 100,
-    prevalence =~ s(as.numeric(docid_field)),
-    data = hansard_dfm$meta,
+    prevalence =~ s(year),
+    data = hansard_stm$meta,
     max.em.its = 75,
     init.type = "Spectral"
   )
+
+
+
 
 td_gamma <- tidy(model_prevalence_is_spline,
                  matrix = "gamma",
@@ -179,32 +217,39 @@ td_gamma %>%
   geom_point() +
   theme_classic() 
 
-prep <- estimateEffect( ~ docid_field + electionCounter, test, meta = hansard_dfm$meta, uncertainty = "Global")
+prep <- estimateEffect( ~ docid_field + electionCounter, test, meta = hansard_stm$meta, uncertainty = "Global")
 summary(prep), topics = 1)
 
 ## NEED TO PUT THE TESTING IN THERE SOMEWHERE
 
 
+# 
+# hansard_dfm <- tidy_hansard %>%
+#   count(date, word, sort = TRUE) %>%
+#   filter(n > 100) %>% # Remove any word that doesn't occur at least 100 times
+#   cast_dfm(date, word, n)
+# 
+# 
+# head(hansard_dfm)
+
+
+many_models <-
+  data_frame(K = c(10, 20)) %>%
+  mutate(topic_model = future_map(
+    K,
+    ~ stm(
+      documents = hansard_stm$documents,
+      vocab = hansard_stm$vocab,
+      K = .,
+      prevalence =  ~ s(as.numeric(docid_field)),
+      data = hansard_stm$meta,
+      verbose = TRUE
+    ),
+    .progress = TRUE
+  ))
 
 
 #### END
-
-hansard_dfm <- tidy_hansard %>%
-  count(date, word, sort = TRUE) %>%
-  filter(n > 100) %>% # Remove any word that doesn't occur at least 100 times
-  cast_dfm(date, word, n)
-
-
-head(hansard_dfm)
-
-many_models <-
-  data_frame(K = c(20, 40, 60, 80, 100)) %>%
-  mutate(topic_model = future_map(K, ~ stm(
-    hansard_dfm,
-    K = .,
-    verbose = TRUE,
-    .progress = TRUE
-  )))
 
 heldout <- make.heldout(hansard_dfm)
 
