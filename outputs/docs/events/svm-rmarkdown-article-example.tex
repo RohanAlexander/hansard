@@ -53,7 +53,7 @@
 \title{Nobody expects the Spanish Inquisition: The effect of events on
 Australian parliamentary discussion \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
 Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, and Chris
-Cochrane for their helpful suggestions. \textbf{Version as of}: 26
+Cochrane for their helpful suggestions. \textbf{Version as of}: 28
 September 2018; \textbf{comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
@@ -249,22 +249,30 @@ their establishment.\footnote{While Hansard is not necessarily verbatim,
   differences would only affect specialised linguistic analysis.
   \citet{Edwards2016} examined Australia, New Zealand and the UK, and
   found that changes were usually made by those responsible for creating
-  the Hansard record, instead of the parliamentarians.} Hansard records
-and their equivalents are an increasingly popular source of data as new
-methods and reduced computational costs make larger-scale analysis
-easier. For instance, the digitisation of the Canadian Hansard,
-\citet{BeelenEtc2017}, allowed \citet{Whyte2017} to examine whether
-parliamentary disruptions in Canada increased between 1926 and 2015 and
-\citet{RheaultCochran2018} to examine ideology and party polarisation in
-Britain and Canada. In the UK, \citet{Duthie2016} analysed Hansard
-records to examine which politicians made supportive or aggressive
-statements toward other politicians between 1979 and 1990 and
-\citet{PetersonSpirling2018} examined polarisation. In New Zealand,
-\citet{Curran2017} modelled the topics discussed between 2003 and 2016,
-and \citet{Graham2016} examined unparliamentary language between 1890
-and 1950. And in the US \citet{GentzkowShapiroTaddy2018} examine
-congressional speech records from 1873 to 2016 to find that partisanship
-has risen in the past few decades.
+  the Hansard record, instead of the parliamentarians.} Earlier work on
+the influence of parliaments, such as \citet{ZandenBuringhBosker2012} or
+\textbf{{[}ANOTHER REFERENCE{]}}, often examined broader activity
+measures. This allowed for long time frames and wide comparisons. But
+Hansard records and their equivalents are an increasingly viable and
+popular source of data as new methods and reduced computational costs
+make larger-scale analysis easier.
+
+The digitisation of the Canadian Hansard, \citet{BeelenEtc2017}, allowed
+\citet{Whyte2017} to examine whether parliamentary disruptions in Canada
+increased between 1926 and 2015 and \citet{RheaultCochran2018} to
+examine ideology and party polarisation in Britain and Canada. In the
+UK, \citet{Duthie2016} analysed Hansard records to examine which
+politicians made supportive or aggressive statements toward other
+politicians between 1979 and 1990 and \citet{PetersonSpirling2018}
+examined polarisation. As digitisation methods improve increasingly
+older UK records can be analysed, for instance \citet{Dimitruk2018}
+considers the effect of estate bills on prorogations in seventeenth
+century England. In New Zealand, \citet{Curran2017} modelled the topics
+discussed between 2003 and 2016, and \citet{Graham2016} examined
+unparliamentary language between 1890 and 1950. And in the US
+\citet{GentzkowShapiroTaddy2018} examine congressional speech records
+from 1873 to 2016 to find that partisanship has risen in the past few
+decades.
 
 Australian Hansard records have been analysed for various purposes. For
 instance, \citet{Rasiah2010} examined Hansard records for the Australian
@@ -348,11 +356,13 @@ These daily records are the main data used in this paper, however the
 daily records are also further divided into individual-level records.
 Sometimes these are just short interjections or notes that are not
 specific to any particular politician, such as `Honourable members
-interjecting'. Interjections are interesting in their own right, for
-instance \citet{Whyte2017} analysed them in a Canadian context for the
-period 1926 to 2015 to find that female MPs were more likely to be
-interrupted than male MPs, but do not usually contribute much to
-defining the topics being discussed.
+interjecting'. The high dimensional nature of text data means that the
+appropriate analysis dataset is research-question specific. For
+instance, in our paper interjections are not important because they do
+not usually contribute much to defining the topics being discussed. But
+they are interesting in their own right and \citet{Whyte2017} analysed
+them in a Canadian context for the period 1926 to 2015 to find that
+female MPs were more likely to be interrupted than male MPs.
 
 Usually the disaggregation into individual-level records is done by
 identifying politicians' names in particular patterns. For instance,
@@ -403,8 +413,7 @@ The main models that we use in this paper are the Structural Topic Model
 \citet{RobertsStewartAiroldiRPackage}, and a discrete choice model as
 implemented by the \texttt{XXXX} R package of \textbf{XYZ}. In theory we
 could have directly used the text as an input to the discrete choice
-model, but this quickly becomes intractable due to computer memory and
-storage constraints. Instead, in a similar way to
+model, but this can become intractable. Instead, in a similar way to
 \citet{MuellerRauh2018}, we use the topics that the text is about as an
 input to another model, which in our case is a discrete choice model. In
 Appendix \textbf{{[}ADD NUMBERING{]}}, we include an alternative
@@ -728,37 +737,16 @@ those such as the 9/11 attacks, or the Bali Bombing. The full list of
 events that we consider is detailed in Appendix \textbf{{[}ADD
 NUMBERING{]}}.
 
-There is a large number of ways to statistically consider the effect of
-events. Options that would take advantage of the time series nature of
-our data include: autoregressive moving average (ARMA) models which are
-commonly used in finance to test for structural breaks
-\textbf{{[}REFERENCE?{]}}; or splines could be fit with specific knot
-placements and then cross validation used to compare the RSS with a more
-general splines model.
-
-We consider events in two ways. The first is in the change in the word
-usage before and after events and the second is in changes in the
-topics.
-
-Differences in word usage can be evaluated using the term
-frequency-inverse document frequency (tf-idf) measure. It will be higher
-for words that are rarely used across all documents, but commonly used
-in a document. For instance, in Australian parliamentary text records
-`the' is commonly used in many documents and so the fact that it is used
-in any particular document is not usual. However, `aboriginal' is less
-common across, and so if it was especially prevalent in a particular
-document that may distinguish that document.
-
-When we consider events using tf-idf, we gather terms from more than one
-day. We define groups of days that are roughly analogous to sitting
-periods. If there is more than a week between a day then we define a new
-group, otherwise the day is in the existing group. We use various
-measures \textbf{(Text2vec R package has some? or some other package)}
-to define a baseline measure of how different each group is, and then
-test for whether groups separated by our events are significantly
-different to this baseline.
-
-Changes in topics also help define how \ldots{}
+There are many ways to statistically consider the effect of events. One
+way would be to ignore the time series aspect and just group the topic
+proportions by each event and then run multinomial tests for whether the
+groups are different. Another would be to consider some type of
+multinomial logistic regression. Options that would take advantage of
+the time series nature of our data include: autoregressive moving
+average (ARMA) models which are commonly used in finance to test for
+structural breaks \textbf{{[}REFERENCE?{]}}; or splines could be fit
+with specific knot placements and then cross validation used to compare
+the RSS with a more general splines model.
 
 \section{Results}\label{results}
 
@@ -769,13 +757,27 @@ Changes in topics also help define how \ldots{}
 Keating.
 \end{quote}
 
-Change of government.
+Change of election
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/topics_separated_by_election} \caption{Example Hansard page - 6 February 1902}\label{fig:unnamed-chunk-1}
+\end{figure}
+
+Change of government
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/topics_separated_by_government_change} \caption{Example Hansard page - 6 February 1902}\label{fig:unnamed-chunk-2}
+\end{figure}
 
 \subsection{Economic events}\label{economic-events}
 
 Major economic changes.
 
-{[}TBD{]}
+Major change in economic conditions
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/topics_separated_by_economic_changes} \caption{Example Hansard page - 6 February 1902}\label{fig:unnamed-chunk-3}
+\end{figure}
 
 \subsection{Other events}\label{other-events}
 
@@ -784,6 +786,12 @@ Major economic changes.
 \end{quote}
 
 Major event such as 9/11 attacks, or economic change.
+
+Major other changes
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/topics_separated_by_other_changes} \caption{Example Hansard page - 6 February 1902}\label{fig:unnamed-chunk-4}
+\end{figure}
 
 \section{Summary and conclusions}\label{summary-and-conclusions}
 
@@ -808,7 +816,7 @@ Future work - examine how it changed during Federation
 \subsection{Example page}\label{example-page}
 
 \begin{figure}
-\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/example_hansard_page} \caption{Example Hansard page - 6 February 1902}\label{fig:unnamed-chunk-1}
+\includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/example_hansard_page} \caption{Example Hansard page - 6 February 1902}\label{fig:unnamed-chunk-5}
 \end{figure}
 
 \subsection{Document sources}\label{document-sources}
@@ -1304,7 +1312,7 @@ Gillard & Julia Gillard & Labor & 2010-06-24 & 2013-06-27 & No\\
 Rudd 2 & Kevin Rudd & Labor & 2013-06-27 & 2013-09-18 & No\\
 Abbott & Tony Abbott & Liberal (Coalition) & 2013-09-18 & 2015-09-15 & No\\
 Turnbull & Malcolm Turnbull & Liberal (Coalition) & 2015-09-15 & 2018-08-24 & No\\
-Morrison & Scott Morrison & Liberal (Coalition) & 2018-08-24 & - & -\\
+Morrison & Scott Morrison & Liberal (Coalition) & 2018-08-24 & NA & NA\\
 \bottomrule
 \end{tabular}
 \end{table}

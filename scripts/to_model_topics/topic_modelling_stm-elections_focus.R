@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 27 September 2018
+# Last updated: 28 September 2018
 # Prerequisites:
 # Issues:
 
@@ -171,31 +171,67 @@ head(metaTM)
 # head(hansard_stm)
 names(hansard_stm)
 
-
-#
-test <- convert(hansard_dfm, to = "data.frame")
-write_csv(test, "corpus.csv")
-
-library(tm)
-writeCorpus(hansard_corpus, "test")
-mytf7 <- ?corpus("corpus.csv", textfield = "inaugSpeech")
-
-summary(corpus(mytf7), 5)
-?dfm()
-
-#
+# Save a copy for the cloud - how do you actually save the corpus?
+# write_csv(tidy_hansard_reduced, "tidy_hansard_reduced.csv")
 
 # Clean up
-rm(tidy_hansard_reduced, hansard_corpus, docsTM, vocabTM, metaTM)
+rm(tidy_hansard_reduced, hansard_corpus, docsTM, vocabTM, metaTM, hansard_dfm)
 
 
-# 
-model_prevalence_is_spline <-
+
+
+
+model_prevalence_years_k_20 <-
   stm(
     documents = hansard_stm$documents,
     vocab = hansard_stm$vocab,
-    K = 100,
+    K = 20,
     prevalence =~ s(year),
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+model_prevalence_years_k_20_elections <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =~ s(year) + electionCounter,
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+model_prevalence_years_k_20_governmentChangeDate <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =~ s(year) + governmentChangeDate,
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+
+model_prevalence_years_k_20_economicEvents <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =~ s(year) + keyEconomicChange,
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+model_prevalence_years_k_20_otherEvents <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =~ s(year) + keyOtherChange,
     data = hansard_stm$meta,
     max.em.its = 75,
     init.type = "Spectral"
@@ -203,13 +239,49 @@ model_prevalence_is_spline <-
 
 
 
+estimateEffect(
+  1:20 ~ electionCounter + s(year),
+  model_prevalence_years_k_20_elections,
+  meta = hansard_stm$meta,
+  uncertainty = "Global") %>%
+  tidy() %>%
+  filter(term == "electionCounter")
 
-td_gamma <- tidy(model_prevalence_is_spline,
+estimateEffect(
+  1:20 ~ governmentChangeDate + s(year),
+  model_prevalence_years_k_20_governmentChangeDate,
+  meta = hansard_stm$meta,
+  uncertainty = "Global") %>%
+  tidy() %>%
+  filter(term == "governmentChangeDate")
+
+estimateEffect(
+  1:20 ~ keyEconomicChange + s(year),
+  model_prevalence_years_k_20_economicEvents,
+  meta = hansard_stm$meta,
+  uncertainty = "Global") %>%
+  tidy() %>%
+  filter(term == "keyEconomicChange")
+
+estimateEffect(
+  1:20 ~ keyOtherChange + s(year),
+  model_prevalence_years_k_20_otherEvents,
+  meta = hansard_stm$meta,
+  uncertainty = "Global") %>%
+  tidy() %>%
+  filter(term == "keyOtherChange")
+
+
+
+
+
+
+td_gamma <- tidy(model_prevalence_years_k_20,
                  matrix = "gamma",
-                 document_names = hansard_dfm$meta$docid_field)
+                 document_names = hansard_stm$meta$docid_field)
 td_gamma
 
-write_csv(td_gamma, "gammas_model_prevalence_is_spline.csv")
+write_csv(td_gamma, "model_prevalence_years_k_20.csv")
 
 td_gamma %>% 
   mutate(document = ymd(document)) %>% 

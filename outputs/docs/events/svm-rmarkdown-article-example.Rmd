@@ -55,7 +55,9 @@ Our paper applies a topic model to a dataset of larger-scale parliamentary text 
 
 # Data
 ## Parliamentary text data
-Following the example of the UK a daily text record called Hansard of what was said in Australian parliaments has been made available since their establishment.[^Verbatimfootnote] Hansard records and their equivalents are an increasingly popular source of data as new methods and reduced computational costs make larger-scale analysis easier. For instance, the digitisation of the Canadian Hansard, @BeelenEtc2017, allowed @Whyte2017 to examine whether parliamentary disruptions in Canada increased between 1926 and 2015 and @RheaultCochran2018 to examine ideology and party polarisation in Britain and Canada. In the UK, @Duthie2016 analysed Hansard records to examine which politicians made supportive or aggressive statements toward other politicians between 1979 and 1990 and @PetersonSpirling2018 examined polarisation. In New Zealand, @Curran2017 modelled the topics discussed between 2003 and 2016, and @Graham2016 examined unparliamentary language between 1890 and 1950. And in the US @GentzkowShapiroTaddy2018 examine congressional speech records from 1873 to 2016 to find that partisanship has risen in the past few decades.
+Following the example of the UK a daily text record called Hansard of what was said in Australian parliaments has been made available since their establishment.[^Verbatimfootnote] Earlier work on the influence of parliaments, such as @ZandenBuringhBosker2012 or **[ANOTHER REFERENCE]**, often examined broader activity measures. This allowed for long time frames and wide comparisons. But Hansard records and their equivalents are an increasingly viable and popular source of data as new methods and reduced computational costs make larger-scale analysis easier. 
+
+The digitisation of the Canadian Hansard, @BeelenEtc2017, allowed @Whyte2017 to examine whether parliamentary disruptions in Canada increased between 1926 and 2015 and @RheaultCochran2018 to examine ideology and party polarisation in Britain and Canada. In the UK, @Duthie2016 analysed Hansard records to examine which politicians made supportive or aggressive statements toward other politicians between 1979 and 1990 and @PetersonSpirling2018 examined polarisation. As digitisation methods improve increasingly older UK records can be analysed, for instance @Dimitruk2018 considers the effect of estate bills on prorogations in seventeenth century England. In New Zealand, @Curran2017 modelled the topics discussed between 2003 and 2016, and @Graham2016 examined unparliamentary language between 1890 and 1950. And in the US @GentzkowShapiroTaddy2018 examine congressional speech records from 1873 to 2016 to find that partisanship has risen in the past few decades.
 
 [^Verbatimfootnote]: While Hansard is not necessarily verbatim, it is considered close enough for text-as-data purposes. For instance, @Mollin2008 found that in the case of the UK Hansard the differences would only affect specialised linguistic analysis. @Edwards2016 examined Australia, New Zealand and the UK, and found that changes were usually made by those responsible for creating the Hansard record, instead of the parliamentarians.
 
@@ -88,7 +90,7 @@ The formatting of the Hansard records changes between the different parliaments 
 
 [^seeMyScripts]: An example of the workflow and some reduced-detail scripts are provided in Appendix **[ADD NUMBERING]**. The full set of scripts are available on request.
 
-These daily records are the main data used in this paper, however the daily records are also further divided into individual-level records. Sometimes these are just short interjections or notes that are not specific to any particular politician, such as 'Honourable members interjecting'. Interjections are interesting in their own right, for instance @Whyte2017 analysed them in a Canadian context for the period 1926 to 2015 to find that female MPs were more likely to be interrupted than male MPs, but do not usually contribute much to defining the topics being discussed.
+These daily records are the main data used in this paper, however the daily records are also further divided into individual-level records. Sometimes these are just short interjections or notes that are not specific to any particular politician, such as 'Honourable members interjecting'. The high dimensional nature of text data means that the appropriate analysis dataset is research-question specific. For instance, in our paper interjections are not important because they do not usually contribute much to defining the topics being discussed. But they are interesting in their own right and @Whyte2017 analysed them in a Canadian context for the period 1926 to 2015 to find that female MPs were more likely to be interrupted than male MPs.
 
 Usually the disaggregation into individual-level records is done by identifying politicians' names in particular patterns. For instance, when the Hansard record is trying to indicate that a person is speaking, as opposed to being mentioned (for more on the political effect of being mentioned see @Alexander2018), often the name is in upper case (e.g. 'Mr WHITLAM' or 'Mr MENZIES'); followed by a dash or colon; or are next to some title within brackets. There is substantial variation in how the person making a statement is identified. Again some error is introduced at this stage because of inconsistencies over time and between the parliaments, as well as the errors introduced during the PDF parsing stage. There is considerable variance but on average each daily record had 250 **[UPDATE]** individual-level records, resulting in roughly 15 million rows **[UPDATE]** across the state and federal parliaments.
 
@@ -103,7 +105,7 @@ The main sources for this additional supplementary information are the handbooks
 
 
 # Model
-The main models that we use in this paper are the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage, and a discrete choice model as implemented by the \texttt{XXXX} R package of **XYZ**. In theory we could have directly used the text as an input to the discrete choice model, but this quickly becomes intractable due to computer memory and storage constraints. Instead, in a similar way to @MuellerRauh2018, we use the topics that the text is about as an input to another model, which in our case is a discrete choice model. In Appendix **[ADD NUMBERING]**, we include an alternative approach that follows @Taddy2015 by using word2vec, which more closely uses words, rather than topics, as an input.
+The main models that we use in this paper are the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage, and a discrete choice model as implemented by the \texttt{XXXX} R package of **XYZ**. In theory we could have directly used the text as an input to the discrete choice model, but this can become intractable. Instead, in a similar way to @MuellerRauh2018, we use the topics that the text is about as an input to another model, which in our case is a discrete choice model. In Appendix **[ADD NUMBERING]**, we include an alternative approach that follows @Taddy2015 by using word2vec, which more closely uses words, rather than topics, as an input.
 
 The basis of the STM is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section we provide a brief overview of both the LDA model and the STM.  we consider the outputs of the topic model as reduced dimension inputs. In our case they are inputs to a discrete choice model, and so we then discuss that model.
 
@@ -226,19 +228,46 @@ There are many ways to statistically consider the effect of events. One way woul
 ## Political events
 >*When you change the government, you change the country.* Paul Keating.
 
-Change of government.
+Change of election
+
+```{r, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_election.pdf"))
+```
+
+Change of government
+
+```{r, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_government_change.pdf"))
+```
+
+
+
+
 
 ## Economic events
 
 Major economic changes.
 
-[TBD]
+Major change in economic conditions
+
+```{r, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_economic_changes.pdf"))
+```
+
+
+
 
 
 ## Other events
 >*Events, dear boy, events.* Attributed to Harold Macmillan.
 
 Major event such as 9/11 attacks, or economic change.
+
+Major other changes
+
+```{r, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_other_changes.pdf"))
+```
 
 
 
