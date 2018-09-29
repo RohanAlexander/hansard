@@ -181,6 +181,7 @@ rm(tidy_hansard_reduced, hansard_corpus, docsTM, vocabTM, metaTM, hansard_dfm)
 
 
 
+
 model_prevalence_years_k_20 <-
   stm(
     documents = hansard_stm$documents,
@@ -238,40 +239,57 @@ model_prevalence_years_k_20_otherEvents <-
   )
 
 
+significance <- tibble(Topic = c(1:20))
 
-estimateEffect(
+elections <- estimateEffect(
   1:20 ~ electionCounter + s(year),
   model_prevalence_years_k_20_elections,
   meta = hansard_stm$meta,
   uncertainty = "Global") %>%
   tidy() %>%
-  filter(term == "electionCounter")
+  filter(term == "electionCounter") %>% 
+  select(`p.value`)
 
-estimateEffect(
+governments <- estimateEffect(
   1:20 ~ governmentChangeDate + s(year),
   model_prevalence_years_k_20_governmentChangeDate,
   meta = hansard_stm$meta,
   uncertainty = "Global") %>%
   tidy() %>%
-  filter(term == "governmentChangeDate")
+  filter(term == "governmentChangeDate") %>% 
+  select(`p.value`)
 
-estimateEffect(
+economic <- estimateEffect(
   1:20 ~ keyEconomicChange + s(year),
   model_prevalence_years_k_20_economicEvents,
   meta = hansard_stm$meta,
   uncertainty = "Global") %>%
   tidy() %>%
-  filter(term == "keyEconomicChange")
+  filter(term == "keyEconomicChange") %>% 
+  select(`p.value`)
 
-estimateEffect(
+other <- estimateEffect(
   1:20 ~ keyOtherChange + s(year),
   model_prevalence_years_k_20_otherEvents,
   meta = hansard_stm$meta,
   uncertainty = "Global") %>%
   tidy() %>%
-  filter(term == "keyOtherChange")
+  filter(term == "keyOtherChange") %>% 
+  select(`p.value`)
 
+significance_all <- cbind(significance, elections, governments, economic, other)
+head(significance)
+colnames(significance_all) <- c("Topic", "Elections", "Governments", "Economic", "Other")
+head(significance_all)
 
+significance_all <- significance_all %>% 
+  mutate(Elections = round(Elections, digits = 2),
+         Governments = round(Governments, digits = 2),
+         Economic = round(Economic, digits = 2),
+         Other = round(Other, digits = 2))
+write_csv(significance_all, "outputs/misc/significance.csv")
+
+labelTopics(model_prevalence_years_k_20)
 
 
 

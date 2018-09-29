@@ -1,11 +1,16 @@
 
 # Load libraries
+# install.packages('ggbeeswarm')
+# install.packages('lubridate')
+# install.packages('tidyverse')
+library(ggbeeswarm)
 library(lubridate)
 library(tidyverse)
 
 # Load the gammas from the topic model
-td_gamma <- read_csv("outputs/big_files_do_not_push/gammas_model_prevalence_is_spline.csv", col_types = cols())
+td_gamma <- read_csv("outputs/big_files_do_not_push/gammas_model_prevalence_years_k_20.csv", col_types = cols())
 head(td_gamma)
+
 
 # Load the metadata that will define groups
 election_dates <- read_csv("inputs/misc/misc_elections_data.csv", col_types = cols())
@@ -31,10 +36,11 @@ head(all_dates)
 td_gamma <- td_gamma %>% 
   left_join(all_dates, by = c("document" = "allDates"))
 head(td_gamma)
+nrow(td_gamma)
 
 
 td_gamma_reduced <- td_gamma %>% 
-  filter(topic %in% c(1:20)) %>% 
+  # filter(topic %in% c(1:20)) %>% 
   mutate(grouper = case_when(topic %in% c(1,5,9,13,17) ~ "Topics 1, 5, 9, 13, 17",
                              topic %in% c(2,6,10,14,18) ~ "Topics 2, 6, 10, 14, 18",
                              topic %in% c(3,7,11,15,19) ~ "Topics 3, 7, 11, 15, 19",
@@ -45,7 +51,8 @@ td_gamma_reduced <- td_gamma %>%
 
 # Change in election
 ggplot(data = td_gamma_reduced, aes(x = electionCounter, y = gamma, color = Topic)) +
-  geom_point() +
+  geom_quasirandom(dodge.width=1) +
+  # geom_point() +
   theme_classic() +
   facet_wrap(vars(grouper), nrow = 4) +
   labs(x = "Election",
@@ -54,7 +61,7 @@ ggplot(data = td_gamma_reduced, aes(x = electionCounter, y = gamma, color = Topi
   scale_colour_viridis_d()
 
 ggsave(
-    "outputs/figures/topics_separated_by_election.pdf",
+    "outputs/figures/2018-09-28-topics_separated_by_election.pdf",
      height = 8,
      width = 6,
      units = "in"
@@ -62,7 +69,8 @@ ggsave(
 
 # Change in government
 ggplot(data = td_gamma_reduced, aes(x = governmentChangeDate, y = gamma, color = Topic)) +
-  geom_point() +
+  geom_quasirandom(dodge.width=1) +
+  # geom_point() +
   theme_classic() +
   facet_wrap(vars(grouper), nrow = 4) +
   labs(x = "Government change",
@@ -71,7 +79,7 @@ ggplot(data = td_gamma_reduced, aes(x = governmentChangeDate, y = gamma, color =
   scale_colour_viridis_d()
 
 ggsave(
-  "outputs/figures/topics_separated_by_government_change.pdf",
+  "outputs/figures/2018-09-28-topics_separated_by_government_change.pdf",
   height = 8,
   width = 6,
   units = "in"
@@ -79,7 +87,8 @@ ggsave(
 
 # Change in economic conditions
 ggplot(data = td_gamma_reduced, aes(x = keyEconomicChange, y = gamma, color = Topic)) +
-  geom_point() +
+  geom_quasirandom(dodge.width=1) +
+  # geom_point() +
   theme_classic() +
   facet_wrap(vars(grouper), nrow = 4) +
   labs(x = "Changed economic conditions",
@@ -88,7 +97,7 @@ ggplot(data = td_gamma_reduced, aes(x = keyEconomicChange, y = gamma, color = To
   scale_colour_viridis_d()
 
 ggsave(
-  "outputs/figures/topics_separated_by_economic_changes.pdf",
+  "outputs/figures/2018-09-28-topics_separated_by_economic_changes.pdf",
   height = 8,
   width = 6,
   units = "in"
@@ -97,7 +106,8 @@ ggsave(
 
 # Changed other conditions
 ggplot(data = td_gamma_reduced, aes(x = keyOtherChange, y = gamma, color = Topic)) +
-  geom_point() +
+  geom_quasirandom(dodge.width=1) +
+  # geom_point() +
   theme_classic() +
   facet_wrap(vars(grouper), nrow = 4) +
   labs(x = "Changed other conditions",
@@ -106,7 +116,7 @@ ggplot(data = td_gamma_reduced, aes(x = keyOtherChange, y = gamma, color = Topic
   scale_colour_viridis_d()
 
 ggsave(
-  "outputs/figures/topics_separated_by_other_changes.pdf",
+  "outputs/figures/2018-09-28-topics_separated_by_other_changes.pdf",
   height = 8,
   width = 6,
   units = "in"
