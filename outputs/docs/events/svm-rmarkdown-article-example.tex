@@ -36,7 +36,8 @@
 
 
 
-\setcounter{secnumdepth}{0}
+% This controls whether you get numbers in the sections or not
+% \setcounter{secnumdepth}{0}
 
 \usepackage{longtable,booktabs}
 
@@ -50,10 +51,9 @@
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 
-\title{Nobody expects the Spanish Inquisition: The effect of events on
-Australian parliamentary discussion \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
+\title{The Effect of Events on Australian Parliamentary Discussion (1870--2017) \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
 Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, and Chris
-Cochrane for their helpful suggestions. \textbf{Version as of}: 29
+Cochrane for their helpful suggestions. \textbf{Version as of}: 30
 September 2018; \textbf{comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
@@ -103,8 +103,7 @@ September 2018; \textbf{comments welcome}:
             bookmarks=true,
             pdfauthor={Monica Alexander (University of Toronto) and Rohan Alexander (Australian National University)},
              pdfkeywords = {text analysis, politics, Australia},  
-            pdftitle={Nobody expects the Spanish Inquisition: The effect of events on
-Australian parliamentary discussion},
+            pdftitle={The Effect of Events on Australian Parliamentary Discussion (1870--2017)},
             colorlinks=true,
             citecolor=blue,
             urlcolor=blue,
@@ -172,23 +171,21 @@ Australian parliamentary discussion},
 
     \vskip 8.5pt % \small 
 
-\noindent Government policy is partly driven by parliamentary discussion.
-Conversely, that same discussion can indicate a government's priorities.
-But major events--both expected, such as an election, and unexpected,
-such as a recession or terrorist attack--can affect the course of
-parliamentary discussion. In this paper, we systematically analyse how
-parliamentary discussion changes in response to different types of
-events in Australian history. We compile a dataset of what was said in
-Australian state and federal parliaments from the mid-1800s through to
-2017 based on available public records. We use a structural text model
-to reduce the dimensionality of the text and to impose prior knowledge
-such as correlation between days and changes over time. We then examine
-the effect of various events. We find that: 1) changes of government are
-associated with topic changes only when there is also a change of the
-party in power; and 2) economic events, such as financial crises, have
-significant and persistent effects. Our findings have implications for
-how we think about the longer-term trajectory of government policy as
-the media cycle becomes increasingly focused on short-term events.
+\noindent We systematically analyse how parliamentary discussion changes in
+response to different types of events in Australian history. We first
+compile a dataset of what was said in Australian state and federal
+parliaments from the mid-1800s through to 2017 based on available public
+records. We then use a structural text model to reduce the
+dimensionality of the text and to impose prior knowledge such as
+correlation between days and changes over time. Finally, we examine the
+effect of various events using a Bayesian choice model. We find that: 1)
+elections are associated with topic changes only when the party in power
+changes but a change in government sometimes does not require this to be
+associated with topic changes; and 2) economic events, such as financial
+crises, have less significant and persistent effects than other events
+such as terrorism. Our findings have implications for how we think about
+the longer-term trajectory of government policy as the media cycle
+becomes increasingly focused on short-term events.
 
 
 \vskip 8.5pt \noindent \emph{Keywords}: text analysis, politics, Australia \par
@@ -205,35 +202,41 @@ the media cycle becomes increasingly focused on short-term events.
 
 \noindent  \section{Introduction}\label{introduction}
 
-New governments often go to some trouble to be different to the
-governments they replace. For instance, Kevin Rudd's apology to
-Indigenous Australians was not supported by his predecessor John Howard,
-and then one of Tony Abbott's first acts was to repeal his predecessor
-Kevin Rudd's carbon tax. Similarly, significant events such as the 9/11
-attacks or the Great Recession have often altered the course of a
-government. However it is not so clear which events drive changes, for
-how long these changes persist, and what was given up due to the change.
+Government policy is partly driven by parliamentary discussion.
+Conversely, that same discussion can indicate a government's priorities.
+But major events--both expected, such as an election, and unexpected,
+such as a recession or terrorist attack--can affect the course of
+parliamentary discussion. For instance, new governments often go to some
+trouble to be different to the governments they replace, such as Kevin
+Rudd's apology to Indigenous Australians not being supported by his
+predecessor John Howard, and then one of Tony Abbott's first acts was to
+repeal his predecessor Kevin Rudd's carbon tax. Similarly, significant
+events such as the 9/11 attacks or the Great Recession have often
+altered the course of a government. But it is not so clear which events
+drive changes, for how long these changes persist, and what was given up
+due to the change.
 
 In this paper we examine text records of what was said in Australian
 state and federal parliaments from the mid-1800s through to 2017. We use
 the Structural Topic Model (STM) of \citet{RobertsStewartAiroldi2016}
 for dimensionality reduction and to impose structure such as correlation
-between days and changes over time. We then examine changes at various
-types of events, including: changes in government; changes in the
-political environment (as defined by polling or other results); changes
-in economic conditions; and other significant events (such as the 9/11
-attacks or the Bali bombings).
+between days and changes over time. We then use a simple discrete choice
+model to examine changes at various types of events, including: changes
+in government; changes in the political environment (as defined by
+polling or other results); changes in economic conditions; and other
+significant events (such as the 9/11 attacks or the Bali bombings).
 
 We find \textbf{{[}INSERT RESULTS{]}}.
 
 Our paper applies a topic model to a dataset of larger-scale
-parliamentary text records from multiple Australian parliaments. Our
-work fits into a growing literature that considers text as an input to
-more usual quantitative techniques, rather than requiring separate
-analysis. While using text as data has well-known shortcomings, it
-allows larger-scale analysis that would not be viable using
-less-automated approaches and so it can identify patterns that may
-otherwise be overlooked.
+parliamentary text records from multiple Australian parliaments. Our use
+of a discrete choice model - essentially a time series multinomial model
+of choices - allows us to construct a counterfactual. Our work fits into
+a growing literature that considers text as an input to more usual
+quantitative techniques, rather than requiring separate analysis. While
+using text as data has well-known shortcomings, it allows larger-scale
+analysis that would not be viable using less-automated approaches and so
+it can identify patterns that may otherwise be overlooked.
 
 \section{Data}\label{data}
 
@@ -248,20 +251,19 @@ their establishment.\footnote{While Hansard is not necessarily verbatim,
   \citet{Edwards2016} examined Australia, New Zealand and the UK, and
   found that changes were usually made by those responsible for creating
   the Hansard record, instead of the parliamentarians.} Earlier work on
-the influence of parliaments, such as \citet{ZandenBuringhBosker2012} or
-\textbf{{[}ANOTHER REFERENCE - Maybe Frank Fisher `Reframing Public
-Policy'?{]}}, often examined broader activity measures such as counts of
-sitting days. This allowed for long time frames and wide comparisons.
-But analysing Hansard records and their equivalents directly are an
-increasingly viable and popular source of data as new methods and
-reduced computational costs make larger-scale analysis easier,
-complementing other measures.
+the influence of parliaments, such as \citet{ZandenBuringhBosker2012},
+often examined broader activity measures such as counts of sitting days.
+This allowed for long time frames and wide comparisons. But analysing
+Hansard records and their equivalents directly are an increasingly
+viable and popular source of data as new methods and reduced
+computational costs make larger-scale analysis easier, complementing
+other measures.
 
-The digitisation of the Canadian Hansard, \citet{BeelenEtc2017}, allowed
-\citet{RheaultCochran2018} to examine ideology and party polarisation in
-Britain and Canada. In the UK, \citet{Duthie2016} analysed Hansard
-records to examine which politicians made supportive or aggressive
-statements toward other politicians between 1979 and 1990 and
+The recent digitisation of the Canadian Hansard, \citet{BeelenEtc2017},
+allowed \citet{RheaultCochran2018} to examine ideology and party
+polarisation in Britain and Canada. In the UK, \citet{Duthie2016}
+analysed Hansard records to examine which politicians made supportive or
+aggressive statements toward other politicians between 1979 and 1990 and
 \citet{PetersonSpirling2018} examined polarisation. And as digitisation
 methods improve older UK records can be analysed, for instance
 \citet{Dimitruk2018} considers the effect of estate bills on
@@ -282,26 +284,21 @@ positive sentiment.
 
 Australian parliaments generally make their daily Hansard records
 available online as PDFs and these are considered the official release.
-An example of what a page of Hansard looks like is included in Appendix
-\textbf{{[}ADD NUMBERING{]}}. There is a more limited set of XML records
-available in some cases.\footnote{Tim Sherratt makes these XML records
-  available as a single download and also presents them in a website
+Additionally, there is a more limited set of XML records available in
+some cases.\footnote{Tim Sherratt makes these XML records available as a
+  single download and also presents them in a website
   (\url{http://historichansard.net/}) that can be used to explore
   Commonwealth Hansard records from 1901 to 1980. Commonwealth XML
   records from 1998 to 2014 are available from Andrew Turpin's website,
   and from 2006 through to today from Open Australia's website. The
   records can also be downloaded from the Australian Hansard website.}
-There are 65,000 \textbf{{[}UPDATE{]}} Hansard records publicly
-available across the state and federal parliaments (Table
-\ref{tab:yearsusedtable}) \textbf{{[}UPDATE NUMBERING{]}}. As with any
-larger-scale data process, there are various issues with some of the
-PDFs and the known ones are detailed in Appendix \textbf{{[}ADD
-NUMBERING{]}}.\footnote{The NSW Legislative Council was established
-  earlier than 1856, however the earlier Hansard records have not been
-  through an independent OCR process and were not used in this paper.
-  However, the Google Tesseract OCR engine as implemented by
-  \citet{Ooms2018tesseract} provided useful data and these could be used
-  in the future.}
+We detail the sources of our Hansard PDFs in \ref{hansardsources} and
+Appendix \ref{examplehansardpage} provides an example of what a Hansard
+PDF looks like. There are 65,000 \textbf{{[}UPDATE{]}} days worth of
+publicly available Hansard records across the state and federal
+parliaments (Table \ref{tab:yearsusedtable}). Our data cleaning process
+indicates concerns with a small number of PDFs and these are detailed in
+Appendix \ref{knownhansardissues}.
 
 \begin{table}
 
@@ -333,67 +330,54 @@ Western Australia & Legislative Assembly & 1890 - 2017 & TBD\\
 \end{table}
 
 The formatting of the Hansard records changes between the different
-parliaments and over time. We use R scripts to convert the PDFs into
-daily text records.\footnote{An example of the workflow and some
-  reduced-detail scripts are provided in Appendix \textbf{{[}ADD
-  NUMBERING{]}}.} These scripts are primarily based on: the
-\texttt{PDFtools} package of \citet{Ooms2018pdftools}; the
-\texttt{tidyverse} package of \citet{Wickham2017}; the \texttt{tm}
-package of \citet{FeinererHornik2018}; the \texttt{lubridate} package of
-\citet{GrolemundWickham2011}; and the \texttt{stringi} package of
-\citet{Gagolewski2018}. The functions of those packages are supported
-by: the \texttt{furrr} package of \citet{VaughanDancho2018}; and the
-\texttt{tictoc} package of \citet{Izrailev2014}. Some error is
-introduced at this stage because many of the records are in a two-column
-format that need to be separated, and the PDF parsing is not always
-accurate especially for older records. An example of the latter issue is
-that `the' is often parsed as `thc'. These errors are fixed when they
-occur at scale and can be identified. One way to provide assurance that
-mistakes in older records are not driving the results is to analyse the
-percentage of stop-words in each record over time. This details of this
-are provided in Appendix \textbf{{[}ADD NUMBERING{]}} and suggest that
-there is no significant difference in the quality of the parsing over
-time. The \texttt{hunspell} package of \citet{Ooms2017} is also used to
-help find spelling issues.
+parliaments and over time. We use scripts written in R (\citet{R2018})
+to convert the PDFs into daily text records. An example of the workflow
+and some reduced-detail scripts are provided in Appendix
+\ref{hansardworkflow}. Some error is introduced at this stage because
+many of the records are in a two-column format that need to be
+separated, and the PDF parsing is not always accurate especially for
+older records. An example of the latter issue is that `the' is often
+parsed as `thc'. These errors are corrected when they occur at scale and
+can be identified. The percentage of stop-words in each record is
+reasonably consistent over time. This suggests that there is no
+significant difference in the quality of the parsing over time. Details
+of this process are provided in Appendix \ref{stopwordsgraph}.
 
-These daily records are the main level at which we consider the data in
-this paper, but the daily records are also further divided into
-individual-level records. Sometimes these are just short interjections
-or notes that are not specific to any particular politician, such as
-`Honourable members interjecting'. The high dimensional nature of text
-data means that the appropriate analysis data are research-question
-specific and datasets need to be tidied toward that. For instance, in
-our paper interjections are not important because they do not usually
-contribute much to defining the topics being discussed. But they are
-interesting in their own right and \citet{Whyte2017} analysed them in a
-Canadian context for the period 1926 to 2015 to find that female MPs
-were more likely to be interrupted than male MPs.
+These daily records are the main level that we consider in this paper,
+but we also disaggregated them into individual-level records during the
+cleaning process. Sometimes these are just short interjections or notes
+that are not specific to any particular politician, such as `Honourable
+members interjecting'. The high dimensional nature of text data means
+that the appropriate level and focus of the dataset being analysed tends
+to be specific to a research question. For instance, in our paper
+interjections are not important because they do not usually contribute
+much to defining the topics being discussed. But they are interesting in
+their own right and \citet{Whyte2017} analysed them in a Canadian
+context for the period 1926 to 2015 to find that female MPs were more
+likely to be interrupted than male MPs.
 
 Usually the disaggregation into individual-level records is done by
 identifying politicians' names in particular patterns. For instance,
 when Hansard is indicating that a particular person is speaking, as
-opposed to being mentioned (for more on the political effect of being
-mentioned see \citet{Alexander2018}), often the name is in upper case,
-for instance `Mr WHITLAM' or `Mr MENZIES'; followed by a dash or colon;
-or are next to some title within brackets. There is substantial
-variation in how the person making a statement is identified. Again some
-error is introduced at this stage because of inconsistencies over time
-and between the parliaments. There is considerable variance but on
-average each daily record had 250 \textbf{{[}UPDATE{]}} individual-level
+opposed to being mentioned, often the name is in upper case, for
+instance `Mr WHITLAM' or `Mr MENZIES'; followed by a dash or colon; or
+are next to some title within brackets. There is substantial variation
+in how the person making a statement is identified. Again some error is
+introduced at this stage because of inconsistencies over time and
+between the parliaments. There is considerable variance but on average
+each daily record had 250 \textbf{{[}UPDATE{]}} individual-level
 records, resulting in roughly 15 million rows \textbf{{[}UPDATE{]}}
 across the state and federal parliaments.
 
-Text usually needs to be pre-processed before topic models can be used.
-The specific steps that we take are to remove numbers and punctuation
-and to change all the words to lower case. Then the sentences are
-deconstructed and each word considered individually. In addition to the
-packages already mentioned, in this step the R scripts to do this use
-the \texttt{tidytext} R package of \citet{SilgeRobinson2016}.
-\textbf{{[}Need to bundle\_ngrams i.e.~New Zealand is new\_zealand.{]}}
+Text is usually pre-processed before topic models are used. The specific
+steps that we take are to remove numbers and punctuation and to change
+the words to lower case. Then the sentences are deconstructed and each
+word considered individually. \textbf{{[}Need to bundle\_ngrams i.e.~New
+Zealand is new\_zealand.{]}}
 
 \subsection{Additional information}\label{additional-information}
 
-Data from other sources are useful to complement the parliamentary text
+Data from other sources are needed to complement the parliamentary text
 data. For instance, although the name, party, and division represented
 are contained in Hansard records they are inconsistent. Also non-Hansard
 information about the politicians informs our analysis. This includes:
@@ -406,25 +390,28 @@ two-party-preferred results.
 The main sources for this additional supplementary information are the
 handbooks supplied by the various parliaments. However these had many
 errors and were supplemented by data from the Australian Dictionary of
-Biography and Wikipedia.\footnote{An example of the additional
-  information is provided in Appendix \textbf{{[}ADD NUMBERING{]}}.} The
-source for the electoral results is the Australian Electoral Commission
-and Adam Carr's Australian Election Archive.
+Biography and Wikipedia. The source for the electoral results is the
+Australian Electoral Commission and Adam Carr's Australian Election
+Archive. An example of the additional information is provided in
+Appendix \ref{additionalinformation}.
 
 \section{Model}\label{model}
 
 The main model that we use in this paper is the Structural Topic Model
 (STM) as implemented by the \texttt{stm} R package of
-\citet{RobertsStewartAiroldiRPackage}. In a similar way to
-\citet{MuellerRauh2018}, we use these topics to analyse the effect of
-various events. In Appendix \textbf{{[}ADD NUMBERING{]}}, we include an
-alternative approach that follows \citet{Taddy2015} by using word2vec,
-which more closely uses words, rather than topics, as an input.
+\citet{RobertsStewartAiroldiRPackage} and a Bayesian discrete choice
+model. In a similar way to \citet{MuellerRauh2018}, we use topics to
+analyse the effect of various events. In Appendix \ref{word2vec}, we
+include an alternative approach that follows \citet{Taddy2015} by using
+word2vec, which more closely uses words, rather than topics, as an
+input.
 
 The basis of the STM is the Latent Dirichlet Allocation (LDA) model of
 \citet{Blei2003latent}. In this section we provide a brief overview of
 both the LDA model and the STM. We consider the outputs of the topic
-model as reduced dimension inputs that can be analysed.
+model as reduced dimension inputs that can be analysed within another
+model. In our case they are inputs to a discrete choice model, and so we
+then discuss that model.
 
 \subsection{Latent Dirichlet
 Allocation}\label{latent-dirichlet-allocation}
@@ -464,8 +451,8 @@ topic could be considered a probability distribution over terms. To
 choose the terms used in each document the speaker picks terms from each
 topic in the appropriate proportion. Figures
 \ref{fig:topicsoverdocuments} and \ref{fig:topicsoverterms} in Appendix
-\textbf{{[}ADD NUMBERING{]}} illustrates an example with five topics,
-two documents, and ten terms.
+\ref{LDAexample} illustrates an example with five topics, two documents,
+and ten terms.
 
 Following \citet{BleiLafferty2009}, \citet{blei2012} and
 \citet{GriffithsSteyvers2004}, the process by which a document is
@@ -554,7 +541,7 @@ document (\citet{blei2012}, p.~7):
 
 Gibbs sampling or the variational expectation-maximization algorithm can
 be used to approximate the posterior. A summary of these approaches is
-provided in Appendix \textbf{{[}ADD NUMBERING{]}}. The choice of the
+provided in Appendix \ref{LDAposteriorestimation}. The choice of the
 number of topics, \emph{k}, drives the results and must be specified
 \emph{a priori}. If there is a strong reason for a particular number,
 then this can be used. Otherwise, one way to choose an appropriate
@@ -645,8 +632,8 @@ data described earlier using the \texttt{stm} R package of
 and content to be functions of time. The choice of the number of topics
 to use in the model is a situation-specific compromise. We use standard
 diagnostic techniques with cross validation to decide on 80
-\textbf{{[}UPDATE AS APPROPRIATE{]}} topics. More detail on this
-selection process is available in Appendix \textbf{{[}ADD NUMBERING{]}}.
+\textbf{{[}UPDATE{]}} topics. More detail on this selection process is
+available in Appendix \ref{selecttopicnumber}.
 
 Figure \ref{fig:exampletopics} illustrates an output of the STM. This
 illustrative model only considers data from the House of Representatives
@@ -667,8 +654,8 @@ related to a change of government or an election. Economic events are
 defined by substantial changes in various economic measures, such as the
 onset of the Great Depression or the Great Recession. Other events are
 those such as the 9/11 attacks, or the Bali Bombing. The full list of
-events that we consider is detailed in Appendix \textbf{{[}ADD
-NUMBERING{]}}.
+events that we consider is detailed in Appendix
+\citet{ref}(eventdetails).
 
 There are many ways to statistically consider the effect of events. One
 way would be to ignore the time series aspect and just group the topic
@@ -689,7 +676,7 @@ METHODS NEED TO ALLOW FOR MORE.{]}}
 We currently consider events in two ways. The first is graphically,
 grouping each of the daily topic proportions by the events and isolating
 the topics. This illustrates the differences between the topics. The
-second is by including incrementing variables in the prevalence metdata.
+second is by including incrementing variables in the prevalence metadata
 This groups each day by events and we can then conduct significance
 tests. Unfortunately both of these do not consider short-term effects.
 
@@ -856,9 +843,17 @@ within findings based on other methods.
 \appendix
 
 
-\section{Appendix}\label{appendix}
+\section{Hansard details}\label{hansard-details}
 
-\subsection{Example page}\label{example-page}
+\subsection{Hansard sources}\label{hansardsources}
+
+Where from?
+
+Which years are being used (not non-OCRd)
+
+{[}IS THIS BEING REFERENCED IN THE TEXT????{]}
+
+\subsection{Example Hansard page}\label{examplehansardpage}
 
 Figure \ref{fig:asdf}
 
@@ -866,440 +861,103 @@ Figure \ref{fig:asdf}
 \includegraphics[width=1\linewidth]{/Users/rohanalexander/Documents/phd/hansard/outputs/figures/example_hansard_page} \caption{Example Hansard page - 6 February 1902}\label{fig:asdf}
 \end{figure}
 
-\subsection{Document sources}\label{document-sources}
+\subsection{Known Hansard issues}\label{knownhansardissues}
 
-Where from?
-
-Which years are being used (not non-OCRd)
-
-\subsection{Dataset issues}\label{dataset-issues}
+The NSW Legislative Council was established earlier than 1856, however
+the earlier Hansard records have not been through an independent OCR
+process and were not used in this paper. However, the Google Tesseract
+OCR engine as implemented by \citet{Ooms2018tesseract} provided useful
+data and these could be used in the future.
 
 Which PDFs are missing or have no content, etc.
 
-\begin{longtable}[]{@{}lllllll@{}}
-\toprule
-\begin{minipage}[b]{0.02\columnwidth}\raggedright\strut
-year\strut
-\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright\strut
-I have this number in Reps\strut
-\end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright\strut
-They say this number in Senate\strut
-\end{minipage} & \begin{minipage}[b]{0.10\columnwidth}\raggedright\strut
-They say this number in Reps\strut
-\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright\strut
-Difference in Reps\strut
-\end{minipage} & \begin{minipage}[b]{0.11\columnwidth}\raggedright\strut
-Comment\strut
-\end{minipage} & \begin{minipage}[b]{0.31\columnwidth}\raggedright\strut
-Source\strut
-\end{minipage}\tabularnewline
-\midrule
-\endhead
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1902\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-106\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-93\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-107\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-Positive means I am missing some\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\url{https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear}\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1908\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-93\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-84\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-91\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--2\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-Negative means I have too many\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1909\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-97\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-71\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-98\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1918\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-87\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-68\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-86\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1920\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-113\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-76\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-114\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1921\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-92\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-79\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-93\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1934\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-36\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-22\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-35\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1935\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-54\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-37\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-55\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1942\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-44\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-36\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-45\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1948\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-89\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-39\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-90\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1951\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-55\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-40\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-56\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1955\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-53\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-36\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-52\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1974\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-64\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-64\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-62\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--2\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1985\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-65\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-74\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-66\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1991\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-66\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-83\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-67\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1992\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-60\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-76\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-44\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--16\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1993\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-47\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-53\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-46\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1994\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-69\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-80\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-68\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1995\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-71\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-78\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-70\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1997\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-79\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-82\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-76\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--3\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-1998\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-56\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-57\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-54\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
--2\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-2000\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-71\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-71\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-73\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-2\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-2002\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-68\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-60\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-69\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-2003\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-74\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-64\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-75\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-2004\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-58\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-49\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-59\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-1\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.02\columnwidth}\raggedright\strut
-2012\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright\strut
-63\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-57\strut
-\end{minipage} & \begin{minipage}[t]{0.10\columnwidth}\raggedright\strut
-67\strut
-\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright\strut
-4\strut
-\end{minipage} & \begin{minipage}[t]{0.11\columnwidth}\raggedright\strut
-\strut
-\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright\strut
-\strut
-\end{minipage}\tabularnewline
-\bottomrule
-\end{longtable}
+\begin{table}
 
-\subsection{Example workflow}\label{example-workflow}
+\caption{\label{tab:missingdays}Missing days}
+\centering
+\fontsize{8}{10}\selectfont
+\begin{tabular}[t]{rrrrr}
+\toprule
+year & HoR PDFs                      & Senate sitting days           & HoR sitting days              & HoR difference\\
+\midrule
+1902 & 106 & 93 & 107 & 1\\
+1908 & 93 & 84 & 91 & -2\\
+1909 & 97 & 71 & 98 & 1\\
+1918 & 87 & 68 & 86 & -1\\
+1920 & 113 & 76 & 114 & 1\\
+\addlinespace
+1921 & 92 & 79 & 93 & 1\\
+1934 & 36 & 22 & 35 & -1\\
+1935 & 54 & 37 & 55 & 1\\
+1942 & 44 & 36 & 45 & 1\\
+1948 & 89 & 39 & 90 & 1\\
+\addlinespace
+1951 & 55 & 40 & 56 & 1\\
+1955 & 53 & 36 & 52 & -1\\
+1974 & 64 & 64 & 62 & -2\\
+1985 & 65 & 74 & 66 & 1\\
+1991 & 66 & 83 & 67 & 1\\
+\addlinespace
+1992 & 60 & 76 & 44 & -16\\
+1993 & 47 & 53 & 46 & -1\\
+1994 & 69 & 80 & 68 & -1\\
+1995 & 71 & 78 & 70 & -1\\
+1997 & 79 & 82 & 76 & -3\\
+\addlinespace
+1998 & 56 & 57 & 54 & -2\\
+2000 & 71 & 71 & 73 & 2\\
+2002 & 68 & 60 & 69 & 1\\
+2003 & 74 & 64 & 75 & 1\\
+2004 & 58 & 49 & 59 & 1\\
+2012 & 63 & 57 & 67 & 4\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Notes: Positive means I am missing some, Negative means I have too many.
+Source:
+\url{https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear}
+
+\subsection{Example Hansard PDf to text record
+workflow}\label{hansardworkflow}
 
 Example of the workflow from PDF to text
 
-\subsection{PDF to CSV issues}\label{pdf-to-csv-issues}
+These scripts are primarily based on: the \texttt{PDFtools} package of
+\citet{Ooms2018pdftools}; the \texttt{tidyverse} package of
+\citet{Wickham2017}; the \texttt{tm} package of
+\citet{FeinererHornik2018}; the \texttt{lubridate} package of
+\citet{GrolemundWickham2011}; and the \texttt{stringi} package of
+\citet{Gagolewski2018}. The functions of those packages are supported
+by: the \texttt{furrr} package of \citet{VaughanDancho2018}; and the
+\texttt{tictoc} package of \citet{Izrailev2014}. The \texttt{hunspell}
+package of \citet{Ooms2017} is also used to help find spelling issues.
+In addition to the packages already mentioned, in this step the R
+scripts to do this use the \texttt{tidytext} R package of
+\citet{SilgeRobinson2016}.
+
+\subsection{Stopwords over time}\label{stopwordsgraph}
 
 Insert graph of stop words over time.
 
-\subsection{Topic modelling example and
+\newpage
+
+\section{Additional information}\label{additionalinformation}
+
+\textbf{TBD}
+
+\newpage
+
+\section{word2vec alternative}\label{word2vec}
+
+An alternative approach that follows \citet{Taddy2015}.
+
+\newpage
+
+\section{Topic modelling example and
 details}\label{topic-modelling-example-and-details}
 
-\subsubsection{Examples}\label{examples}
+\subsection{Examples}\label{LDAexample}
 
 For instance, if there were five topics and two documents, then the
 first document may be comprised mostly of the first few topics; the
@@ -1324,7 +982,7 @@ topic may give more weight to terms related to the economy (Figure
 \caption{\label{fig:topicsoverterms}Probability distributions over terms}
 \end{figure}
 
-\subsubsection{Solution details}\label{solution-details}
+\subsection{Posterior estimation}\label{LDAposteriorestimation}
 
 Following \citet{SteyversGriffiths2006} and \citet{Darling2011}, the
 Gibbs sampling process attempts to find a topic for a particular term in
@@ -1357,18 +1015,21 @@ random allocation of topics means that the results of early passes
 through the corpus of document are poor, but given enough time the
 algorithm converges to an appropriate estimate.
 
-\subsection{Selection of number of
-topics}\label{selection-of-number-of-topics}
+\subsection{Selection of number of topics}\label{selecttopicnumber}
+
+\textbf{{[}TBD{]}}
 
 \subsection{Robustness of results}\label{robustness-of-results}
 
-Here we change the number of sitting days considered either side of an
-event. The results in the main section of the paper are for the nearest
-ten days either side of an event. Here are show that the results are
-essentially the same if the nearest one, two, five, and twenty days
-either side of an event.
+\textbf{{[}IS THIS BEING USED?{]}} Here we change the number of sitting
+days considered either side of an event. The results in the main section
+of the paper are for the nearest ten days either side of an event. Here
+are show that the results are essentially the same if the nearest one,
+two, five, and twenty days either side of an event.
 
-\subsection{Events}\label{events}
+\newpage
+
+\section{Events}\label{eventdetails}
 
 \begin{table}
 
@@ -1558,13 +1219,7 @@ theDate & event\\
 \end{tabular}
 \end{table}
 
-\subsection{Choosing number of topics}\label{choosing-number-of-topics}
-
 Add the graphs and procedures.
-
-\subsection{word2vec alternative}\label{word2vec-alternative}
-
-An alternative approach that follows \citet{Taddy2015}.
 
 \newpage
 
