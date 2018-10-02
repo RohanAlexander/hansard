@@ -1,0 +1,16 @@
+model{
+for(s in 1:nsittings){
+for (t in 1:ndays.s[s]){
+    for (p in 1:ntopics){
+      log(a0[s,t,p]) <- alpha[s,p] 
+    }
+    y.stp[s,t,1:ntopics] ~ ddirch(a0[s,t,1:ntopics]) 
+    mu.stp[s,t,1:ntopics] ~ ddirch(a0[s,t,1:ntopics]) 
+  }
+  alpha[s,1] <- 0
+  for (p in 2:ntopics){
+    alpha[s,p] ~ dnorm(0, 1.0E-3) 
+    #beta[p] ~ dnorm(0, 1.0E-3) 
+  }
+}
+}

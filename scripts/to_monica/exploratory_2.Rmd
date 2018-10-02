@@ -1,0 +1,144 @@
+---
+title: "Dirichlet?"
+author: "Monica Alexander"
+date: "10/1/2018"
+output: html_document
+---
+
+Try and get this dirichlet thing going
+
+```{r, message=F}
+library(tidyverse)
+library(lubridate)
+library(boot)
+library(rjags)
+library(R2jags)
+library(distortr)
+```
+
+Read in the data
+
+```{r}
+d <- read_csv("gammas_model_prevalence_years_k_20.csv")
+dr <- d %>% 
+  filter(document > ymd("2016-01-01"))
+```
+
+Plot these just to visualize. Note that the topics are really dominated by two particular ones. 
+
+```{r}
+dr %>% 
+  ggplot(aes(document, gamma, fill = factor(topic))) + geom_bar(stat = "identity")
+```
+
+
+
+Get info about sitting period, day number in sitting period etc. In this period we have 10 different sitting days. Sitting periods usually only have 8 days in them. 
+
+```{r}
+dr_wide <- dr %>% 
+  spread(topic, gamma)
+
+dr_wide <- dr_wide %>% mutate(day_diff = document - lag(document))
+
+k <- 1
+dr_wide$group <- NA
+for(i in 1:nrow(dr_wide)){
+  if(is.na(dr_wide$day_diff[i])|dr_wide$day_diff[i]<7){
+    k <- k
+  }
+  else{
+    k <- k+1
+  }
+  dr_wide$group[i] <- k
+}
+
+dr_wide <- dr_wide %>% group_by(group) %>% 
+  mutate(day_number = row_number())
+
+```
+
+
+Make back into long format. Now we have some covariates!
+
+```{r}
+dr_long <- dr_wide %>% 
+  gather(topic, gamma, -document, -group, -day_number, -day_diff) %>% 
+  arrange(document)
+```
+
+Think about a simple model here. The dependent variable is $\gamma_{stp}$, for sitting period $s$, day $t$ and topic $p$. This could be a function of: sitting period, the gamma of the same topic the day before, the year....
+
+Start off with 
+
+$$
+\gamma_{st,} \sim Dirichlet(\mu_{st,})\\
+\log \mu_{stp} = \alpha_{sp} 
+$$
+
+So just linear in time for each topic and sitting period. Now need to get the data in the right form to fit:
+
+```{r}
+ntopics <- 20
+y.stp <- array(NA, c(max(dr_long$group),max(dr_long$day_number), 20))
+
+for (i in 1:ntopics){
+  y.stp[,,i] <- dr_long %>% 
+  ungroup() %>% 
+  filter(topic==i) %>% 
+  dplyr::select(-topic, -day_diff, -document) %>% 
+  spread(day_number, gamma) %>% 
+  dplyr::select(-group) %>% 
+  as.matrix()
+}
+
+nsittings <- max(dr_long$group)
+ndays.s <- dr_long %>% group_by(group) %>% summarise(days = max(day_number)) %>% dplyr::select(days) %>% pull()
+
+
+```
+
+Run the model:
+
+```{r}
+jags.data <- list(nsittings = nsittings,
+                  ndays.s = ndays.s, 
+                  ntopics = ntopics, 
+                  y.stp = y.stp)
+parnames <- c("alpha", "mu.stp")
+
+mod <- jags(data = jags.data, 
+            #n.iter = 5000,
+            parameters.to.save=parnames,
+            model.file = "model_dirichlet.txt")
+
+max(mod$BUGSoutput$summary[,"Rhat"])
+mcmc.array <- mod$BUGSoutput$sims.array
+```
+
+
+```{r}
+df_res <- c()
+for(i in 1:nsittings){
+  for(j in 1:ndays.s[i]){
+    for(k in 1:ntopics)
+    df_res <- rbind(df_res, tibble(group = i, day = j, topic = k, 
+                                   document =  dr_long$document[dr_long$group==i&dr_long$day_number==j&dr_long$topic==k],
+                                   median = (median(mcmc.array[,,paste0("mu.stp[",i,",",j, ",",k,"]")])),
+                                   upper = (quantile(mcmc.array[,,paste0("mu.stp[",i,",",j, ",",k,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.stp[",i,",",j, ",",k,"]")], 0.025))
+    ))
+  }
+}
+```
+
+Plot:
+
+```{r}
+df_res %>% 
+ggplot(aes(day, median, fill = factor(topic))) + geom_line(aes(color = factor(topic))) + 
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) + 
+  facet_wrap(~group)+
+  geom_point(data = dr_long, aes((day_number), gamma, color = factor(topic)))
+```
+
