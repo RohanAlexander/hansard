@@ -124,7 +124,15 @@ all_dates <-
          keyOtherChange = if_else(allDates %in% keyOtherDates$theDate, 1, 0),
          keyOtherChange = cumsum(keyOtherChange)) %>% 
   rename(electionCounter = electionDate)
+
 head(all_dates)
+# 
+# all_dates <- all_dates %>% 
+#   select(-keyEconomicChange, -keyOtherChange) %>% 
+#   mutate(governmentChangeDate = governmentChangeDate + 1) %>% 
+#   filter(allDates > "1901-03-29")
+# 
+# write_csv(all_dates, "dates_of_gov_and_election.csv")
 
 tidy_hansard_reduced <- tidy_hansard_reduced %>% 
   left_join(all_dates, by = c("docid_field" = "allDates"))

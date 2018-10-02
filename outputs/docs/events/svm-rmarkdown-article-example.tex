@@ -53,8 +53,8 @@
 
 \title{The Effect of Events on Australian Parliamentary Discussion (1870--2017) \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
 Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, and Chris
-Cochrane for their helpful suggestions. \textbf{Version as of}: 30
-September 2018; \textbf{comments welcome}:
+Cochrane for their helpful suggestions. \textbf{Version as of}: 02
+October 2018; \textbf{comments welcome}:
 \href{mailto:rohan.alexander@anu.edu.au}{\nolinkurl{rohan.alexander@anu.edu.au}}.}  }
 
 
@@ -177,15 +177,16 @@ compile a dataset of what was said in Australian state and federal
 parliaments from the mid-1800s through to 2017 based on available public
 records. We then use a structural text model to reduce the
 dimensionality of the text and to impose prior knowledge such as
-correlation between days and changes over time. Finally, we examine the
-effect of various events using a Bayesian choice model. We find that: 1)
-elections are associated with topic changes only when the party in power
-changes but a change in government sometimes does not require this to be
-associated with topic changes; and 2) economic events, such as financial
+correlation between days and steady changes over time. Finally, we
+consider various events using Bayesian regression with a
+Dirichlet-distributed response variable. We find that: 1) elections are
+associated with topic changes only when the party in power changes; 2) a
+change in government can be associated with topic changes even if the
+party in power does not change; 3) economic events, such as financial
 crises, have less significant and persistent effects than other events
-such as terrorism. Our findings have implications for how we think about
-the longer-term trajectory of government policy as the media cycle
-becomes increasingly focused on short-term events.
+such as terrorist attacks. Our findings have implications for how we
+think about the longer-term trajectory of government policy as the media
+cycle becomes increasingly focused on short-term events.
 
 
 \vskip 8.5pt \noindent \emph{Keywords}: text analysis, politics, Australia \par
@@ -313,18 +314,18 @@ Commonwealth & House of Representatives & 1901 - 2017 & 7873\\
  & Senate & 1901 - 2017 & TBD\\
 Queensland & Legislative Assembly & 1860 - 2017 & 9699\\
  & Legislative Council & 1860 - 1922 & 4156\\
-New South Wales & Legislative Assembly & 1856 - 2017 & TBD\\
+New South Wales & Legislative Assembly & 1879 - 2017 & 8903\\
 \addlinespace
- & Legislative Council & 1856 - 2017 & TBD\\
-Victoria & Legislative Assembly & 1856 - 2017 & TBD\\
- & Legislative Council & 1851 - 2017 & TBD\\
-Tasmania & House of Assembly & 1856 - 2017 & TBD\\
- & Legislative Council & 1856 - 2017 & TBD\\
+ & Legislative Council & 1879 - 2017 & 6463\\
+Victoria & Legislative Assembly & 1856 - 2017 & -\\
+ & Legislative Council & 1851 - 2017 & -\\
+Tasmania & House of Assembly & TBD - 2017 & TBD\\
+ & Legislative Council & TBD - 2017 & TBD\\
 \addlinespace
-South Australia & House of Assembly & 1857 - 2017 & TBD\\
- & Legislative Council & 1840 - 2017 & TBD\\
-Western Australia & Legislative Assembly & 1890 - 2017 & TBD\\
- & Legislative Council & 1832 - 2017 & TBD\\
+South Australia & House of Assembly & TBD - 2017 & TBD\\
+ & Legislative Council & TBD - 2017 & TBD\\
+Western Australia & Legislative Assembly & 1890 - 2017 & 5977\\
+ & Legislative Council & 1870 - 2017 & 5725\\
 \bottomrule
 \end{tabular}
 \end{table}

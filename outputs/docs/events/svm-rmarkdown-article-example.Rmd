@@ -14,7 +14,7 @@ author:
   affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "We systematically analyse how parliamentary discussion changes in response to different types of events in Australian history. We first compile a dataset of what was said in Australian state and federal parliaments from the mid-1800s through to 2017 based on available public records. We then use a structural text model to reduce the dimensionality of the text and to impose prior knowledge such as correlation between days and changes over time. Finally, we examine the effect of various events using a Bayesian choice model. We find that: 1) elections are associated with topic changes only when the party in power changes but a change in government sometimes does not require this to be associated with topic changes; and 2) economic events, such as financial crises, have less significant and persistent effects than other events such as terrorism. Our findings have implications for how we think about the longer-term trajectory of government policy as the media cycle becomes increasingly focused on short-term events."
+abstract: "We systematically analyse how parliamentary discussion changes in response to different types of events in Australian history. We first compile a dataset of what was said in Australian state and federal parliaments from the mid-1800s through to 2017 based on available public records. We then use a structural text model to reduce the dimensionality of the text and to impose prior knowledge such as correlation between days and steady changes over time. Finally, we consider various events using Bayesian regression with a Dirichlet-distributed response variable. We find that: 1) elections are associated with topic changes only when the party in power changes; 2) a change in government can be associated with topic changes even if the party in power does not change; 3) economic events, such as financial crises, have less significant and persistent effects than other events such as terrorist attacks. Our findings have implications for how we think about the longer-term trajectory of government policy as the media cycle becomes increasingly focused on short-term events."
 keywords: "text analysis, politics, Australia"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
@@ -69,7 +69,7 @@ The recent digitisation of the Canadian Hansard, @BeelenEtc2017, allowed @Rheaul
 
 Australian Hansard records have been analysed for various purposes. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment.
 
-Australian parliaments generally make their daily Hansard records available online as PDFs and these are considered the official release. Additionally, there is a more limited set of XML records available in some cases.[^XMLfootnote] We detail the sources of our Hansard PDFs in \@ref(hansardsources) and Appendix \@ref(examplehansardpage) provides an example of what a Hansard PDF looks like. There are 65,000 **[UPDATE]** days worth of publicly available Hansard records across the state and federal parliaments (Table \ref{tab:yearsusedtable}). Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
+Australian parliaments generally make their daily Hansard records available online as PDFs and these are considered the official release. Additionally, there is a more limited set of XML records available in some cases.[^XMLfootnote] We detail the sources of our Hansard PDFs in \@ref(hansardsources) and Appendix \@ref(examplehansardpage) provides an example of what a Hansard PDF looks like. There are roughly 54,331 **[UPDATE]** days worth of publicly available Hansard records across the state and federal parliaments (Table \ref{tab:yearsusedtable}). Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
 
 [^XMLfootnote]: Tim Sherratt makes these XML records available as a single download and also presents them in a website (http://historichansard.net/) that can be used to explore Commonwealth Hansard records from 1901 to 1980. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website.
 
@@ -288,7 +288,7 @@ Which PDFs are missing or have no content, etc.
 
 missing_days %>% 
   kable(booktabs = T, caption = "Missing days") %>%
-  kable_styling(font_size = 8)
+  kable_styling(font_size = 12)
 
 ```
 
@@ -395,7 +395,7 @@ Here we change the number of sitting days considered either side of an event. Th
 
 governments %>% 
   kable(booktabs = T, caption = "Change in governments") %>%
-  kable_styling(font_size = 8)
+  kable_styling(font_size = 12)
 
 ```
 
@@ -406,7 +406,7 @@ elections %>%
   filter(election == 1) %>% 
   select(year, electionDate, electionWinner) %>% 
   kable("latex", booktabs = T, caption = "Elections") %>%
-  kable_styling(font_size = 8)
+  kable_styling(font_size = 12)
 
 ```
 
@@ -415,7 +415,7 @@ elections %>%
 
 keyEconomicDates %>% 
   kable(booktabs = T, caption = "Key economic events") %>%
-  kable_styling(font_size = 8)
+  kable_styling(font_size = 12)
 
 ```
 
@@ -424,7 +424,7 @@ keyEconomicDates %>%
 
 keyOtherDates %>% 
   kable(booktabs = T, caption = "Key other events") %>%
-  kable_styling(font_size = 8)
+  kable_styling(font_size = 12)
 
 ```
 
