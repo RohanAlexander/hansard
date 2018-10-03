@@ -22,11 +22,11 @@ In contrast to Eggers, et al., (2015) who focuses on 1987-2007 and only at a Com
 
 # Data
 ## Centrality
-To construct measures of centrality, or importance, I use the Hansard records for the Australian Commonwealth, and the six states over the period that they are available. The availability of this data is summarised in Table 1.
+To construct measures of centrality, or importance, I use the Hansard records for the Australian Commonwealth, and the six states over the period that they are available. For details on the dataset please see Alexander and Alexander. Daily Hansard records were the main level that we considered in that paper, but here were disaggregated them into individual-level records. Sometimes these are just short interjections or notes that are not specific to any particular politician, such as 'Honourable members interjecting'. The high dimensional nature of text data means that the appropriate level and focus of the dataset being analysed tends to be specific to a research question. For instance, in our paper interjections are not important because they do not usually contribute much to defining the topics being discussed. But they are interesting in their own right and @Whyte2017 analysed them in a Canadian context for the period 1926 to 2015 to find that female MPs were more likely to be interrupted than male MPs.
 
-[INSERT TABLE 1]
+Usually the disaggregation into individual-level records is done by identifying politicians' names in particular patterns. For instance, when Hansard is indicating that a particular person is speaking, as opposed to being mentioned, often the name is in upper case, for instance 'Mr WHITLAM' or 'Mr MENZIES'; followed by a dash or colon; or are next to some title within brackets. There is substantial variation in how the person making a statement is identified. Again some error is introduced at this stage because of inconsistencies over time and between the parliaments. There is considerable variance but on average each daily record had 250 **[UPDATE]** individual-level records, resulting in roughly 15 million rows **[UPDATE]** across the state and federal parliaments.
 
-For more information on this dataset please see the Appendix.
+For more information on this dataset please see Alexander and Alexander and also Appendix X.
 
 
 ## Elections

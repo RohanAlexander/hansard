@@ -1,4 +1,4 @@
-date,Chamber,PdfDocId,chamber_type,URL,save_name
+date,Chamber,PdfDocId,chamber_type,URL,file_name
 1879-12-18,Legislative Assembly,HANSARD-290296563-9469,A,https://api.parliament.nsw.gov.au/api/hansard/search/daily/searchablepdf/HANSARD-290296563-9469,NSW-1879-12-18-A.pdf
 1879-12-18,Legislative Council,HANSARD-290296563-11403,C,https://api.parliament.nsw.gov.au/api/hansard/search/daily/searchablepdf/HANSARD-290296563-11403,NSW-1879-12-18-C.pdf
 1879-12-17,Legislative Assembly,HANSARD-290296563-9468,A,https://api.parliament.nsw.gov.au/api/hansard/search/daily/searchablepdf/HANSARD-290296563-9468,NSW-1879-12-17-A.pdf
