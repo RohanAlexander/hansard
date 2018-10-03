@@ -51,7 +51,7 @@
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 
-\title{The Effect of Events on Australian Parliamentary Discussion (1870--2017) \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
+\title{The Effect of Events on Australian Parliamentary Discussion (1851--2017) \thanks{Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi
 Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, and Chris
 Cochrane for their helpful suggestions. \textbf{Version as of}: 02
 October 2018; \textbf{comments welcome}:
@@ -103,7 +103,7 @@ October 2018; \textbf{comments welcome}:
             bookmarks=true,
             pdfauthor={Monica Alexander (University of Toronto) and Rohan Alexander (Australian National University)},
              pdfkeywords = {text analysis, politics, Australia},  
-            pdftitle={The Effect of Events on Australian Parliamentary Discussion (1870--2017)},
+            pdftitle={The Effect of Events on Australian Parliamentary Discussion (1851--2017)},
             colorlinks=true,
             citecolor=blue,
             urlcolor=blue,
@@ -178,15 +178,15 @@ parliaments from the mid-1800s through to 2017 based on available public
 records. We then use a structural text model to reduce the
 dimensionality of the text and to impose prior knowledge such as
 correlation between days and steady changes over time. Finally, we
-consider various events using Bayesian regression with a
-Dirichlet-distributed response variable. We find that: 1) elections are
-associated with topic changes only when the party in power changes; 2) a
-change in government can be associated with topic changes even if the
-party in power does not change; 3) economic events, such as financial
-crises, have less significant and persistent effects than other events
-such as terrorist attacks. Our findings have implications for how we
-think about the longer-term trajectory of government policy as the media
-cycle becomes increasingly focused on short-term events.
+consider the effect of various events using Bayesian hierarchical
+Dirichlet regression. We find that: 1) elections are associated with
+topic changes only when the party in power changes; 2) a change in
+government can be associated with topic changes even if the party in
+power does not change; 3) economic events, such as financial crises,
+have less significant and persistent effects than other events such as
+terrorist attacks. Our findings have implications for how we think about
+the longer-term trajectory of government policymaking as the media cycle
+becomes increasingly focused on the short-term.
 
 
 \vskip 8.5pt \noindent \emph{Keywords}: text analysis, politics, Australia \par
@@ -221,23 +221,24 @@ In this paper we examine text records of what was said in Australian
 state and federal parliaments from the mid-1800s through to 2017. We use
 the Structural Topic Model (STM) of \citet{RobertsStewartAiroldi2016}
 for dimensionality reduction and to impose structure such as correlation
-between days and changes over time. We then use a simple discrete choice
-model to examine changes at various types of events, including: changes
-in government; changes in the political environment (as defined by
-polling or other results); changes in economic conditions; and other
-significant events (such as the 9/11 attacks or the Bali bombings).
+between days and changes over time. We then use Bayesian hierarchical
+Dirichlet regression to examine changes at various types of events,
+including: changes in government; changes in the political environment
+(as defined by polling or other results); changes in economic
+conditions; and other significant events (such as the 9/11 attacks or
+the Bali bombings).
 
 We find \textbf{{[}INSERT RESULTS{]}}.
 
 Our paper applies a topic model to a dataset of larger-scale
 parliamentary text records from multiple Australian parliaments. Our use
-of a discrete choice model - essentially a time series multinomial model
-of choices - allows us to construct a counterfactual. Our work fits into
-a growing literature that considers text as an input to more usual
-quantitative techniques, rather than requiring separate analysis. While
-using text as data has well-known shortcomings, it allows larger-scale
-analysis that would not be viable using less-automated approaches and so
-it can identify patterns that may otherwise be overlooked.
+of Bayesian hierarchical Dirichlet regression allows us to construct a
+counterfactual. Our work fits into a growing literature that considers
+text as an input to more usual quantitative techniques, rather than
+requiring separate analysis. While using text as data has well-known
+shortcomings, it allows larger-scale analysis that would not be viable
+using less-automated approaches and so it can identify patterns that may
+otherwise be overlooked.
 
 \section{Data}\label{data}
 
@@ -295,8 +296,8 @@ some cases.\footnote{Tim Sherratt makes these XML records available as a
   records can also be downloaded from the Australian Hansard website.}
 We detail the sources of our Hansard PDFs in \ref{hansardsources} and
 Appendix \ref{examplehansardpage} provides an example of what a Hansard
-PDF looks like. There are 65,000 \textbf{{[}UPDATE{]}} days worth of
-publicly available Hansard records across the state and federal
+PDF looks like. There are roughly 54,331 \textbf{{[}UPDATE{]}} days
+worth of publicly available Hansard records across the state and federal
 parliaments (Table \ref{tab:yearsusedtable}). Our data cleaning process
 indicates concerns with a small number of PDFs and these are detailed in
 Appendix \ref{knownhansardissues}.
@@ -876,7 +877,7 @@ Which PDFs are missing or have no content, etc.
 
 \caption{\label{tab:missingdays}Missing days}
 \centering
-\fontsize{8}{10}\selectfont
+\fontsize{12}{14}\selectfont
 \begin{tabular}[t]{rrrrr}
 \toprule
 year & HoR PDFs                      & Senate sitting days           & HoR sitting days              & HoR difference\\
@@ -1036,7 +1037,7 @@ two, five, and twenty days either side of an event.
 
 \caption{\label{tab:governments}Change in governments}
 \centering
-\fontsize{8}{10}\selectfont
+\fontsize{12}{14}\selectfont
 \begin{tabular}[t]{llllll}
 \toprule
 government & primeMinister & party & start & end & diedInOffice\\
@@ -1091,7 +1092,7 @@ Morrison & Scott Morrison & Liberal (Coalition) & 2018-08-24 & NA & NA\\
 
 \caption{\label{tab:elections}Elections}
 \centering
-\fontsize{8}{10}\selectfont
+\fontsize{12}{14}\selectfont
 \begin{tabular}[t]{rll}
 \toprule
 year & electionDate & electionWinner\\
@@ -1157,7 +1158,7 @@ year & electionDate & electionWinner\\
 
 \caption{\label{tab:economics}Key economic events}
 \centering
-\fontsize{8}{10}\selectfont
+\fontsize{12}{14}\selectfont
 \begin{tabular}[t]{ll}
 \toprule
 theDate & event\\
@@ -1185,7 +1186,7 @@ theDate & event\\
 
 \caption{\label{tab:others}Key other events}
 \centering
-\fontsize{8}{10}\selectfont
+\fontsize{12}{14}\selectfont
 \begin{tabular}[t]{ll}
 \toprule
 theDate & event\\
