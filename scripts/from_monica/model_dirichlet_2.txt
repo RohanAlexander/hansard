@@ -1,0 +1,29 @@
+model{
+for(s in 1:nsittings){
+for (t in 1:ndays.s[s]){
+    for (p in 1:ntopics){
+      log(a0[s,t,p]) <- alpha[s,p] + delta[s,t,p]
+      delta[s,t,p] <- eps[s,t,p] #- mean(eps[s,1:ndays.s[s], p])
+    }
+    y.stp[s,t,1:ntopics] ~ ddirch(a0[s,t,1:ntopics]) 
+    mu.stp[s,t,1:ntopics] ~ ddirch(a0[s,t,1:ntopics]) 
+  }
+  for (p in 1:ntopics){
+    eps[s,1,p] <- 0
+    for(t in 2:(ndays.s[s])){
+      eps[s,t,p] ~ dnorm(eps[s,t-1,p], tau.delta[s])
+    }
+  }
+  alpha[s,1] <- 0
+  
+  for(p in 2:ntopics){
+    alpha[s,p] ~ dnorm(0, 1.0E-3) 
+  }
+    tau.delta[s] <- pow(sigma.delta[s], -2)
+    sigma.delta[s] <- exp(log_sigma.delta[s])
+    log_sigma.delta[s] ~ dnorm(chi, tau.chi)
+}
+  chi ~ dnorm(0, 0.01)
+  tau.chi <- pow(sigma.chi, -2)
+  sigma.chi ~ dunif(0, 40)
+}

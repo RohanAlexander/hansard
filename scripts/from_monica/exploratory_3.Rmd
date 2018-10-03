@@ -1,0 +1,166 @@
+---
+title: "More complicated dirichlet"
+author: "Monica Alexander"
+date: "10/2/2018"
+output: html_document
+---
+
+Now that a basic model seems to be working, let's try an build on this to get some more realistic estimates. 
+
+Here's the model set-up and notation. Note we are indexing everything by sitting period $s$, time $t$ and topic $p$. Note that time $t$ refers to the day index within the sitting period (for now... maybe later we can add back in the date characteristics such as day of week? But probably not important for now). 
+
+We are assuming the the probability of topic $p$ on day $t$ and sitting $s$, $\gamma_{stp}$ are Dirichlet distributed; this makes sense because it is the multivariate extension of the Beta distribution:
+
+$$
+\gamma_{stp} \sim Dirichlet(\mu_{stp})
+$$
+
+where the $\mu$'s could be interpreted as the 'true' topic probabilities distributions (less useful to thing about that here because the gammas are estimated to begin with. But anyway). The main goal of the modeling exercise is to find an appropriate and meaningful functional form for the $\mu$'s. In exploratory 2, we tried to model the $\mu$'s with just an intercept, one for each topic and sitting period, and that seem to work okay - but it doesn't allow for variation within a sitting period. Let's try a simple time series model:
+
+$$
+\log \mu_{stp} = \alpha_{sp} + \delta_{stp}\\
+\alpha_{s1} = 0 \\
+\alpha_{sp} \sim N(0, 100) \text { for } p>1 \\
+\delta_{s,t,p} \sim N(\delta_{s,t-1,p}, \sigma^2_{s}) \\
+\sigma^2_{s} \sim U(0, 40)
+$$
+
+In words: first line is overall model, second line is constraining first intercept to be zero (for identification purposes), third line is priors on all other intercepts, fourth line is random walk around each intercept, last line is prior on random walk variance. 
+
+Let's try and fit this. 
+
+
+```{r, message=F}
+library(tidyverse)
+library(lubridate)
+library(rjags)
+library(R2jags)
+source("plottrace.R")
+```
+
+Read in the data and reduce it down to only a couple of years. 
+
+```{r}
+d <- read_csv("gammas_model_prevalence_years_k_20.csv")
+dr <- d %>% 
+  filter(document > ymd("2017-08-01"))
+```
+
+Plot to visualize. 
+
+```{r}
+dr %>% 
+  ggplot(aes(document, gamma, fill = factor(topic))) + geom_bar(stat = "identity")
+```
+
+
+
+Get info about sitting period, day number in sitting period.
+
+```{r}
+dr_wide <- dr %>% 
+  spread(topic, gamma)
+
+dr_wide <- dr_wide %>% mutate(day_diff = document - lag(document))
+
+k <- 1
+dr_wide$group <- NA
+for(i in 1:nrow(dr_wide)){
+  if(is.na(dr_wide$day_diff[i])|dr_wide$day_diff[i]<7){
+    k <- k
+  }
+  else{
+    k <- k+1
+  }
+  dr_wide$group[i] <- k
+}
+
+dr_wide <- dr_wide %>% group_by(group) %>% 
+  mutate(day_number = row_number())
+
+```
+
+
+Make back into long format.
+
+```{r}
+dr_long <- dr_wide %>% 
+  gather(topic, gamma, -document, -group, -day_number, -day_diff) %>% 
+  arrange(document)
+```
+
+
+Now need to get the data in the right form to fit:
+
+```{r}
+ntopics <- 20
+y.stp <- array(NA, c(max(dr_long$group),max(dr_long$day_number), 20))
+
+for (i in 1:ntopics){
+  y.stp[,,i] <- dr_long %>% 
+  ungroup() %>% 
+  filter(topic==i) %>% 
+  dplyr::select(-topic, -day_diff, -document) %>% 
+  spread(day_number, gamma) %>% 
+  dplyr::select(-group) %>% 
+  as.matrix()
+}
+
+nsittings <- max(dr_long$group)
+ndays.s <- dr_long %>% group_by(group) %>% summarise(days = max(day_number)) %>% dplyr::select(days) %>% pull()
+
+
+```
+
+Run the model:
+
+```{r}
+jags.data <- list(nsittings = nsittings,
+                  ndays.s = ndays.s, 
+                  ntopics = ntopics, 
+                  y.stp = y.stp)
+parnames <- c("alpha", "mu.stp", "delta")
+
+inits_list <- list()
+inits_list[["delta"]] <- y.stp*0
+
+all_inits <- list()
+for(i in 1:3){
+  all_inits[[i]] <- inits_list
+}
+
+mod <- jags(data = jags.data, 
+            #n.iter = 5000,
+            #inits = all_inits,
+            parameters.to.save=parnames,
+            model.file = "model_dirichlet_2.txt")
+
+max(mod$BUGSoutput$summary[,"Rhat"])
+mcmc.array <- mod$BUGSoutput$sims.array
+PlotTrace("alpha[1,16]", mcmc.array)
+```
+
+
+```{r}
+df_res <- c()
+for(i in 1:nsittings){
+  for(j in 1:ndays.s[i]){
+    for(k in 1:ntopics)
+    df_res <- rbind(df_res, tibble(group = i, day = j, topic = k, 
+                                   document =  dr_long$document[dr_long$group==i&dr_long$day_number==j&dr_long$topic==k],
+                                   median = (median(mcmc.array[,,paste0("mu.stp[",i,",",j, ",",k,"]")])),
+                                   upper = (quantile(mcmc.array[,,paste0("mu.stp[",i,",",j, ",",k,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.stp[",i,",",j, ",",k,"]")], 0.025))
+    ))
+  }
+}
+```
+
+```{r}
+df_res %>% 
+ggplot(aes(day, median, fill = factor(topic))) + geom_line(aes(color = factor(topic))) + 
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) + 
+  facet_wrap(~group)+
+  geom_point(data = dr_long, aes((day_number), gamma, color = factor(topic)))
+```
+
