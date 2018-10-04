@@ -8,7 +8,7 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "The Effect of Events on Australian Parliamentary Discussion (1851--2017)"
-thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, and Chris Cochrane for their helpful suggestions. **Version as of**: `r format(Sys.time(), '%d %B %Y')`; **comments welcome**: rohan.alexander@anu.edu.au."
+thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, Chris Cochrane and Dan Simpson for their helpful suggestions. **Version as of**: `r format(Sys.time(), '%d %B %Y')`; **comments welcome**: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto
