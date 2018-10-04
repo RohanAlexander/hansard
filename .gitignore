@@ -5,4 +5,4 @@
 .DS_Store
 outputs/big_files_do_not_push/
 outputs/hansard/
-.DS_Store
+scripts/.DS_Store
