@@ -1,0 +1,198 @@
+---
+title: "Dirichlet with government groups"
+author: "Monica Alexander"
+date: "10/3/2018"
+output: html_document
+---
+
+Now we have a model going, let's try and add in some groupings based on changes in government. Hopefully then we will be able to visualize the 'average' topic distributions across governments. Let's try
+
+$$
+\gamma_{stp} \sim Dirichlet(\mu_{stp}) \\ 
+\log \mu_{stp} = \alpha_{sp} + \delta_{stp}\\
+\alpha_{s1} = 0 \\
+\alpha_{sp} \sim N(\eta_{g[s]}, \sigma^2_g) \text { for } p>1 \\
+\delta_{s,t,p} \sim N(\delta_{s,t-1,p}, \sigma^2_{\delta}) \\
+\sigma^2_{\delta} \sim U(0, 40)
+$$
+
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(rjags)
+library(R2jags)
+source("plottrace.R")
+```
+
+```{r}
+d1 <- read_csv("dates_of_gov_and_election.csv")
+d2 <- read_csv("gammas_model_prevalence_years_k_20.csv")
+d <- d2 %>% 
+  left_join(d1 %>% rename(document = allDates))
+```
+
+```{r}
+dr <- d %>% 
+  filter(electionCounter %in%41:42)
+```
+
+```{r}
+dr %>% 
+  ggplot(aes(document, gamma, fill = factor(topic))) + geom_bar(stat = "identity")
+```
+
+```{r}
+unique(dr$electionCounter)
+```
+
+Get info about sitting period, day number in sitting period.
+
+```{r}
+dr_wide <- dr %>% 
+  spread(topic, gamma)
+
+dr_wide <- dr_wide %>% mutate(day_diff = document - lag(document))
+
+k <- 1
+dr_wide$group <- NA
+for(i in 1:nrow(dr_wide)){
+  if(is.na(dr_wide$day_diff[i])|dr_wide$day_diff[i]<7){
+    k <- k
+  }
+  else{
+    k <- k+1
+  }
+  dr_wide$group[i] <- k
+}
+
+dr_wide <- dr_wide %>% group_by(group) %>% 
+  mutate(day_number = row_number())
+
+dr_long <- dr_wide %>% 
+  gather(topic, gamma, -document, -group, -day_number, -day_diff, -electionCounter, -governmentChangeDate) %>% 
+  arrange(document)
+
+```
+
+Now need to get the data in the right form to fit:
+
+```{r}
+ntopics <- 20
+y.stp <- array(NA, c(max(dr_long$group), max(dr_long$day_number), 20))
+
+for (i in 1:ntopics){
+  y.stp[,,i] <- dr_long %>% 
+  ungroup() %>% 
+  filter(topic==i) %>% 
+  dplyr::select(-topic, -day_diff, -document, -electionCounter, -governmentChangeDate) %>% 
+  spread(day_number, gamma) %>% 
+  dplyr::select(-group) %>% 
+  as.matrix()
+}
+
+nsittings <- max(dr_long$group)
+ndays.s <- dr_long %>% group_by(group) %>% summarise(days = max(day_number)) %>% dplyr::select(days) %>% pull()
+
+election.s <- (dr_long %>% group_by(group) %>% summarise(election = electionCounter[row_number()==1]) %>% dplyr::select(election) %>% pull()) - min(dr_long$electionCounter) + 1
+
+nelections <- length(unique(dr_long$electionCounter))
+
+```
+
+Run the model:
+
+```{r}
+jags.data <- list(nsittings = nsittings,
+                  nelections = nelections,
+                  ndays.s = ndays.s, 
+                  election.s = election.s,
+                  ntopics = ntopics, 
+                  y.stp = y.stp)
+parnames <- c("alpha", "mu.sp", "mu.alpha")
+
+mod <- jags(data = jags.data, 
+            #n.iter = 5000,
+            parameters.to.save=parnames,
+            model.file = "model_dirichlet_means.txt")
+
+max(mod$BUGSoutput$summary[,"Rhat"])
+mcmc.array <- mod$BUGSoutput$sims.array
+PlotTrace("mu.alpha[1,1]", mcmc.array)
+```
+
+Extract and plot the results:
+
+```{r}
+df_res <- c()
+for(i in 1:nsittings){
+  for(j in 1:ndays.s[i]){
+    for(k in 1:ntopics)
+    df_res <- rbind(df_res, tibble(group = i, day = j, topic = k, 
+                                   document =  dr_long$document[dr_long$group==i&dr_long$day_number==j&dr_long$topic==k],
+                                   median = (median(mcmc.array[,,paste0("mu.sp[",i,",",k,"]")])),
+                                   upper = (quantile(mcmc.array[,,paste0("mu.sp[",i,",",k,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.sp[",i,",",k,"]")], 0.025))
+    ))
+  }
+}
+```
+
+```{r}
+df_res %>% 
+ggplot(aes(day, median, fill = factor(topic))) + geom_line(aes(color = factor(topic))) + 
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) + 
+  facet_wrap(~group)+
+  geom_point(data = dr_long, aes((day_number), gamma, color = factor(topic)))
+```
+
+Pull out the means by election and have a look 
+
+```{r}
+mu_res <- c()
+for(i in 1:nelections){
+  for(j in 1:ntopics)
+    mu_res <- rbind(mu_res, tibble(election = i, topic = j, 
+                                   median = (median(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")])),
+                                   upper = (quantile(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")], 0.025))
+    ))
+}
+```
+
+
+```{r}
+mu_res %>% 
+  ggplot(aes(election, median, color = factor(election))) + 
+  geom_point() + geom_errorbar(aes(ymin = lower, ymax = upper)) + 
+  facet_wrap(~topic)
+```
+
+Have a look at the alphas
+
+```{r}
+alpha_res <- c()
+for(i in 1:nsittings){
+  for(j in 1:ntopics)
+    alpha_res <- rbind(alpha_res, tibble(sitting = i, topic = j, election = election.s[i],
+                                   median = (median(mcmc.array[,,paste0("alpha[",i,",",j,"]")])),
+                                   upper = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.025))
+    ))
+}
+```
+
+
+```{r}
+ggplot(alpha_res, aes(median, group = factor(election), color = factor(election))) + 
+  geom_density() + facet_wrap(~topic)
+```
+
+```{r}
+alpha_res %>% 
+  ggplot(aes(sitting, median, color = factor(election))) + geom_point() + facet_wrap(~topic)
+```
+
+
+
+

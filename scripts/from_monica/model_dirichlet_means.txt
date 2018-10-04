@@ -1,0 +1,27 @@
+model{
+for(s in 1:nsittings){
+for (t in 1:ndays.s[s]){
+    for (p in 1:ntopics){
+      log(a0[s,t,p]) <- alpha[s,p]
+    }
+    y.stp[s,t,1:ntopics] ~ ddirch(a0[s,t,1:ntopics]) 
+    #mu.stp[s,t,1:ntopics] ~ ddirch(a0[s,t,1:ntopics]) 
+  }
+
+  
+  for(p in 1:ntopics){
+    alpha[s,p] ~ dnorm(mu.alpha[election.s[s],p], tau.s[election.s[s]]) 
+    log(b0[s,p]) <- alpha[s,p]
+  }
+  mu.sp[s,1:ntopics] ~ ddirch(b0[s,1:ntopics])
+} # end sittings
+
+for (e in 1:nelections){
+  for(p in 1:ntopics){
+    mu.alpha[e,p] ~ dnorm(0, 0.01)
+  }
+      tau.s[e] <- pow(sigma.s[e], -2)
+    sigma.s[e] ~ dunif(0, 40)
+} # end elections
+
+}
