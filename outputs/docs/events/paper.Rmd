@@ -187,7 +187,6 @@ We index each proportion, $\gamma$, by sitting period $s$, time $t$ and topic $p
 \sigma^2_{\delta} &\sim \mbox{Uniform}(0, 40). (\#eq:randomwalkvariance)  
 \end{align} 
 
-
 **[Does the variance parameter used in Equation 4 need to be specified too?]**
 
 Equation \@ref(eq:distributionforgammas) describes the proportion of each day within a sitting period given to a particular topic as a draw from a Dirichlet distribution parameterised by $\mu_{stp}$. The Dirichlet distribution is the multivariate extension of the Beta distribution, and the parameter controls where the 'weight' of the distribution lies. Equation \@ref(eq:meanforgammas) describes that distribution parameter, $\mu_{stp}$, as the sum of $\alpha_{sp}$, which means the model is linear in time for each topic and sitting period, and $\delta_{stp}$, which is a simple time series that allows for a little variation within a sitting period. These are themselves parameters. The primary aim of the modelling task is to find an appropriate and meaningful functional form for $\mu$. 
@@ -196,6 +195,8 @@ Equation \@ref(eq:zeroconstraint) constrains the first intercept to zero for ide
 
 We run the model in Stan using the \texttt{RStan} package of @RStan. An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation). 
 
+
+**[Probably need to add: 1) where does each covariate come into it and how do they interact; 2) how does correlation work; 3) what are the random effects and fixed effects?]**
 
 
 
