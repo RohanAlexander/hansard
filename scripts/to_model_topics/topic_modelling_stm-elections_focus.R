@@ -28,11 +28,16 @@ library(tidyverse)
 # Load Hansard words by day
 load("outputs/big_files_do_not_push/all_hansard_words_by_date.Rda") # Takes 30 sec or so
 # Load the metadata
-election_dates <- read_csv("inputs/misc/misc_elections_data.csv", col_types = cols())
-hansard_dates <- read_csv("inputs/misc/hansard_dates.csv", col_types = cols())
-governmentChanges <- read_csv("inputs/misc/change_of_pm.csv", col_types = cols())
-keyEconomicDates <- read_csv("inputs/misc/key_dates-economic.csv", col_types = cols())
-keyOtherDates <- read_csv("inputs/misc/key_dates-other.csv", col_types = cols())
+election_dates <-
+  read_csv("inputs/misc/misc_elections_data.csv", col_types = cols())
+hansard_dates <-
+  read_csv("inputs/misc/hansard_dates.csv", col_types = cols())
+governmentChanges <-
+  read_csv("inputs/misc/change_of_pm.csv", col_types = cols())
+keyEconomicDates <-
+  read_csv("inputs/misc/key_dates-economic.csv", col_types = cols())
+keyOtherDates <-
+  read_csv("inputs/misc/key_dates-other.csv", col_types = cols())
 
 
 #### Temp fix for dodgy words ####
@@ -72,7 +77,10 @@ tidy_hansard <- all_hansard_words %>%
   split(.$grouper) %>%
   map_dfr(tidy_hansard_pieces, .id = NULL)
 
-rm(tidy_hansard_pieces, custom_stop_words, politicians, all_hansard_words)
+rm(tidy_hansard_pieces,
+   custom_stop_words,
+   politicians,
+   all_hansard_words)
 
 # # Construct the TF-IDF measures on a day basis
 # # By day
@@ -84,7 +92,7 @@ rm(tidy_hansard_pieces, custom_stop_words, politicians, all_hansard_words)
 #   group_by(date) %>%
 #   top_n(100) %>%
 #   ungroup
-# 
+#
 # head(hansard_tf_idf)
 # # Can graph that if you want
 # rm(hansard_tf_idf)
@@ -115,52 +123,53 @@ rm(tidy_hansard)
 # Add metadata
 all_dates <-
   tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) %>%  # Make a column of all the dates from Federation
-  mutate(electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
-         electionDate = cumsum(electionDate),
-         governmentChangeDate = if_else(allDates %in% governmentChanges$end, 1, 0),
-         governmentChangeDate = cumsum(governmentChangeDate),
-         keyEconomicChange = if_else(allDates %in% keyEconomicDates$theDate, 1, 0),
-         keyEconomicChange = cumsum(keyEconomicChange),
-         keyOtherChange = if_else(allDates %in% keyOtherDates$theDate, 1, 0),
-         keyOtherChange = cumsum(keyOtherChange)) %>% 
+  mutate(
+    electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
+    electionDate = cumsum(electionDate),
+    governmentChangeDate = if_else(allDates %in% governmentChanges$end, 1, 0),
+    governmentChangeDate = cumsum(governmentChangeDate),
+    keyEconomicChange = if_else(allDates %in% keyEconomicDates$theDate, 1, 0),
+    keyEconomicChange = cumsum(keyEconomicChange),
+    keyOtherChange = if_else(allDates %in% keyOtherDates$theDate, 1, 0),
+    keyOtherChange = cumsum(keyOtherChange)
+  ) %>%
   rename(electionCounter = electionDate)
 
 head(all_dates)
-# 
-# all_dates <- all_dates %>% 
-#   select(-keyEconomicChange, -keyOtherChange) %>% 
-#   mutate(governmentChangeDate = governmentChangeDate + 1) %>% 
+#
+# all_dates <- all_dates %>%
+#   select(-keyEconomicChange, -keyOtherChange) %>%
+#   mutate(governmentChangeDate = governmentChangeDate + 1) %>%
 #   filter(allDates > "1901-03-29")
-# 
+#
 # write_csv(all_dates, "dates_of_gov_and_election.csv")
 
-tidy_hansard_reduced <- tidy_hansard_reduced %>% 
+tidy_hansard_reduced <- tidy_hansard_reduced %>%
   left_join(all_dates, by = c("docid_field" = "allDates"))
 
-tidy_hansard_reduced <- tidy_hansard_reduced %>% 
-  mutate(electionCounter = as.integer(electionCounter),
-         governmentChangeDate = as.integer(governmentChangeDate),
-         keyEconomicChange = as.integer(keyEconomicChange),
-         keyOtherChange = as.integer(keyOtherChange),
-         year = year(docid_field),
-         year = as.integer(year)
+tidy_hansard_reduced <- tidy_hansard_reduced %>%
+  mutate(
+    electionCounter = as.integer(electionCounter),
+    governmentChangeDate = as.integer(governmentChangeDate),
+    keyEconomicChange = as.integer(keyEconomicChange),
+    keyOtherChange = as.integer(keyOtherChange),
+    year = year(docid_field),
+    year = as.integer(year)
   )
 head(tidy_hansard_reduced)
 
-rm(all_dates, election_dates, hansard_dates, governmentChanges, keyEconomicDates, keyOtherDates)
+rm(
+  all_dates,
+  election_dates,
+  hansard_dates,
+  governmentChanges,
+  keyEconomicDates,
+  keyOtherDates
+)
 
 # Create a corpus with document variables except for the "text"
-hansard_corpus <- corpus(tidy_hansard_reduced, text_field = "textid_field")
-
-# Add metadata
-# all_hansard_words_test <- all_hansard_words %>% 
-#   filter(date %in% tidy_hansard_reduced$docid_field)
-# tidy_hansard_reduced <- tidy_hansard_reduced %>% 
-#   left_join(all_hansard_words_test, by = c("docid_field" = "date")) %>% 
-#   select(-words, -grouper)
-
-# docvars(hansard_corpus, "electionCounter") <- tidy_hansard_reduced$electionCounter
-# summary(hansard_corpus)
+hansard_corpus <-
+  corpus(tidy_hansard_reduced, text_field = "textid_field")
 
 # Convert that corpus to a document-feature matrix - cleaning options can be added
 hansard_dfm <- dfm(hansard_corpus)
@@ -183,152 +192,15 @@ names(hansard_stm)
 # write_csv(tidy_hansard_reduced, "tidy_hansard_reduced.csv")
 
 # Clean up
-rm(tidy_hansard_reduced, hansard_corpus, docsTM, vocabTM, metaTM, hansard_dfm)
+rm(tidy_hansard_reduced,
+   hansard_corpus,
+   docsTM,
+   vocabTM,
+   metaTM,
+   hansard_dfm)
 
+#### TEsting for the optimal k 
 
-
-
-
-
-model_prevalence_years_k_20 <-
-  stm(
-    documents = hansard_stm$documents,
-    vocab = hansard_stm$vocab,
-    K = 20,
-    prevalence =~ s(year),
-    data = hansard_stm$meta,
-    max.em.its = 75,
-    init.type = "Spectral"
-  )
-
-model_prevalence_years_k_20_elections <-
-  stm(
-    documents = hansard_stm$documents,
-    vocab = hansard_stm$vocab,
-    K = 20,
-    prevalence =~ s(year) + electionCounter,
-    data = hansard_stm$meta,
-    max.em.its = 75,
-    init.type = "Spectral"
-  )
-
-model_prevalence_years_k_20_governmentChangeDate <-
-  stm(
-    documents = hansard_stm$documents,
-    vocab = hansard_stm$vocab,
-    K = 20,
-    prevalence =~ s(year) + governmentChangeDate,
-    data = hansard_stm$meta,
-    max.em.its = 75,
-    init.type = "Spectral"
-  )
-
-
-model_prevalence_years_k_20_economicEvents <-
-  stm(
-    documents = hansard_stm$documents,
-    vocab = hansard_stm$vocab,
-    K = 20,
-    prevalence =~ s(year) + keyEconomicChange,
-    data = hansard_stm$meta,
-    max.em.its = 75,
-    init.type = "Spectral"
-  )
-
-model_prevalence_years_k_20_otherEvents <-
-  stm(
-    documents = hansard_stm$documents,
-    vocab = hansard_stm$vocab,
-    K = 20,
-    prevalence =~ s(year) + keyOtherChange,
-    data = hansard_stm$meta,
-    max.em.its = 75,
-    init.type = "Spectral"
-  )
-
-
-significance <- tibble(Topic = c(1:20))
-
-elections <- estimateEffect(
-  1:20 ~ electionCounter + s(year),
-  model_prevalence_years_k_20_elections,
-  meta = hansard_stm$meta,
-  uncertainty = "Global") %>%
-  tidy() %>%
-  filter(term == "electionCounter") %>% 
-  select(`p.value`)
-
-governments <- estimateEffect(
-  1:20 ~ governmentChangeDate + s(year),
-  model_prevalence_years_k_20_governmentChangeDate,
-  meta = hansard_stm$meta,
-  uncertainty = "Global") %>%
-  tidy() %>%
-  filter(term == "governmentChangeDate") %>% 
-  select(`p.value`)
-
-economic <- estimateEffect(
-  1:20 ~ keyEconomicChange + s(year),
-  model_prevalence_years_k_20_economicEvents,
-  meta = hansard_stm$meta,
-  uncertainty = "Global") %>%
-  tidy() %>%
-  filter(term == "keyEconomicChange") %>% 
-  select(`p.value`)
-
-other <- estimateEffect(
-  1:20 ~ keyOtherChange + s(year),
-  model_prevalence_years_k_20_otherEvents,
-  meta = hansard_stm$meta,
-  uncertainty = "Global") %>%
-  tidy() %>%
-  filter(term == "keyOtherChange") %>% 
-  select(`p.value`)
-
-significance_all <- cbind(significance, elections, governments, economic, other)
-head(significance)
-colnames(significance_all) <- c("Topic", "Elections", "Governments", "Economic", "Other")
-head(significance_all)
-
-significance_all <- significance_all %>% 
-  mutate(Elections = round(Elections, digits = 2),
-         Governments = round(Governments, digits = 2),
-         Economic = round(Economic, digits = 2),
-         Other = round(Other, digits = 2))
-write_csv(significance_all, "outputs/misc/significance.csv")
-
-labelTopics(model_prevalence_years_k_20)
-
-
-
-
-td_gamma <- tidy(model_prevalence_years_k_20,
-                 matrix = "gamma",
-                 document_names = hansard_stm$meta$docid_field)
-td_gamma
-
-write_csv(td_gamma, "model_prevalence_years_k_20.csv")
-
-td_gamma %>% 
-  mutate(document = ymd(document)) %>% 
-  ggplot(aes(x = document, y = gamma)) +
-  geom_point() +
-  theme_classic() 
-
-prep <- estimateEffect( ~ docid_field + electionCounter, test, meta = hansard_stm$meta, uncertainty = "Global")
-summary(prep), topics = 1)
-
-## NEED TO PUT THE TESTING IN THERE SOMEWHERE
-
-
-# 
-# hansard_dfm <- tidy_hansard %>%
-#   count(date, word, sort = TRUE) %>%
-#   filter(n > 100) %>% # Remove any word that doesn't occur at least 100 times
-#   cast_dfm(date, word, n)
-# 
-# 
-# head(hansard_dfm)
 
 
 many_models <-
@@ -352,7 +224,8 @@ many_models <-
 
 head(many_models)
 
-heldout <- make.heldout(documents = hansard_stm$documents, vocab = hansard_stm$vocab)
+heldout <-
+  make.heldout(documents = hansard_stm$documents, vocab = hansard_stm$vocab)
 
 k_result <- many_models %>%
   mutate(
@@ -380,18 +253,18 @@ k_result %>% transmute(
   `Semantic coherence` = map_dbl(semantic_coherence, mean),
   `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")
 ) %>%
-  gather(Metric, Value, -K) %>%
+  gather(Metric, Value,-K) %>%
   ggplot(aes(K, Value, color = Metric)) +
   geom_line(size = 1.5,
             alpha = 0.7,
             show.legend = FALSE) +
-  facet_wrap(~ Metric, scales = "free_y") +
+  facet_wrap( ~ Metric, scales = "free_y") +
   labs(x = "K (number of topics)",
        y = NULL,
        title = "Model diagnostics by number of topics")
-       # subtitle = "These diagnostics indicate that a good number of topics would be around 60")
-       
-       
+# subtitle = "These diagnostics indicate that a good number of topics would be around 60")
+
+
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
   # filter(K %in% c(20, 60, 100)) %>%
@@ -414,7 +287,6 @@ topic_model <- k_result %>%
 
 class(topic_model)
 
-# save(topic_model, file = "xy.RData")
 
 
 td_beta <- tidy(topic_model)
@@ -424,7 +296,183 @@ td_gamma <- tidy(topic_model,
                  matrix = "gamma",
                  document_names = rownames(hansard_stm))
 td_gamma
-write_csv(td_gamma, "gammas.csv")
+
+
+save(topic_model, file = "outputs/topic_models_and_gammas/topic_model_100.RData")
+tidy(topic_model,
+     matrix = "gamma",
+     document_names = rownames(hansard_stm)) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_100.csv")
+
+topic_model_80 <- k_result %>%
+  filter(K == 80) %>%
+  pull(topic_model) %>%
+  .[[1]]
+save(topic_model_80, file = "outputs/topic_models_and_gammas/topic_model_80.RData")
+tidy(topic_model_80,
+     matrix = "gamma",
+     document_names = rownames(hansard_stm)) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_80.csv")
+
+topic_model_60 <- k_result %>%
+  filter(K == 60) %>%
+  pull(topic_model) %>%
+  .[[1]]
+save(topic_model_60, file = "outputs/topic_models_and_gammas/topic_model_60.RData")
+tidy(topic_model_60,
+     matrix = "gamma",
+     document_names = rownames(hansard_stm)) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
+
+topic_model_40 <- k_result %>%
+  filter(K == 40) %>%
+  pull(topic_model) %>%
+  .[[1]]
+save(topic_model_40, file = "outputs/topic_models_and_gammas/topic_model_40.RData")
+tidy(topic_model_40,
+     matrix = "gamma",
+     document_names = rownames(hansard_stm)) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_40.csv")
+
+topic_model_20 <- k_result %>%
+  filter(K == 20) %>%
+  pull(topic_model) %>%
+  .[[1]]
+save(topic_model_20, file = "outputs/topic_models_and_gammas/topic_model_20.RData")
+tidy(topic_model_20,
+     matrix = "gamma",
+     document_names = rownames(hansard_stm)) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_20.csv")
+
+
+
+
+
+# Run some model
+model_prevalence_years_k_20 <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =  ~ s(year),
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+model_prevalence_years_k_20_elections <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =  ~ s(year) + electionCounter,
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+model_prevalence_years_k_20_governmentChangeDate <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =  ~ s(year) + governmentChangeDate,
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+
+model_prevalence_years_k_20_economicEvents <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =  ~ s(year) + keyEconomicChange,
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+model_prevalence_years_k_20_otherEvents <-
+  stm(
+    documents = hansard_stm$documents,
+    vocab = hansard_stm$vocab,
+    K = 20,
+    prevalence =  ~ s(year) + keyOtherChange,
+    data = hansard_stm$meta,
+    max.em.its = 75,
+    init.type = "Spectral"
+  )
+
+
+significance <- tibble(Topic = c(1:20))
+
+elections <- estimateEffect(
+  1:20 ~ electionCounter + s(year),
+  model_prevalence_years_k_20_elections,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) %>%
+  tidy() %>%
+  filter(term == "electionCounter") %>%
+  select(`p.value`)
+
+governments <- estimateEffect(
+  1:20 ~ governmentChangeDate + s(year),
+  model_prevalence_years_k_20_governmentChangeDate,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) %>%
+  tidy() %>%
+  filter(term == "governmentChangeDate") %>%
+  select(`p.value`)
+
+economic <- estimateEffect(
+  1:20 ~ keyEconomicChange + s(year),
+  model_prevalence_years_k_20_economicEvents,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) %>%
+  tidy() %>%
+  filter(term == "keyEconomicChange") %>%
+  select(`p.value`)
+
+other <- estimateEffect(
+  1:20 ~ keyOtherChange + s(year),
+  model_prevalence_years_k_20_otherEvents,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) %>%
+  tidy() %>%
+  filter(term == "keyOtherChange") %>%
+  select(`p.value`)
+
+significance_all <-
+  cbind(significance, elections, governments, economic, other)
+head(significance)
+colnames(significance_all) <-
+  c("Topic", "Elections", "Governments", "Economic", "Other")
+head(significance_all)
+
+significance_all <- significance_all %>%
+  mutate(
+    Elections = round(Elections, digits = 2),
+    Governments = round(Governments, digits = 2),
+    Economic = round(Economic, digits = 2),
+    Other = round(Other, digits = 2)
+  )
+write_csv(significance_all, "outputs/misc/significance.csv")
+
+labelTopics(model_prevalence_years_k_20)
+
+
+
+
+
+
+
+
 
 
 library(ggthemes)
@@ -498,7 +546,12 @@ election_dates <- election_dates %>%
   mutate(lastElectionWinner = lag(electionWinner)) %>%
   mutate(changedPartyOfGovernment = if_else(electionWinner == lastElectionWinner, 0, 1)) %>%
   mutate(electionNumber = 1:n()) %>%
-  select(-year,-election,-seatsTotalNumber,-electionWinner,-comment,-lastElectionWinner)
+  select(-year,
+         -election,
+         -seatsTotalNumber,
+         -electionWinner,
+         -comment,
+         -lastElectionWinner)
 
 
 gamme_summarises_diff_summary <-
@@ -772,7 +825,7 @@ hist(errs)
 library(ldatuning)
 
 data("AssociatedPress", package = "topicmodels")
-dtm <- AssociatedPress[1:10, ]
+dtm <- AssociatedPress[1:10,]
 
 result <- FindTopicsNumber(
   dtm,
@@ -857,7 +910,7 @@ relevant_dates <- all_dates %>%
   fill(tenAfterElectionDay, .direction = "up") %>%
   mutate(tenAfterElectionDay = na_if(tenAfterElectionDay, 2)) %>%
   mutate(dateOfInterest = tenAfterElectionDay) %>%
-  select(-tenAfterElectionDay,-elevenBeforeElectionDay,-hansardDate) %>%
+  select(-tenAfterElectionDay, -elevenBeforeElectionDay, -hansardDate) %>%
   filter(electionDate == 0) %>%
   filter(dateOfInterest == 1) %>%
   mutate(beforeAfter = c(rep(c(
@@ -879,5 +932,5 @@ relevant_dates$allDates
 # Filter to just the dates that are the date nearest each side of an election
 head(all_hansard_words)
 some_days_hansard_words <-
-  all_hansard_words[which(all_hansard_words$date %in% relevant_dates$allDates), ]
+  all_hansard_words[which(all_hansard_words$date %in% relevant_dates$allDates),]
 rm(all_hansard_words)
