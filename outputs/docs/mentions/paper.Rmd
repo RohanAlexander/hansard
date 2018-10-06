@@ -29,6 +29,13 @@ Usually the disaggregation into individual-level records is done by identifying 
 For more information on this dataset please see Alexander and Alexander and also Appendix X.
 
 
+
+## Additional information
+
+Data from other sources are needed to complement the parliamentary text data. For instance, although the name, party, and division represented are contained in Hansard records they are inconsistent. Also non-Hansard information about the politicians informs our analysis. This includes: date of birth and date of death; sex; date of entry to parliament and exit from parliament; some aspects of their pre- and post-parliamentary career; some aspects of their parliamentary career, such as ministry appointments; and electoral information such as primary and two-party-preferred results.
+
+The main sources for this additional supplementary information are the handbooks supplied by the various parliaments. However these had many errors and were supplemented by data from the Australian Dictionary of Biography and Wikipedia. The source for the electoral results is the Australian Electoral Commission and Adam Carr's Australian Election Archive. An example of the additional information is provided in Appendix \@ref(additionalinformation). 
+
 ## Elections
 
 
@@ -40,5 +47,13 @@ Following Gelamn and
 
 # Summary and conclusions
 
+
+
+
+# Additional information {#additionalinformation}
+**TBD**
+
+
+\newpage
 
 

@@ -104,7 +104,7 @@ head(tidy_hansard)
 tidy_hansard <- tidy_hansard %>%
   select(date, word)
 
-# The issue with using, the corpus construction function in the STM package is that it's really slow. But at the same time, the metadata is needed, so can't just use code from Julia Silge (maybe you can, but I don't know what to change). Anyway, this way works (cf STM alternative) and keeps metadata (cf Julia Silge code). If the dataset is smaller then use the STM function. If you don't need the metadata then use Julia Silge's code. Sure, this way is clumsy, but I need results for the paper draft and I can make this better later. Based on:
+# My issue with using the corpus construction function in the STM package is that it's really slow. But at the same time, the metadata is needed, so can't just use code from Julia Silge (maybe you can, but I don't know what to change). Anyway, this way works (cf STM alternative) and keeps metadata (cf Julia Silge code). If the dataset is smaller then use the STM function. If you don't need the metadata then use Julia Silge's code. Sure, this way is clumsy, but I need results for the paper draft and I can make this better later. Based on:
 # https://stackoverflow.com/questions/47652890/stm-how-to-keep-metadata-when-converting-from-tm-to-stm-document-term-matrix
 head(tidy_hansard)
 # Reduce the number of words that we have to deal with
