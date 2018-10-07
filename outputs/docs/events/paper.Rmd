@@ -14,7 +14,7 @@ author:
   affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "We systematically analyse how parliamentary discussion changes in response to different types of events in Australian history. We first create a dataset of what was said in Australian state and federal parliaments from the mid-1800s through to 2017 based on available public records. To reduce the dimensionality of this dataset we then use a topic model that allows correlation and a steady change over time. Finally, we consider the effect of various events using a Bayesian hierarchical Dirichlet model. We find that: 1) elections are associated with topic changes only when the party in power changes; 2) a change in government can be associated with topic changes even if the party in power does not change; 3) economic events, such as financial crises, have less significant and persistent effects than other events such as terrorist attacks. Our findings have implications for how we think about the longer-term trajectory of government policymaking as the media cycle becomes increasingly focused on short-term events."
+abstract: "We systematically analyse how parliamentary discussion changes in response to different types of events in Australian history. We first create a dataset of what was said in Australian state and federal parliaments from the mid-1800s through to 2017 based on available public records. To reduce the dimensionality of this dataset we use a topic model that allows for correlation and steady changes over time. We analyse the effect of various events using a Bayesian hierarchical Dirichlet model. We find that: 1) elections are associated with topic changes only when the party in power changes; 2) a change in government can be associated with topic changes even if the party in power does not change; 3) economic events, such as financial crises, have less significant and persistent effects than other events such as terrorist attacks. Our findings have implications for how we think about the longer-term trajectory of government policymaking as the media cycle becomes increasingly focused on short-term events."
 keywords: "text analysis, politics, Australia"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
@@ -38,11 +38,12 @@ yearsUsed <- read_csv(here::here("outputs/misc/years_used.csv"), col_types = col
   replace_na(list(Parliament = ""))
 elections <- read_csv(here::here("inputs/misc/misc_elections_data.csv"), col_types = cols())
 governments <- read_csv(here::here("inputs/misc/change_of_pm.csv"), col_types = cols())
-keyEconomicDates <- read_csv(here::here("inputs/misc/key_dates-economic.csv"), col_types = cols())
-keyOtherDates <- read_csv(here::here("inputs/misc/key_dates-other.csv"), col_types = cols())
+keyEvents <- read_csv(here::here("inputs/misc/key_events.csv"), col_types = cols())
 significances <- read_csv(here::here("outputs/misc/significance.csv"), col_types = cols())
 top_words <- read_csv2(here::here("outputs/misc/top_words.csv"), col_types = cols())
 missing_days <- read_csv(here::here("outputs/misc/missing_days.csv"), col_types = cols())
+hansard_sources <- read_csv(here::here("outputs/misc/hansard_sources.csv"), col_types = cols())
+
 
 ```
 
@@ -58,7 +59,7 @@ We use a topic model for dimensionality reduction and to allow for correlation b
 <!-- Section \@ref(results) details our results, but broadly  -->
 We find: 1) elections are associated with topic changes only when the party in power changes; 2) a change in government can be associated with topic changes even if the party in power does not change; 3) economic events, such as financial crises, have less significant and persistent effects than other events such as terrorist attacks. **[More here on the nature of the differences.]**
 
-In this paper we apply a topic model to a dataset of larger-scale parliamentary text records from multiple Australian parliaments and then use a Bayesian hierarchical Dirichlet model to examine events. From a data perspective we contribute **[?????]**. From a methods perspective, we contribute **[?????]**. Our model can be used in many settings where the results of topic models need to be further analysed.
+In this paper we apply a topic model to a dataset of larger-scale parliamentary text records from multiple Australian parliaments and then use a Bayesian hierarchical Dirichlet model to examine events. From a data perspective we contribute **[TBD]**. From a methods perspective, we contribute **[TBD]**. Our model can be used in many settings where the results of topic models need to be further analysed.
 
 Our work is cross-disciplinary and in the traditions of political economy, economic history, political science and statistics. It contributes to a growing modern quantitative social sciences literature that considers text as an input to more traditional methods, rather than requiring separate analysis. As the digitisation of historical sources continues and computational power becomes cheaper, we expect interest in this approach to only increase.
 
@@ -93,7 +94,7 @@ yearsUsed %>%
 
 The formatting of the Hansard records changes between the different parliaments and over time. We use scripts written in R (@R2018) to convert the PDFs into daily text records. An example of the workflow and some reduced-detail scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they occur at scale and can be identified. 
 
-The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time. Details of this process are provided in Appendix \@ref(stopwordsgraph). We mainly use Hansard records on a daily basis in this paper. Text is usually pre-processed before topic models are used. The specific steps that we take are to remove numbers and punctuation and to change the words to lower case. **[Need to bundle_ngrams i.e. New Zealand is new_zealand.]** Then the sentences are deconstructed and each word considered individually. 
+The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time. Details of this process are provided in Appendix \@ref(stopwordsgraph). We mainly use Hansard records on a daily basis in this paper. Text is usually pre-processed before topic models are used. The specific steps that we take are to remove numbers and punctuation and to change the words to lower case. **[Need to bundle_ngrams i.e. New Zealand is new_zealand and ad valorem is ad_valorem.]** Then the sentences are deconstructed and each word considered individually. 
 
 
 
@@ -160,7 +161,7 @@ We primarily implement the STM on the daily-level parliamentary text data descri
 
 Figure \@ref(fig:exampletopics) illustrates an output of the STM. This illustrative example only shows five per cent of data from the House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be allocated to a topic and highlights how the prominence of these topics changes over time.
 
-```{r exampletopics, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
+```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
 knitr::include_graphics(here::here("outputs/figures/topics_example.pdf"))
 ```
 
@@ -170,9 +171,9 @@ knitr::include_graphics(here::here("outputs/figures/topics_example.pdf"))
 <!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
 
 
-The main output of the STM that is of interest to us is the share of each topic in each document. We would like to know how those shares change given events. But with around 80 **[UPDATE]** topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. Instead, we use a Bayesian hierarchical Dirichlet model that takes those shares as an input. 
+The main output of the STM that is of interest to us is the proportion of each topic in each document. We would like to know how those proportions change given events. But with around 80 **[UPDATE]** topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. Instead, we use a Bayesian hierarchical Dirichlet model that takes those proportions as an input. 
 
-We index each proportion, $\gamma$, by sitting period $s$, time $t$ and topic $p$, that is $\gamma_{stp}$. Note that time $t$ refers to the day index within a sitting period which is any collection of days separated from other days by at least a week. Our model is:
+We index each proportion, $\gamma$, by sitting period $s$, time $t$ and topic $p$, that is $\gamma_{stp}$. For this purpose time, $t$, refers to the day index within a sitting period, and a sitting period is any collection of days separated from another collection of days by at least a week. Our model is:
 
 \begin{align}
 \gamma_{stp} &\sim \mbox{Dirichlet}(\mu_{stp}) (\#eq:distributionforgammas) \\ 
@@ -215,52 +216,45 @@ We run the model in Stan using the \texttt{RStan} package of @RStan. An illustra
 
 
 # Results
-We are interested in considering the effect of various events on what is talked about in Australia's parliaments. Each of the parliaments and their houses are treated independently here. Future work could expand the model to better understand, and allow, for correlation between them. 
+We are interested in considering the effect of various events on what is talked about in Australia's parliaments. 
+<!-- Each of the parliaments and their houses are treated independently here. Future work could expand the model to better understand, and allow, for correlation between them.  -->
+Political events are those related to a change of government or an election. Other events are defined by substantial changes in various economic measures, such as the onset of the Great Depression or floating the currency; events of a historical magnitude, such as entering into a war or the 9/11 attacks; or events that had a significant effect on Australian life, such as hosting the Olympics, or the Mabo decision. The full list of events that we consider are detailed in Appendix \@ref(eventdetails).
 
-Political events are those related to a change of government or an election. Economic events are defined by substantial changes in various economic measures, such as the onset of the Great Depression or floating the currency. Other events are those such as the 9/11 attacks. The full list of events that we consider are detailed in Appendix \@ref(eventdetails).
+First considering the mean topic distributions over governments, Figures \@ref(fig:mu1to20) - \@ref(fig:mu41to60).
+
+```{r mu1to20, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/mu_topic1-20.pdf"))
+```
 
 
-We consider four types of events and group the day's topic proportions by these events. One unfortunate effect of this is that we only allow an event to have a long-run effect and ignore short-run effects. Another is that we ignore coincidence of events. 
+```{r mu21to40, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/mu_topic21-40.pdf"))
+```
+
+
+```{r mu41to60, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/mu_topic41-60.pdf"))
+```
+
+Topics related to Federation such as the British Empire and the constitution decrease in importance over time. A substantial increase in the importance of issues dealing with 
+
+Increasing from 20th gov: 2, 4, 8, 12, 
+
+32 increases and then decreases
+
+Increases only recently: 33, 35
+
+Breakpoint: 23, 25, 49, 48, 46, 47, 41
+
 
 Figure \@ref(fig:electionsevents) shows the grouping by election. If elections had significant effects on the discussion in parliament then there would be considerable change between groups. However changes generally appear to be longer-term rather than election to election. 
 
-```{r electionsevents, echo=FALSE, fig.cap="Topic proportions grouped by elections", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_election.png"))
-```
-
-Figure \@ref(fig:governmentevents) shows the grouping by government. This can be different to election groupings, for instance, the change from the Rudd to Gillard governments happened without an election. Similarly, John Howard's three terms are all considered the one government for our purposes.
+Groupings by government. This can be different to election groupings, for instance, the change from the Rudd to Gillard governments happened without an election. Similarly, John Howard's three terms are all considered the one government for our purposes.
 
 Here we see much more difference between adjacent events. This suggests that new governments tend to talk about different topics than the government they replace.
 
 
-```{r governmentevents, echo=FALSE, fig.cap="Topic proportions grouped by government", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_government_change.png"))
-```
 
-
-Figure \@ref(fig:economicevents) shows the grouping by major economic changes. There are considerable changes between adjacent events.
-
-
-```{r economicevents, echo=FALSE, fig.cap="Topic proportions grouped by economic events", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_economic_changes.png"))
-```
-
-Figure \@ref(fig:otherevents) shows the grouping by major other events, such as the 9/11 attacks.
-
-```{r otherevents, echo=FALSE, fig.cap="Topic proportions grouped by other events", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/2018-09-28-topics_separated_by_other_changes.png"))
-```
-
-
-Another way to consider the effect of events is by including incrementing variables in the prevelance metadata. This then gets included in the topic modelling and the significance to each topic can be computed. Table \@ref(tab:dodgysignificances) summarises these by the type of dummy and the topic. At the five per cent level the events that we consider were significant for eight topics. This significance tended to be correlated, especially for economic and other events.
-
-```{r dodgysignificances, echo = FALSE, results = 'asis'}
-
-significances %>% 
-  kable(booktabs = T, caption = "Significance of dummy") %>%
-  kable_styling(font_size = 12)
-
-```
 
 For instance, all of the incrementing variables have a significant effect on the prevalence of Topic 1. Table \@ref(tab:topwordssig) shows that this has to do with tariffs and trade. On the other hand, Topic 2 has to do with aspects of daily life such as community and children, and Topic 3 has to do with legal issues and neither is significant. This is not surprising given the centrality of these concerns at all times.
 
@@ -268,7 +262,7 @@ For instance, all of the incrementing variables have a significant effect on the
 
 top_words %>% 
   kable(booktabs = T, caption = "Top words for each topic") %>%
-  kable_styling(font_size = 12)
+  kable_styling(font_size = 8)
 
 ```
 
@@ -295,11 +289,26 @@ While using text as data has well-known shortcomings, it allows larger-scale ana
 # Hansard details
 
 ## Hansard sources {#hansardsources}
-Where from?
+
+Hansard records are available from a variety of sources, as detailed in Table \ref{tab:hansardsourcestable}.
+
+
+```{r hansardsourcestable, cache = TRUE, echo = FALSE, results = 'asis'}
+
+hansard_sources %>%
+  kable(
+    booktabs = T,
+    align = c('l', 'r', 'r', 'r'),
+    caption = "Hansard sources and notes") %>%
+  kable_styling(font_size = 10)
+
+# Break cachee
+
+```
+
+Detail where from, and which years are being used and why.
 
 Which years are being used (not non-OCRd)
-
-[IS THIS BEING REFERENCED IN THE TEXT????]
 
 
 ## Example Hansard page {#examplehansardpage}
@@ -443,19 +452,10 @@ elections %>%
 ```
 
 
-```{r economics, echo = FALSE, results = 'asis'}
+```{r keyevents, echo = FALSE, results = 'asis'}
 
-keyEconomicDates %>% 
-  kable(booktabs = T, caption = "Key economic events") %>%
-  kable_styling(font_size = 10)
-
-```
-
-
-```{r others, echo = FALSE, results = 'asis'}
-
-keyOtherDates %>% 
-  kable(booktabs = T, caption = "Key other events") %>%
+keyEvents %>% 
+  kable(booktabs = T, caption = "Key events") %>%
   kable_styling(font_size = 10)
 
 ```

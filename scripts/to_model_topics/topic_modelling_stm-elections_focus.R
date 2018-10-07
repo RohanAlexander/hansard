@@ -199,10 +199,10 @@ rm(tidy_hansard_reduced,
    metaTM,
    hansard_dfm)
 
-#### TEsting for the optimal k 
 
-
-
+#### Testing for the optimal k ####
+# Create models with different values for K
+# Takes an age to run
 many_models <-
   data_frame(K = c(20, 40, 60, 80, 100)) %>%
   mutate(topic_model = map(
@@ -472,20 +472,24 @@ labelTopics(model_prevalence_years_k_20)
 
 
 
+load("outputs/topic_models_and_gammas/topic_model_60.RData")
+gammas_model_60 <- read_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
+betas_model_60 <- tidy(topic_model_60)
+td_beta
 
+head(gammas_model_60)
 
-
-library(ggthemes)
-
-top_terms <- td_beta %>%
+top_terms <- betas_model_60 %>%
   arrange(beta) %>%
   group_by(topic) %>%
-  top_n(7, beta) %>%
+  top_n(5, beta) %>%
   arrange(-beta) %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
   unnest()
+
+write_delim(top_terms, path = "outputs/misc/top_words.csv", delim = ";")
 
 gamma_terms <- td_gamma %>%
   group_by(topic) %>%
@@ -501,6 +505,44 @@ gamma_terms %>%
     digits = 3,
     col.names = c("Topic", "Expected topic proportion", "Top 7 terms")
   )
+
+
+
+
+load("outputs/topic_models_and_gammas/topic_model_20.RData")
+gammas_model_60 <- read_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
+betas_model_20 <- tidy(topic_model_20)
+td_beta
+
+head(gammas_model_60)
+
+top_terms <- betas_model_20 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest()
+
+
+load("outputs/topic_models_and_gammas/topic_model_40.RData")
+betas_model_40 <- tidy(topic_model_40)
+
+top_terms <- betas_model_40 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest()
+
+
+
+
 
 
 ## Sweet graph of probability each document is generated from each topic
