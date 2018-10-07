@@ -59,4 +59,5 @@ sigma_res <- sigma_res %>% mutate(government = ifelse(government>18, government+
 write_csv(sigma_res, "./governments/sigma_res.csv")
 
 sigma_res %>% 
-  ggplot(aes(government, median)) + geom_point()
+  filter(median<0.3) %>% 
+  ggplot(aes(government, median)) + geom_point() + geom_errorbar(aes(ymin = lower, ymax = upper))
