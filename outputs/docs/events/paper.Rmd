@@ -93,13 +93,9 @@ yearsUsed %>%
 
 The formatting of the Hansard records changes between the different parliaments and over time. We use scripts written in R (@R2018) to convert the PDFs into daily text records. An example of the workflow and some reduced-detail scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they occur at scale and can be identified. 
 
-The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time. Details of this process are provided in Appendix \@ref(stopwordsgraph). We mainly use Hansard records on a daily basis in this paper. Text is usually pre-processed before topic models are used. The specific steps that we take are to remove numbers and punctuation and to change the words to lower case. Then the sentences are deconstructed and each word considered individually. **[Need to bundle_ngrams i.e. New Zealand is new_zealand.]**
+The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time. Details of this process are provided in Appendix \@ref(stopwordsgraph). We mainly use Hansard records on a daily basis in this paper. Text is usually pre-processed before topic models are used. The specific steps that we take are to remove numbers and punctuation and to change the words to lower case. **[Need to bundle_ngrams i.e. New Zealand is new_zealand.]** Then the sentences are deconstructed and each word considered individually. 
 
-## Additional information
-**[Not sure this is being used - might be better in the other paper.]**
-Data from other sources are needed to complement the parliamentary text data. For instance, although the name, party, and division represented are contained in Hansard records they are inconsistent. Also non-Hansard information about the politicians informs our analysis. This includes: date of birth and date of death; sex; date of entry to parliament and exit from parliament; some aspects of their pre- and post-parliamentary career; some aspects of their parliamentary career, such as ministry appointments; and electoral information such as primary and two-party-preferred results.
 
-The main sources for this additional supplementary information are the handbooks supplied by the various parliaments. However these had many errors and were supplemented by data from the Australian Dictionary of Biography and Wikipedia. The source for the electoral results is the Australian Electoral Commission and Adam Carr's Australian Election Archive. An example of the additional information is provided in Appendix \@ref(additionalinformation). 
 
 
 # Model
@@ -160,12 +156,12 @@ $$\beta_{d,k}\propto \mbox{exp}\left(m+\kappa^{(t)}_{k} + \kappa_{y_d}^{(c)} + \
     a. Randomly choose a topic for that term from the document-specific multinomial distribution over topics.
     b. Randomly choose a term from the topic-specific multinomial distribution over terms.
 
-We primarily implement the STM on the daily-level parliamentary text data described earlier using the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. We consider both topic prevalence and content to be functions of time. The choice of the number of topics to use in the model is a situation-specific compromise. We use standard diagnostic techniques with cross validation to decide on 80 **[UPDATE]** topics. More detail on this selection process is available in Appendix \@ref(selecttopicnumber).
+We primarily implement the STM on the daily-level parliamentary text data described earlier using the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. We consider both topic prevalence and content to be functions of time. The choice of the number of topics to use in the model is a situation-specific compromise. We use a standard diagnostic approach to decide on 80 **[UPDATE]** topics. More detail on this selection process is available in Appendix \@ref(selecttopicnumber).
 
-Figure \@ref(fig:exampletopics) illustrates an output of the STM. This illustrative model only considers data from the House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be allocated to one of ten topics and highlights how the prominence of these topics changes over time. **[RUN AND GRAPH AN ACTUAL 10-TOPIC MODEL - THESE DATA ARE JUST SUMMED FROM THE GENERAL ONE!.]**
+Figure \@ref(fig:exampletopics) illustrates an output of the STM. This illustrative example only shows five per cent of data from the House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be allocated to a topic and highlights how the prominence of these topics changes over time.
 
-```{r exampletopics, echo=FALSE, fig.cap="Estimated 10-topic-proportion", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/topics_example.png"))
+```{r exampletopics, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
+knitr::include_graphics(here::here("outputs/figures/topics_example.pdf"))
 ```
 
 
@@ -174,9 +170,9 @@ knitr::include_graphics(here::here("outputs/figures/topics_example.png"))
 <!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
 
 
-The main output of the STM that is of interest to us is the share of each topic in each document. We would like to know how those shares change given events. But with around 80 **[UPDATE]** topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. Instead, we put together a Bayesian hierarchical Dirichlet model that takes those shares as an input. 
+The main output of the STM that is of interest to us is the share of each topic in each document. We would like to know how those shares change given events. But with around 80 **[UPDATE]** topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. Instead, we use a Bayesian hierarchical Dirichlet model that takes those shares as an input. 
 
-We index each proportion, $\gamma$, by sitting period $s$, time $t$ and topic $p$, that is $\gamma_{stp}$. Note that time $t$ refers to the day index within a sitting period which is any collection of days separated from other days by at least a week. Our analysis model is:
+We index each proportion, $\gamma$, by sitting period $s$, time $t$ and topic $p$, that is $\gamma_{stp}$. Note that time $t$ refers to the day index within a sitting period which is any collection of days separated from other days by at least a week. Our model is:
 
 \begin{align}
 \gamma_{stp} &\sim \mbox{Dirichlet}(\mu_{stp}) (\#eq:distributionforgammas) \\ 
@@ -189,7 +185,9 @@ We index each proportion, $\gamma$, by sitting period $s$, time $t$ and topic $p
 
 **[Does the variance parameter used in Equation 4 need to be specified too?]**
 
-Equation \@ref(eq:distributionforgammas) describes the proportion of each day within a sitting period given to a particular topic as a draw from a Dirichlet distribution parameterised by $\mu_{stp}$. The Dirichlet distribution is the multivariate extension of the Beta distribution, and the parameter controls where the 'weight' of the distribution lies. Equation \@ref(eq:meanforgammas) describes that distribution parameter, $\mu_{stp}$, as the sum of $\alpha_{sp}$, which means the model is linear in time for each topic and sitting period, and $\delta_{stp}$, which is a simple time series that allows for a little variation within a sitting period. These are themselves parameters. The primary aim of the modelling task is to find an appropriate and meaningful functional form for $\mu$. 
+Equation \@ref(eq:distributionforgammas) describes the proportion of each day within a sitting period given to a particular topic. This is considered as a draw from a Dirichlet distribution parameterised by $\mu_{stp}$. In a sense, $\mu_{stp}$ will be mean topic distributions over whatever time period is of interest. 
+<!-- The Dirichlet distribution is the multivariate extension of the Beta distribution, and the parameter controls where the 'weight' of the distribution lies.  -->
+Equation \@ref(eq:meanforgammas) describes that distribution parameter, $\mu_{stp}$, as the sum of $\alpha_{sp}$, which are sitting period specific topic distributions and mean the model is linear in time for each topic and sitting period, and $\delta_{stp}$, which is a simple time series that allows for a little variation within a sitting period. These are themselves parameters. The primary aim of the modelling task is to find an appropriate and meaningful functional form for $\mu$. 
 
 Equation \@ref(eq:zeroconstraint) constrains the first intercept to zero for identification purposes. Equation \@ref(eq:alphasp) shows how we consider $\alpha_{sp}$ as a draw from a Normal distribution with a mean that depends on **[SOMETHING]** and a variance that depends on **[SOMETHING ELSE]**. Similarly, Equation \@ref(eq:deltasp) show how we model $\delta_{stp}$  as a draw from a Normal distribution with a mean that depends on the preceding $\delta$ and some variance which is drawn from the Uniform distribution in Equation \@ref(eq:randomwalkvariance), that is, a random walk around each intercept.
 
@@ -197,8 +195,6 @@ We run the model in Stan using the \texttt{RStan} package of @RStan. An illustra
 
 
 **[Probably need to add: 1) where does each covariate come into it and how do they interact; 2) how does correlation work; 3) what are the random effects and fixed effects?]**
-
-
 
 
 
@@ -350,12 +346,6 @@ Insert graph of stop words over time.
 \newpage
 
 
-
-# Additional information {#additionalinformation}
-**TBD**
-
-
-\newpage
 
 
 
