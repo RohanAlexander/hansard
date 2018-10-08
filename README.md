@@ -1,5 +1,7 @@
 # Analysis of Australian Hansard
 
+TEST
+
 This contains data, scripts, and related material for analysing Australia's Hansard.
 
 ## Getting started
