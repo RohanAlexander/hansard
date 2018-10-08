@@ -345,7 +345,15 @@ Source: https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet
 ## Example Hansard PDf to text record workflow {#hansardworkflow}
 Example of the workflow from PDF to text
 
-These scripts are primarily based on: the \texttt{PDFtools} package of @Ooms2018pdftools; the \texttt{tidyverse} package of @Wickham2017; the \texttt{tm} package of @FeinererHornik2018; the \texttt{lubridate} package of @GrolemundWickham2011; and the \texttt{stringi} package of @Gagolewski2018. The functions of those packages are supported by: the \texttt{furrr} package of @VaughanDancho2018; and the \texttt{tictoc} package of @Izrailev2014. The \texttt{hunspell} package of @Ooms2017 is also used to help find spelling issues. In addition to the packages already mentioned, in this step the R scripts to do this use the \texttt{tidytext} R package of @SilgeRobinson2016. 
+These scripts are primarily based on: the \texttt{PDFtools} package of @Ooms2018pdftools; the \texttt{tidyverse} package of @Wickham2017; the \texttt{tm} package of @FeinererHornik2018; the \texttt{lubridate} package of @GrolemundWickham2011; and the \texttt{stringi} package of @Gagolewski2018. 
+
+The functions of those packages are supported by: the \texttt{furrr} package of @VaughanDancho2018; and the \texttt{tictoc} package of @Izrailev2014. 
+
+The \texttt{hunspell} package of @Ooms2017 is also used to help find spelling issues. 
+
+In addition to the packages already mentioned, in this step the R scripts to do this use the \texttt{tidytext} R package of @SilgeRobinson2016. 
+
+And @Benoit2018 for compounding multiword expressions.
 
 
 ## Stopwords over time {#stopwordsgraph}
