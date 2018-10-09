@@ -21,6 +21,8 @@ Then you can parse the PDFs with parse_each_pdf_and_save_csv_pdftools.R. Then cr
 
 
 ## Notes
+- Check for committees from 2000 in the Hansard records - could explain the overcount in some years.
+- Follow up on 1984-09-13, 1973-04-03, 1953-10-21, 1984-08-21, 1984-05-30, 1983-05-10, 1973-09-17, and 1999-02-08 in terms of identifying front matter. But not really sure what to do.
 - HoR voting: ACT only split out from 1949 election, and NT only split out from 1922 election.
 - Maybe this PDF is corrupted for Commonwealth - no CSV output - 1918-06-14.
 - Graph of the dates is interesting - in the early days they seemed to sit in a quite bunched up way. But these days spread it out more.

@@ -469,6 +469,10 @@ keyEvents %>%
 ```
 
 
+For background on the Premiers' Plan see @Copland1934.
+
+For background on the Gruen tariff cut see @Gruen1975.
+
 Add the graphs and procedures.
 
 
