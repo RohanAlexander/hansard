@@ -31,7 +31,7 @@ plan(multiprocess)
 use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
 # use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
 
-use_this_path_to_save_csv_files  <- "outputs/hansard/temp"
+# use_this_path_to_save_csv_files  <- "outputs/hansard/temp"
 use_this_path_to_save_csv_files  <- "/Volumes/Backup/temp"
 # use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
 
@@ -71,7 +71,7 @@ get_text_from_PDFs <-
   function(name_of_input_PDF_file,
            name_of_output_csv_file) {
     # Read in the document, based on the filename list
-    name_of_input_PDF_file <- "/Volumes/Backup/hansard_pdfs/1953-10-21.pdf"
+    # name_of_input_PDF_file <- "/Volumes/Backup/hansard_pdfs/1953-10-21.pdf"
     # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1971-10-05.pdf" # uncomment for testing
     pdf_document <- pdf_text(name_of_input_PDF_file)
     
