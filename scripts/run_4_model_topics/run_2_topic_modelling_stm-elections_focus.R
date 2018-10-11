@@ -34,10 +34,8 @@ hansard_dates <-
   read_csv("inputs/misc/hansard_dates.csv", col_types = cols())
 governmentChanges <-
   read_csv("inputs/misc/change_of_pm.csv", col_types = cols())
-keyEconomicDates <-
-  read_csv("inputs/misc/key_dates-economic.csv", col_types = cols())
-keyOtherDates <-
-  read_csv("inputs/misc/key_dates-other.csv", col_types = cols())
+keyEvents <-
+  read_csv("inputs/misc/key_events.csv", col_types = cols())
 
 
 #### Temp fix for dodgy words ####
@@ -52,13 +50,85 @@ politicians <-
 # Bind custom list of stopwords to the default list
 custom_stop_words <- bind_rows(stop_words, # The default list
                                data_frame(
-                                 word = c(
-                                   politicians,
-                                   "na", "tax", "ment", "south", "wales", "na", "bhe", "tbe", 'tile', 'tlie', "duncanhughes", "fche", "honorahle", "madam", "brucepage", "archie", "showeth", "report", "sir", "act", "amendment", "amount", "australia", "australian", "bill", "board", "cent", "clause", "commission", "committee", "commonwealth", "countries", "country", "day", "deal", "debate", "department", "desire", "duty", "gentleman", "government", "honorable", "honourable", "house", "increase", "labor", "labour", "leader", "legislation", "matter", "minister", "national", "opposition", "parliament", "party", "people", "policy", "position", "power", "prime", "proposed", "public", "question", "regard", "statement", "support", "system", "time", "industry", "million"
-                                 ),
+                                 word = c(politicians,
+                                          "act",
+                                          "amendment",
+                                          "australia", 
+                                          "bill",
+                                          "commonwealth",
+                                          "esq",
+                                          "gentleman",
+                                          "honorable",
+                                          "honourable",
+                                          "house",
+                                          "labor",
+                                          "labour",
+                                          "legislation",
+                                          "liberal",
+                                          "madam",
+                                          "motion", 
+                                          "opposition",
+                                          "people", 
+                                          "sir",
+                                          "speaker", 
+                                          # "na",
+                                          # "tax",
+                                          # "ment",
+                                          # "na",
+                                          # "bhe",
+                                          # "tbe",
+                                          # 'tile',
+                                          # 'tlie',
+                                          # "duncanhughes",
+                                          # "fche",
+                                          # "honorahle",
+                                          # "brucepage",
+                                          # "archie",
+                                          # "showeth",
+                                          # "report",
+                                          # "amount",
+                                          # "australia",
+                                          # "australian",
+                                          # "board",
+                                          # "cent",
+                                          # "clause",
+                                          # "commission",
+                                          # "committee",
+                                          # "countries",
+                                          # "country",
+                                          # "day",
+                                          # "deal",
+                                          # "debate",
+                                          # "department",
+                                          # "desire",
+                                          # "duty",
+                                          # "government",
+                                          # "increase",
+                                          # "leader",
+                                          # "matter",
+                                          # "minister",
+                                          # "national",
+                                          # "parliament",
+                                          # "party",
+                                          # "people",
+                                          # "policy",
+                                          # "position",
+                                          # "power",
+                                          # "prime",
+                                          # "proposed",
+                                          # "public",
+                                          # "question",
+                                          # "regard",
+                                          # "statement",
+                                          # "support",
+                                          # "system",
+                                          # "time",
+                                          # "industry",
+                                          # "million"
+                                          ),
                                  lexicon = rep("custom", length(word))
-                               ))
-
+                                 ))
+                               
 
 #### Prepare for topic modelling ####
 # Put each word on its own row - from https://juliasilge.com/blog/sherlock-holmes-stm/
@@ -110,7 +180,7 @@ head(tidy_hansard)
 # Reduce the number of words that we have to deal with
 tidy_hansard_reduced <- tidy_hansard %>%
   count(date, word, sort = TRUE) %>% # Create counts, by day, of how many times each word appears
-  filter(n > 10) %>% # Filter to only those words that appear at least 10 times in a day
+  filter(n > 5) %>% # Filter to only those words that appear at least 10 times in a day
   uncount(n) %>% # Undo the counting so that each word is on it's own line
   group_by(date) %>% # Push it all back together so that all the words in a particular day are on the one row
   summarise(textid_field = paste(word, collapse = " ")) %>%
@@ -118,6 +188,7 @@ tidy_hansard_reduced <- tidy_hansard %>%
 
 head(tidy_hansard_reduced)
 rm(tidy_hansard)
+
 
 
 # Add metadata
@@ -128,10 +199,8 @@ all_dates <-
     electionDate = cumsum(electionDate),
     governmentChangeDate = if_else(allDates %in% governmentChanges$end, 1, 0),
     governmentChangeDate = cumsum(governmentChangeDate),
-    keyEconomicChange = if_else(allDates %in% keyEconomicDates$theDate, 1, 0),
-    keyEconomicChange = cumsum(keyEconomicChange),
-    keyOtherChange = if_else(allDates %in% keyOtherDates$theDate, 1, 0),
-    keyOtherChange = cumsum(keyOtherChange)
+    keyEvent = if_else(allDates %in% keyEvents$theDate, 1, 0),
+    keyEvent = cumsum(keyEvent)
   ) %>%
   rename(electionCounter = electionDate)
 
@@ -151,8 +220,7 @@ tidy_hansard_reduced <- tidy_hansard_reduced %>%
   mutate(
     electionCounter = as.integer(electionCounter),
     governmentChangeDate = as.integer(governmentChangeDate),
-    keyEconomicChange = as.integer(keyEconomicChange),
-    keyOtherChange = as.integer(keyOtherChange),
+    keyEvent = as.integer(keyEvent),
     year = year(docid_field),
     year = as.integer(year)
   )
@@ -163,8 +231,7 @@ rm(
   election_dates,
   hansard_dates,
   governmentChanges,
-  keyEconomicDates,
-  keyOtherDates
+  keyEvents
 )
 
 # Create a corpus with document variables except for the "text"
@@ -204,7 +271,8 @@ rm(tidy_hansard_reduced,
 # Create models with different values for K
 # Takes an age to run
 many_models <-
-  data_frame(K = c(20, 40, 60, 80, 100)) %>%
+  data_frame(K = c(20, 40, 60)) %>%
+  # data_frame(K = c(20, 40, 60, 80, 100)) %>%
   mutate(topic_model = map(
     # mutate(topic_model = future_map(
     K,
@@ -264,7 +332,6 @@ k_result %>% transmute(
        title = "Model diagnostics by number of topics")
 # subtitle = "These diagnostics indicate that a good number of topics would be around 60")
 
-
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
   # filter(K %in% c(20, 60, 100)) %>%
@@ -280,16 +347,24 @@ k_result %>%
     subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity"
   )
 
-topic_model <- k_result %>%
-  filter(K == 100) %>%
+topic_model_20 <- k_result %>%
+  filter(K == 20) %>%
   pull(topic_model) %>%
   .[[1]]
 
-class(topic_model)
+topic_model_40 <- k_result %>%
+  filter(K == 40) %>%
+  pull(topic_model) %>%
+  .[[1]]
+
+topic_model_60 <- k_result %>%
+  filter(K == 60) %>%
+  pull(topic_model) %>%
+  .[[1]]
 
 
 
-td_beta <- tidy(topic_model)
+td_beta <- tidy(topic_model_20)
 td_beta
 
 td_gamma <- tidy(topic_model,
@@ -542,6 +617,18 @@ top_terms <- betas_model_40 %>%
 
 
 
+
+
+the20 <- tidy(topic_model_20) %>% 
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(15, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest()
+write_csv(the20, "test20.csv")
 
 
 

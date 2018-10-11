@@ -24,8 +24,8 @@ multiword_expressions <- read_csv2("inputs/misc/multiwords_with_corrections.csv"
 
 #### Create the lists of CSV filenames to read in ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/hansard_csv_files" # For testing
-# use_this_path_to_get_csvs  <- "/Volumes/Backup/hansard_csv"
+# use_this_path_to_get_csvs  <- "outputs/hansard/hansard_csv_files" # For testing
+use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
 
 file_names <-
   list.files(
@@ -98,7 +98,10 @@ toc()
 
 # object.size(all_hansard_words)
 
+head(all_hansard_words)
+
 #### Save and clean up ####
+
 save(all_hansard_words, file = "outputs/big_files_do_not_push/all_hansard_words_by_date.Rda")
 
 rm(all_hansard_words, file_names, use_this_path_to_get_csvs, tidy_the_hansard_csv_files)

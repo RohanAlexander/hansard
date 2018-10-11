@@ -21,9 +21,10 @@ library(tm)
 # Set up furrr
 plan(multiprocess)
 # Get the spell checker
-fix_wrong_spellings <- read_csv2("inputs/misc/misspelt_words_with_corrections.csv") %>% 
-  mutate(numberOfCharacters = nchar(original)) %>% 
-  arrange(desc(numberOfCharacters)) %>% 
+fix_wrong_spellings <-
+  read_csv2("inputs/misc/misspelt_words_with_corrections.csv") %>%
+  mutate(numberOfCharacters = nchar(original)) %>%
+  arrange(desc(numberOfCharacters)) %>%
   select(-numberOfCharacters)
 
 
@@ -51,7 +52,7 @@ save_names <- file_names %>%
 
 
 #### Create the function that will be applied to the files ####
-split_columns <-
+fix_spelling <-
   function(name_of_input_csv_file,
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
@@ -83,7 +84,7 @@ split_columns <-
 # walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y))
 # toc()
 
-safely_split_columns <- safely(split_columns)
+safely_fix_spelling <- safely(fix_spelling)
 
 # file_names <- file_names[1:10]
 # save_names <- save_names[1:10]
@@ -94,7 +95,6 @@ safely_split_columns <- safely(split_columns)
 tic("Furrr walk2 stringr")
 future_walk2(file_names,
              save_names,
-             ~ safely_split_columns(.x, .y),
+             ~ safely_fix_spelling(.x, .y),
              .progress = TRUE)
 toc()
-
