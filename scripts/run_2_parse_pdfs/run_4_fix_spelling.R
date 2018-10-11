@@ -1,10 +1,10 @@
 # !diagnostics off
 #### Preamble ####
-# Purpose: This file takes Australian Hansard CSV files and it splits the ones that were in two column format. The PDFs until (not including) 2013-11-12 are arranged as two columns on each page and so most rows are two different speeches and those columns need to be separated.
+# Purpose: This file takes Australian Hansard CSV files that are all in one column and one row and applies a basic, custom, spell-checker.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 9 October 2018
-# Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /inputs/for_testing_hansard_pdf folder.
+# Last updated: 11 October 2018
+# Prerequisites: You need to have done all the other parsing steps. For testing purposes there should be some in the /outputs/hansard folder.
 # To do:
 
 
@@ -12,7 +12,7 @@
 # devtools::install_github("DavisVaughan/furrr")
 library(furrr)
 library(lubridate)
-library(pdftools)
+# library(pdftools)
 library(stringi)
 library(tidyverse)
 library(tictoc)
@@ -28,11 +28,10 @@ fix_wrong_spellings <-
   select(-numberOfCharacters)
 
 
-
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
-# use_this_path_to_get_csvs  <- "outputs/hansard/temp"
+# use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
+use_this_path_to_get_csvs  <- "outputs/hansard/temp/testing"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -45,8 +44,8 @@ file_names <-
 
 file_names <- file_names %>% sample() # Randomise the order
 
-# use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
-use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
+use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing/test"
+# use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 

@@ -1,12 +1,11 @@
-FOLLOW UP
-
-prime minis 
-
-
 
 remove: government, joseph, australian, john, frank, senator, ad, val,
-collate: per cent, royal commission, public servants; Papua New Guinea
-fix: AttorneyGeneral -> Attorney_General, wul -> will; AustraUa -> Australia; AustraUan-> Australian; nas -> has
+john - remove all first names
+william - remove all first names
+joseph - remove all first names
 
-ad val. is the word. Need to replace with ad_valorem
- 
+These words are in the topics, but they are signs of errors
+
+tion - fix 
+ing - fix 
+

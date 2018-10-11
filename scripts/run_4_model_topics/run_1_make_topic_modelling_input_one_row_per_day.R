@@ -19,7 +19,12 @@ library(tidyverse)
 # update.packages()
 
 # Read in multiword expression concatenation list e.g. new zealand to new_zealand
-multiword_expressions <- read_csv2("inputs/misc/multiwords_with_corrections.csv", col_types = cols())
+multiword_expressions <- read_csv2("inputs/misc/multiwords_with_corrections.csv", col_types = cols()) %>% 
+  mutate(numberOfCharacters = nchar(original)) %>%
+  arrange(desc(numberOfCharacters)) %>%
+  select(-numberOfCharacters)
+
+
 
 
 #### Create the lists of CSV filenames to read in ####

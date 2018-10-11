@@ -3,8 +3,8 @@
 # Purpose: This file takes Australian Hansard CSV files and it splits the ones that were in two column format. The PDFs until (not including) 2013-11-12 are arranged as two columns on each page and so most rows are two different speeches and those columns need to be separated.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 9 October 2018
-# Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /inputs/for_testing_hansard_pdf folder.
+# Last updated: 11 October 2018
+# Prerequisites: You need to have downloaded the PDFs and read them from PDF to a CSV. For testing purposes there should be some in the /outputs/hansard/ folder.
 # To do:
 
 
@@ -12,7 +12,7 @@
 # devtools::install_github("DavisVaughan/furrr")
 library(furrr)
 library(lubridate)
-library(pdftools)
+# library(pdftools)
 library(stringi)
 library(tidyverse)
 library(tictoc)
@@ -24,8 +24,8 @@ plan(multiprocess)
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
-# use_this_path_to_get_csvs  <- "outputs/hansard/temp"
+# use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
+use_this_path_to_get_csvs  <- "outputs/hansard/temp"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -38,8 +38,7 @@ file_names <-
 
 file_names <- file_names %>% sample() # Randomise the order
 
-# Seems as though this is only an issue up to 12 November 2013
-# Remove the file if it is after 2013-11-12
+# The two columns is only issue up to 12 November 2013 so remove the file if it is after 2013-11-12
 file_names_tibble <- tibble(file_name = file_names)
 file_names_tibble <- file_names_tibble %>% 
   mutate(date = basename(file_names) %>% 
@@ -50,8 +49,9 @@ file_names_tibble <- file_names_tibble %>%
 file_names <- file_names_tibble$file_name
 rm(file_names_tibble)
 
-# use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
-use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
+#Sometimes it's useful to seperate the input and hte output, but otherwise might prefer to overwrite
+use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
+# use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
@@ -212,23 +212,10 @@ split_columns <-
                                    is.na(textInPosition), 1, 0)) %>%
       filter(emptyCell == 0) %>%
       select(-emptyCell, -position, -counter) %>%
-      rename(text = textInPosition)
+      rename(text = textInPosition) %>% 
+      select(text, pageNumbers)
     
-    # Remove any extra whitespace i.e. two or more spaces and spaces at either end
-    all_one_column$text <-
-      str_squish(all_one_column$text)
-    
-    # Finally, put everything onto one line, which allows us to rejoin words that have been split across two lines e.g. Mon- ica
-    all_one_column <- all_one_column %>%
-      mutate(text = str_replace_all(text, "-$", "MONICA"))
-    
-    full_days_hansard <- all_one_column %>%
-      select(-pageNumbers) %>%
-      summarise(text = paste(text, collapse = " ")) %>%
-      mutate(text = str_replace_all(text, "MONICA ", "")) %>%
-      mutate(text = str_replace_all(text, "[:space:]-(?=[:alpha:])", " - "))
-    
-    write_csv(full_days_hansard, name_of_output_csv_file)
+    write_csv(all_one_column, name_of_output_csv_file)
     
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
   }
@@ -240,12 +227,6 @@ split_columns <-
 # toc()
 
 safely_split_columns <- safely(split_columns)
-
-# file_names <- file_names[1:10]
-# save_names <- save_names[1:10]
-# file_names <- file_names[1:(length(file_names)/2)]
-# save_names <- save_names[1:(length(save_names)/2)]
-
 
 tic("Furrr walk2 stringr")
 future_walk2(file_names,
