@@ -171,9 +171,66 @@ knitr::include_graphics(here::here("outputs/figures/topics_example.pdf"))
 <!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
 
 
-The main output of the STM that is of interest to us is the proportion of each topic in each document. We would like to know how those proportions change given events. But with around 80 **[UPDATE]** topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. Instead, we use a Bayesian hierarchical Dirichlet model that takes those proportions as an input. 
+The main output of the STM that is of interest to us is the proportion of each topic appearing in each document. Specifically, we are interested in how the distribution of topics changes in relation to different types of events. But with around 80 **[UPDATE]** topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. Instead, we formalize a statistical framework which allows us to systematically identify significant changes in topic distributions over time. Specifically, we use a Bayesian hierarchical Dirichlet regression framework which relates proportions of each topic to underlying time trends, changes in goverments and elections. 
 
-We index each proportion, $\gamma$, by sitting period $s$, time $t$ and topic $p$, that is $\gamma_{stp}$. For this purpose time, $t$, refers to the day index within a sitting period, and a sitting period is any collection of days separated from another collection of days by at least a week. Our model is:
+Define $\gamma_{tp}$ to be the proportion of topic of topic $p$ on day $t$. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Thus, the topic proportions on day $t$ are modeled in reference to their membership in a particular sitting period $s$. Firstly, we assume that each set of $\gamma_{t,}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[t],}$:
+
+$$
+\gamma_{t,} &\sim \mbox{Dirichlet}(\mu_{s[t],})
+$$
+This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1. 
+
+The goal of the model is to relate these proportions to the government $g$ of time $t$, and also the days since the most recent election, $e$, while account for underlying time trends. Thus, the mean parameters $\mu_{sp}$ are modeled on the log scale as
+
+$$
+\log \mu_{s,p} = \alpha_{g[s],p} + \cdot\alpha_{e[s],d,p}  + \sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k} + \delta_{s,p}
+$$
+where:
+
+- $\alpha_{g[s],p}$ is the mean effect for government $g$ (which covers sitting period $s$) and topic $p$
+- $\alpha_{e[s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$) for topic $p$ on day $d$ since the election
+- $x_{s,k}$ is the $k$th basis spline in sitting period s
+- $\beta_{p,k}$ is a cofficient on the $k$th basis spline. 
+- $\delta_{s,p}$ is a structured random effect for each sittiing period and topic. 
+
+The government term $\alpha_{g[s],p}$ assumes there is some underlying mean effect of each government on the topic distribution. We place uninformative priors on each of these parameters:
+$$
+\alpha_{g[s],p} \sim N(0, 100)
+$$
+
+The election term $\alpha_{e[s],d,p}$ assumes there is an initial effect of an election on the topic distribution, which then decays as a function of days since election, $d$. In particular, we model this as an AR(1) in $d$:
+
+$$
+\alpha_{e[s],d,p} = \rho_{e[s],p} \cdot \alpha_{e[s],d-1,p}
+$$
+The value of the initial effect $\alpha_{e[s],0,p}$ and the AR(1) term $\rho$ both have non-informative priors:
+
+$$
+\alpha_{e[s],0,p} \sim N(0, 100)\\
+\rho_{e[s],p} \sim U(0,1)
+$$
+
+We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes in the economy, and Australian society and culture. The $x_{s,k}$ for $k = 1,2,\dots K$ are the value of cubic basis splines for sitting period $s$ at knot point $k$. We chose to place knot points every 5 sitting periods as this is the average length of time for a government to sit (**CHECK**). Non-informative priors are placed on the splines coefficients:
+$$
+\beta_{p,k} \sim N(0, 100)
+$$
+
+Finally, the sitting period-specific random effect $\delta_{s,p}$ allows for the topic distributions in some sitting periods to be different than expected based on the government/election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-government and non-election events. The $\delta_{s,p}$'s are modeled as 
+
+$$
+\delta_{s,p} \sim N(0, \sigma_{e[s],p}^2)
+$$
+
+The variance parameters $\sigma_{e[s],p}^2$ give an indication of the how the variation in topics is changing over election periods. If the estimates of the variance are larger, then there is more variation in the topics discussed within an election period. Non-informative priors are placed on the variance parameters:
+
+$$
+\sigma_{e[s],p} \sim U(0,3)
+$$
+
+
+RA STUFF:
+
+The full model is:
 
 \begin{align}
 \gamma_{stp} &\sim \mbox{Dirichlet}(\mu_{stp}) (\#eq:distributionforgammas) \\ 
