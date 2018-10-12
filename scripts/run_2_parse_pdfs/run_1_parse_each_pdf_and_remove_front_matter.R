@@ -32,8 +32,7 @@ use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
 # use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
 
 # use_this_path_to_save_csv_files  <- "outputs/hansard/temp"
-use_this_path_to_save_csv_files  <- "/Volumes/Backup/temp"
-# use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
+use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
 
 # Get list of Hansard PDF filenames
 file_names <-
@@ -245,16 +244,14 @@ get_text_from_PDFs <-
         TRUE ~ first_page_of_interest_JOINTHOUSE
       )
 
-    
-    
-    
-        
+
     pdf_document_tibble <- pdf_document_tibble %>%
       filter(pageNumbers >= filter_from_here) %>%
       select(-firstSpeakerRow,
              -firstJointHouseRow,
              -firstTookTheChairRow,
              -firstTheChairAtRow)
+    
     rm(
       first_page_of_interest_SPEAKER,
       row_of_first_SPEAKER,

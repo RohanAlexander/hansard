@@ -25,7 +25,9 @@ plan(multiprocess)
 #### Create lists of CSVs to read ####
 # Change the path as required:
 # use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
-use_this_path_to_get_csvs  <- "outputs/hansard/temp/testing"
+# use_this_path_to_get_csvs  <- "outputs/hansard/temp/testing"
+use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
+
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -39,7 +41,8 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # Seems unnecessary, but sometimes useful to separate input and output
-use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
+# use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
+use_this_path_to_save_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
 # use_this_path_to_save_csvs  <- "/Volumes/Backup/temp/testing"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
@@ -56,7 +59,7 @@ split_columns <-
                trim_ws = FALSE,
                col_types = cols())
     
-    # Remove any extra whitespace i.e. two or more spaces and spaces at either end
+    # Remove any extra whitespace i.e. two or more spaces and spaces at either end. Yes, I know that I turned this off in the read_csv, but it's important to be explicit because the whitespcae is useful sometimes.
     csv_with_rows_to_combine$text <-
       str_squish(csv_with_rows_to_combine$text)
     

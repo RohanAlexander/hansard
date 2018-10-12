@@ -1,6 +1,6 @@
 # !diagnostics off
 #### Preamble ####
-# Purpose: This file takes Australian Hansard CSV files that are all in one column and one row and applies a basic, custom, spell-checker.
+# Purpose: This file takes Australian Hansard CSV files that are all in one column and one row and applies a brutal, replacement-based, custom-dictionary, spell-checker.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
 # Last updated: 11 October 2018
@@ -31,7 +31,8 @@ fix_wrong_spellings <-
 #### Create lists of CSVs to read ####
 # Change the path as required:
 # use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
-use_this_path_to_get_csvs  <- "outputs/hansard/temp/testing"
+# use_this_path_to_get_csvs  <- "outputs/hansard/temp/testing"
+use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -44,7 +45,8 @@ file_names <-
 
 file_names <- file_names %>% sample() # Randomise the order
 
-use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing/test"
+# use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing/test"
+use_this_path_to_save_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
 # use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
@@ -85,10 +87,6 @@ fix_spelling <-
 
 safely_fix_spelling <- safely(fix_spelling)
 
-# file_names <- file_names[1:10]
-# save_names <- save_names[1:10]
-# file_names <- file_names[1:(length(file_names)/2)]
-# save_names <- save_names[1:(length(save_names)/2)]
 
 
 tic("Furrr walk2 stringr")

@@ -1,11 +1,20 @@
+Add to stop words: 
 
-remove: government, joseph, australian, john, frank, senator, ad, val,
-john - remove all first names
-william - remove all first names
-joseph - remove all first names
+government, 
 
-These words are in the topics, but they are signs of errors
+australian, 
 
-tion - fix 
-ing - fix 
+senator, 
+
+frank, 
+john, 
+joseph, 
+william,
+
+
+
+
+Check whether these still show up in the topics:
+tion
+ing
 

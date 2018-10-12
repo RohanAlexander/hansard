@@ -25,7 +25,7 @@ plan(multiprocess)
 #### Create lists of CSVs to read ####
 # Change the path as required:
 # use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
-use_this_path_to_get_csvs  <- "outputs/hansard/temp"
+use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -49,8 +49,9 @@ file_names_tibble <- file_names_tibble %>%
 file_names <- file_names_tibble$file_name
 rm(file_names_tibble)
 
-#Sometimes it's useful to seperate the input and hte output, but otherwise might prefer to overwrite
-use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
+#Sometimes it's useful to seperate the input and the output, but otherwise might prefer to overwrite
+# use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
+use_this_path_to_save_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
 # use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
