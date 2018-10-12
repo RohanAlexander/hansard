@@ -76,72 +76,20 @@ custom_stop_words <- bind_rows(stop_words, # The default list
                                           "legislation",
                                           "liberal",
                                           "madam",
+                                          "minister",
                                           "motion", 
+                                          "mp",
                                           "opposition",
                                           "people", 
                                           "senator",
                                           "sir",
                                           "speaker"
-                                          # "na",
-                                          # "tax",
-                                          # "ment",
-                                          # "na",
-                                          # "bhe",
-                                          # "tbe",
-                                          # 'tile',
-                                          # 'tlie',
-                                          # "duncanhughes",
-                                          # "fche",
-                                          # "honorahle",
-                                          # "brucepage",
-                                          # "archie",
-                                          # "showeth",
-                                          # "report",
-                                          # "amount",
-                                          # "australia",
-                                          # "australian",
-                                          # "board",
-                                          # "cent",
-                                          # "clause",
-                                          # "commission",
-                                          # "committee",
-                                          # "countries",
-                                          # "country",
-                                          # "day",
-                                          # "deal",
-                                          # "debate",
-                                          # "department",
-                                          # "desire",
-                                          # "duty",
-                                          # "government",
-                                          # "increase",
-                                          # "leader",
-                                          # "matter",
-                                          # "minister",
-                                          # "national",
-                                          # "parliament",
-                                          # "party",
-                                          # "people",
-                                          # "policy",
-                                          # "position",
-                                          # "power",
-                                          # "prime",
-                                          # "proposed",
-                                          # "public",
-                                          # "question",
-                                          # "regard",
-                                          # "statement",
-                                          # "support",
-                                          # "system",
-                                          # "time",
-                                          # "industry",
-                                          # "million"
                                           ),
                                  lexicon = rep("custom", length(word))
                                  ))
                                
 
-#### Prepare for topic modelling ####
+#### Remove stop words ####
 # Put each word on its own row - from https://juliasilge.com/blog/sherlock-holmes-stm/
 # Best to split it up so you don't have memory issues
 all_hansard_words <- all_hansard_words %>%
@@ -359,6 +307,7 @@ k_result %>%
     subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity"
   )
 
+
 topic_model_20 <- k_result %>%
   filter(K == 20) %>%
   pull(topic_model) %>%
@@ -372,7 +321,16 @@ tidy(topic_model_20,
      matrix = "beta",
      document_names = hansard_stm$meta$docid_field) %>% 
   write_csv("outputs/topic_models_and_gammas/betas_model_20.csv")
-
+read_csv("outputs/topic_models_and_gammas/betas_model_20.csv") %>% 
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(5, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest() %>% 
+  write_delim(path = "outputs/misc/top_words_20.csv", delim = ";")
 
 topic_model_40 <- k_result %>%
   filter(K == 40) %>%
@@ -387,7 +345,16 @@ tidy(topic_model_40,
      matrix = "beta",
      document_names = hansard_stm$meta$docid_field) %>% 
   write_csv("outputs/topic_models_and_gammas/betas_model_40.csv")
-
+read_csv("outputs/topic_models_and_gammas/betas_model_40.csv") %>% 
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(5, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest() %>% 
+  write_delim(path = "outputs/misc/top_words_40.csv", delim = ";")
 
 topic_model_60 <- k_result %>%
   filter(K == 60) %>%
@@ -402,11 +369,62 @@ tidy(topic_model_60,
      matrix = "beta",
      document_names = hansard_stm$meta$docid_field) %>% 
   write_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
+read_csv("outputs/topic_models_and_gammas/betas_model_60.csv") %>% 
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(5, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest() %>% 
+  write_delim(path = "outputs/misc/top_words_60.csv", delim = ";")
 
 
 
 
 
+
+
+
+
+
+
+
+betas_model_60 <- read_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
+betas_model_60 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(5, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest() %>% 
+  write_delim(path = "outputs/misc/top_words_60.csv", delim = ";")
+
+
+
+
+
+gamma_terms <- td_gamma %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms %>%
+  select(topic, gamma, terms) %>%
+  knitr::kable(
+    digits = 3,
+    col.names = c("Topic", "Expected topic proportion", "Top 7 terms")
+  )
+
+
+
+# Misc debris below
 
 
 
@@ -557,32 +575,6 @@ td_beta
 
 head(gammas_model_60)
 
-top_terms <- betas_model_60 %>%
-  arrange(beta) %>%
-  group_by(topic) %>%
-  top_n(5, beta) %>%
-  arrange(-beta) %>%
-  select(topic, term) %>%
-  summarise(terms = list(term)) %>%
-  mutate(terms = map(terms, paste, collapse = ", ")) %>%
-  unnest()
-
-write_delim(top_terms, path = "outputs/misc/top_words.csv", delim = ";")
-
-gamma_terms <- td_gamma %>%
-  group_by(topic) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  select(topic, gamma, terms) %>%
-  knitr::kable(
-    digits = 3,
-    col.names = c("Topic", "Expected topic proportion", "Top 7 terms")
-  )
 
 
 
