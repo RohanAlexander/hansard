@@ -30,7 +30,8 @@ multiword_expressions <- read_csv2("inputs/misc/multiwords_with_corrections.csv"
 #### Create the lists of CSV filenames to read in ####
 # Change the path as required:
 # use_this_path_to_get_csvs  <- "outputs/hansard/hansard_csv_files" # For testing
-use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
+use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv" # For testing
+# use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
 
 file_names <-
   list.files(

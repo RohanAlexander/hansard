@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 5 October 2018
+# Last updated: 12 October 2018
 # Prerequisites:
 # Issues:
 
@@ -40,24 +40,34 @@ keyEvents <-
 
 #### Temp fix for dodgy words ####
 # Temp fix for getting rid of politicians names
-politicians <-
+politicians_surname <-
   read_csv("inputs/politicians/politicians_by_individuals.csv") %>%
   select(surname) %>%
   mutate(surname = str_to_lower(surname)) %>%
   unique() %>%
   pull()
 
+politicians_first_name <-
+  read_csv("inputs/politicians/politicians_by_individuals.csv") %>%
+  select(firstName) %>%
+  mutate(firstName = str_to_lower(firstName)) %>%
+  unique() %>%
+  pull()
+
 # Bind custom list of stopwords to the default list
 custom_stop_words <- bind_rows(stop_words, # The default list
                                data_frame(
-                                 word = c(politicians,
+                                 word = c(politicians_surname,
+                                          politicians_first_name,
                                           "act",
                                           "amendment",
                                           "australia", 
+                                          "australian",
                                           "bill",
                                           "commonwealth",
                                           "esq",
                                           "gentleman",
+                                          "government",
                                           "honorable",
                                           "honourable",
                                           "house",
@@ -69,8 +79,9 @@ custom_stop_words <- bind_rows(stop_words, # The default list
                                           "motion", 
                                           "opposition",
                                           "people", 
+                                          "senator",
                                           "sir",
-                                          "speaker", 
+                                          "speaker"
                                           # "na",
                                           # "tax",
                                           # "ment",
@@ -149,7 +160,8 @@ tidy_hansard <- all_hansard_words %>%
 
 rm(tidy_hansard_pieces,
    custom_stop_words,
-   politicians,
+   politicians_first_name,
+   politicians_surname,
    all_hansard_words)
 
 # # Construct the TF-IDF measures on a day basis
@@ -351,16 +363,54 @@ topic_model_20 <- k_result %>%
   filter(K == 20) %>%
   pull(topic_model) %>%
   .[[1]]
+save(topic_model_20, file = "outputs/topic_models_and_gammas/topic_model_20.RData")
+tidy(topic_model_20,
+     matrix = "gamma",
+     document_names = hansard_stm$meta$docid_field) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_20.csv")
+tidy(topic_model_20,
+     matrix = "beta",
+     document_names = hansard_stm$meta$docid_field) %>% 
+  write_csv("outputs/topic_models_and_gammas/betas_model_20.csv")
+
 
 topic_model_40 <- k_result %>%
   filter(K == 40) %>%
   pull(topic_model) %>%
   .[[1]]
+save(topic_model_40, file = "outputs/topic_models_and_gammas/topic_model_40.RData")
+tidy(topic_model_40,
+     matrix = "gamma",
+     document_names = hansard_stm$meta$docid_field) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_40.csv")
+tidy(topic_model_40,
+     matrix = "beta",
+     document_names = hansard_stm$meta$docid_field) %>% 
+  write_csv("outputs/topic_models_and_gammas/betas_model_40.csv")
+
 
 topic_model_60 <- k_result %>%
   filter(K == 60) %>%
   pull(topic_model) %>%
   .[[1]]
+save(topic_model_60, file = "outputs/topic_models_and_gammas/topic_model_60.RData")
+tidy(topic_model_60,
+     matrix = "gamma",
+     document_names = hansard_stm$meta$docid_field) %>%
+  write_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
+tidy(topic_model_60,
+     matrix = "beta",
+     document_names = hansard_stm$meta$docid_field) %>% 
+  write_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
+
+
+
+
+
+
+
+
+
 
 
 
@@ -371,53 +421,6 @@ td_gamma <- tidy(topic_model,
                  matrix = "gamma",
                  document_names = rownames(hansard_stm))
 td_gamma
-
-
-save(topic_model, file = "outputs/topic_models_and_gammas/topic_model_100.RData")
-tidy(topic_model,
-     matrix = "gamma",
-     document_names = rownames(hansard_stm)) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_100.csv")
-
-topic_model_80 <- k_result %>%
-  filter(K == 80) %>%
-  pull(topic_model) %>%
-  .[[1]]
-save(topic_model_80, file = "outputs/topic_models_and_gammas/topic_model_80.RData")
-tidy(topic_model_80,
-     matrix = "gamma",
-     document_names = rownames(hansard_stm)) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_80.csv")
-
-topic_model_60 <- k_result %>%
-  filter(K == 60) %>%
-  pull(topic_model) %>%
-  .[[1]]
-save(topic_model_60, file = "outputs/topic_models_and_gammas/topic_model_60.RData")
-tidy(topic_model_60,
-     matrix = "gamma",
-     document_names = rownames(hansard_stm)) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
-
-topic_model_40 <- k_result %>%
-  filter(K == 40) %>%
-  pull(topic_model) %>%
-  .[[1]]
-save(topic_model_40, file = "outputs/topic_models_and_gammas/topic_model_40.RData")
-tidy(topic_model_40,
-     matrix = "gamma",
-     document_names = rownames(hansard_stm)) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_40.csv")
-
-topic_model_20 <- k_result %>%
-  filter(K == 20) %>%
-  pull(topic_model) %>%
-  .[[1]]
-save(topic_model_20, file = "outputs/topic_models_and_gammas/topic_model_20.RData")
-tidy(topic_model_20,
-     matrix = "gamma",
-     document_names = rownames(hansard_stm)) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_20.csv")
 
 
 
