@@ -162,7 +162,7 @@ We primarily implement the STM on the daily-level parliamentary text data descri
 Figure \@ref(fig:exampletopics) illustrates an output of the STM. This illustrative example only shows five per cent of data from the House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be allocated to a topic and highlights how the prominence of these topics changes over time.
 
 ```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/topics_example.pdf"))
+knitr::include_graphics("../../figures/topics_example.pdf")
 ```
 
 
@@ -280,17 +280,17 @@ Political events are those related to a change of government or an election. Oth
 First considering the mean topic distributions over governments, Figures \@ref(fig:mu1to20) - \@ref(fig:mu41to60).
 
 ```{r mu1to20, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/mu_topic1-20.pdf"))
+knitr::include_graphics("../../figures/mu_topic1-20.pdf")
 ```
 
 
 ```{r mu21to40, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/mu_topic21-40.pdf"))
+knitr::include_graphics("../../figures/mu_topic21-40.pdf")
 ```
 
 
 ```{r mu41to60, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/mu_topic41-60.pdf"))
+knitr::include_graphics("../../figures/mu_topic41-60.pdf")
 ```
 
 Topics related to Federation such as the British Empire and the constitution decrease in importance over time. A substantial increase in the importance of issues dealing with 
@@ -373,7 +373,7 @@ Which years are being used (not non-OCRd)
 Figure \@ref(fig:asdf)
 
 ```{r asdf, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '100%'}
-knitr::include_graphics(here::here("outputs/figures/example_hansard_page.png"))
+knitr::include_graphics("../../figures/example_hansard_page.png")
 ```
 
 ## Known Hansard issues {#knownhansardissues}
