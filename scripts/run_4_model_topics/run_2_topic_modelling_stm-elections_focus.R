@@ -150,7 +150,6 @@ head(tidy_hansard_reduced)
 rm(tidy_hansard)
 
 
-
 # Add metadata
 all_dates <-
   tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) %>%  # Make a column of all the dates from Federation
@@ -160,15 +159,17 @@ all_dates <-
     governmentChangeDate = if_else(allDates %in% governmentChanges$end, 1, 0),
     governmentChangeDate = cumsum(governmentChangeDate),
     keyEvent = if_else(allDates %in% keyEvents$theDate, 1, 0),
-    keyEvent = cumsum(keyEvent)
-  ) %>%
-  rename(electionCounter = electionDate, governmentCounter = governmentChangeDate) %>% 
-  mutate(electionCounterCharacter = as.character(electionCounter),
-         governmentCounterCharacter = as.character(governmentCounter))
+    keyEvent = cumsum(keyEvent),
+    electionOrGovernmentDate = if_else(allDates %in% c(election_dates$electionDate, governmentChanges$end), 1, 0),
+    electionOrGovernmentDate = cumsum(electionOrGovernmentDate)) %>%
+  rename(
+    electionCounter = electionDate,
+    governmentCounter = governmentChangeDate,
+    electionOrGovernmentCounter = electionOrGovernmentDate
+  )
   
-
 head(all_dates)
-#
+
 # all_dates <- all_dates %>%
 #   select(-keyEconomicChange, -keyOtherChange) %>%
 #   mutate(governmentChangeDate = governmentChangeDate + 1) %>%
@@ -179,17 +180,27 @@ head(all_dates)
 tidy_hansard_reduced <- tidy_hansard_reduced %>%
   left_join(all_dates, by = c("docid_field" = "allDates"))
 
+head(tidy_hansard_reduced)
+tail(tidy_hansard_reduced)
+
 tidy_hansard_reduced <- tidy_hansard_reduced %>%
   mutate(
     electionCounter = as.integer(electionCounter),
     governmentCounter = as.integer(governmentCounter),
+    electionOrGovernmentCounter = as.integer(electionOrGovernmentCounter),
     keyEvent = as.integer(keyEvent),
     year = year(docid_field),
     year = as.integer(year)
   )
 head(tidy_hansard_reduced)
+tail(tidy_hansard_reduced)
+
+
+
+
 
 ##### FOR TESTING ######
+heh <- tidy_hansard_reduced
 tidy_hansard_reduced <- tidy_hansard_reduced %>%
   filter(year > 2000)
 head(tidy_hansard_reduced)
@@ -228,12 +239,13 @@ names(hansard_stm)
 # write_csv(tidy_hansard_reduced, "tidy_hansard_reduced.csv")
 
 # Clean up
-rm(tidy_hansard_reduced,
-   hansard_corpus,
+rm(hansard_corpus,
    docsTM,
    vocabTM,
    metaTM,
    hansard_dfm)
+# Comment while testing!
+# rm(tidy_hansard_reduced)
 
 
 #### Testing for the optimal k ####
@@ -407,22 +419,118 @@ first_model <- stm(
 toc()
 save(first_model, file = "outputs/topic_models_and_gammas/topic_model_first_model.RData")
 
+first_estimates <- estimateEffect(
+  1:40 ~ s(year) + s(electionCounter) + factor(governmentCounter),
+  first_model,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) 
 
-
-
-
-
-
+# Warning message:
+#   In estimateEffect(1:3 ~ s(year) + s(electionCounter) + factor(governmentCounter),  :
+#                       Covariate matrix is singular.  See the details of ?estimateEffect() for some common causes.
+#                     Adding a small prior 1e-5 for numerical stability.
+                    
+##
+tic("Second model")
 second_model <- stm(
   documents = hansard_stm$documents,
   vocab = hansard_stm$vocab,
   K = 40,
-  prevalence =  ~ s(year) + s(electionCounter) + governmentCounterCharacter,
+  prevalence =  ~ s(electionCounter) + factor(governmentCounter),
   data = hansard_stm$meta,
   max.em.its = 75,
   init.type = "Spectral",
   verbose = TRUE
 )
+toc()
+
+save(second_model, file = "outputs/topic_models_and_gammas/topic_model_second_model.RData")
+
+second_estimates <- estimateEffect(
+  1:40 ~ s(electionCounter) + factor(governmentCounter),
+  second_model,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) 
+
+# Warning message:
+#   In estimateEffect(1:3 ~ s(year) + s(electionCounter) + factor(governmentCounter),  :
+#                       Covariate matrix is singular.  See the details of ?estimateEffect() for some common causes.
+#                     Adding a small prior 1e-5 for numerical stability.
+
+
+##
+tic("Third model")
+third_model <- stm(
+  documents = hansard_stm$documents,
+  vocab = hansard_stm$vocab,
+  K = 40,
+  prevalence =  ~ s(year) + factor(electionOrGovernmentCounter),
+  data = hansard_stm$meta,
+  max.em.its = 75,
+  init.type = "Spectral",
+  verbose = TRUE
+)
+toc()
+
+save(third_model, file = "outputs/topic_models_and_gammas/topic_model_third_model.RData")
+
+third_estimates <- estimateEffect(
+  1:40 ~ s(year) + factor(electionOrGovernmentCounter),
+  third_model,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) %>%
+  tidy() 
+
+
+third_estimates %>% 
+  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
+  ggplot(aes(x = term, y = p.value, color = as.factor(topic))) +
+  geom_jitter(width = 0.05)
+
+third_estimates %>% 
+  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
+  ggplot(aes(x = term, y = estimate, color = as.factor(topic))) +
+  geom_jitter(width = 0.05)
+
+
+##
+tic("Fourth model")
+fourth_model <- stm(
+  documents = hansard_stm$documents,
+  vocab = hansard_stm$vocab,
+  K = 40,
+  prevalence =  ~ s(year) + factor(electionOrGovernmentCounter),
+  data = hansard_stm$meta,
+  max.em.its = 75,
+  init.type = "Spectral",
+  verbose = TRUE
+)
+toc()
+
+save(third_model, file = "outputs/topic_models_and_gammas/topic_model_third_model.RData")
+
+third_estimates <- estimateEffect(
+  1:40 ~ s(year) + factor(electionOrGovernmentCounter),
+  third_model,
+  meta = hansard_stm$meta,
+  uncertainty = "Global"
+) %>%
+  tidy() 
+
+
+third_estimates %>% 
+  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
+  ggplot(aes(x = term, y = p.value, color = as.factor(topic))) +
+  geom_jitter(width = 0.05)
+
+third_estimates %>% 
+  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
+  ggplot(aes(x = term, y = estimate, color = as.factor(topic))) +
+  geom_jitter(width = 0.05)
+
 
 
 
