@@ -391,6 +391,8 @@ read_csv("outputs/topic_models_and_gammas/betas_model_60.csv") %>%
 
 
 
+
+
 betas_model_60 <- read_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
 betas_model_60 %>%
   arrange(beta) %>%

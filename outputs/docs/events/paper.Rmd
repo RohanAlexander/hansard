@@ -40,7 +40,7 @@ elections <- read_csv(here::here("inputs/misc/misc_elections_data.csv"), col_typ
 governments <- read_csv(here::here("inputs/misc/change_of_pm.csv"), col_types = cols())
 keyEvents <- read_csv(here::here("inputs/misc/key_events.csv"), col_types = cols())
 significances <- read_csv(here::here("outputs/misc/significance.csv"), col_types = cols())
-top_words <- read_csv2(here::here("outputs/misc/top_words.csv"), col_types = cols())
+top_words <- read_csv2(here::here("outputs/misc/top_words_40.csv"), col_types = cols())
 missing_days <- read_csv(here::here("outputs/misc/missing_days.csv"), col_types = cols())
 hansard_sources <- read_csv(here::here("outputs/misc/hansard_sources.csv"), col_types = cols())
 
@@ -176,7 +176,7 @@ The main output of the STM that is of interest to us is the proportion of each t
 Define $\gamma_{tp}$ to be the proportion of topic of topic $p$ on day $t$. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Thus, the topic proportions on day $t$ are modeled in reference to their membership in a particular sitting period $s$. Firstly, we assume that each set of $\gamma_{t,}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[t],}$:
 
 $$
-\gamma_{t,} &\sim \mbox{Dirichlet}(\mu_{s[t],})
+\gamma_{t,} \sim \mbox{Dirichlet}(\mu_{s[t],})
 $$
 This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1. 
 
