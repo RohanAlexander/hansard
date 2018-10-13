@@ -171,16 +171,27 @@ knitr::include_graphics("../../figures/topics_example.pdf")
 <!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
 
 
-The main output of the STM that is of interest to us is the proportion of each topic appearing in each document. Specifically, we are interested in how the distribution of topics changes in relation to different types of events. But with around 80 **[UPDATE]** topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. Instead, we formalize a statistical framework which allows us to systematically identify significant changes in topic distributions over time. Specifically, we use a Bayesian hierarchical Dirichlet regression framework which relates proportions of each topic to underlying time trends, changes in goverments and elections. 
+The main output of the STM that is of interest to us is the proportion of each topic appearing in each document. Specifically, we are interested in how the distribution of topics changes in relation to different types of events. But with around 40 topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. 
 
-Define $\gamma_{tp}$ to be the proportion of topic of topic $p$ on day $t$. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Thus, the topic proportions on day $t$ are modeled in reference to their membership in a particular sitting period $s$. Firstly, we assume that each set of $\gamma_{t,}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[t],}$:
+The STM framework allows for covariates to be included in the estimation of the topic distributions, $\theta_d$ (see equation **[XX]** above). This allows the certain types of relationships between topics and events to be assessed. However, there are several limitations to the STM covariate framework in this context:
+
+- There is no way of specifying more complicated autocorrelated functional forms of the effects of events over time. For example, we believe that the effect of an election would peak at the time of the election, then gradually decay as a function of days since election. In the STM framework, it is possible to specify constant or linear effect of elections over time, or a spline relationship over elections, but it is not possible to restrict the effect of a specific election over time to be monotonically decreasing. 
+- There is no way of implementing partial pooling across groups of similar documents. The STM framework assumes that  documents are independently and identically distributed conditional on the covariates in the model. However, it could be expected that topic distributions within a particular government period, for example, may be more or less likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period. 
+- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 terrorist attacks had an effect on parliamentary discourse, a dummy for 9/11 would have to be included in the STM framework. Ideally, we would like to identify important events based on different-to-expected topic distributions, after account for time trends, government and election effects. 
+
+
+To overcome these challenges, we formalize a statistical framework which allows us to systematically identify significant changes in topic distributions over time. Specifically, we use a Bayesian hierarchical Dirichlet regression framework which relates proportions of each topic to underlying time trends, changes in goverments and elections. 
+
+Define $\gamma_{dp}$ to be the proportion of topic of topic $p$ on day $d$. Note that $\gamma_{d,1:P}$ for $p = 1,2,\dots P=40$ is equal to the estimated values of $\theta_d$ from the STM. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods across all years of interest (1901--2017).
+
+The topic proportions on day $d$ are modeled in reference to their membership in a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\gamma_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
 
 $$
-\gamma_{t,} \sim \mbox{Dirichlet}(\mu_{s[t],})
+\gamma_{d,1:P} \sim \mbox{Dirichlet}(\mu_{s[d],1:P})
 $$
-This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1. 
+where the notation $s[d]$ refers to the sitting period $s$ which day $d$ belongs to. This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1. 
 
-The goal of the model is to relate these proportions to the government $g$ of time $t$, and also the days since the most recent election, $e$, while account for underlying time trends. Thus, the mean parameters $\mu_{sp}$ are modeled on the log scale as
+The goal of the model is to relate these proportions to the government $g$ of time $d$, and also the days since the most recent election, $e$, while account for underlying time trends. The mean parameters $\mu_{sp}$ are modeled on the log scale as
 
 $$
 \log \mu_{s,p} = \alpha_{g[s],p} + \cdot\alpha_{e[s],d,p}  + \sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k} + \delta_{s,p}
@@ -189,8 +200,7 @@ where:
 
 - $\alpha_{g[s],p}$ is the mean effect for government $g$ (which covers sitting period $s$) and topic $p$
 - $\alpha_{e[s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$) for topic $p$ on day $d$ since the election
-- $x_{s,k}$ is the $k$th basis spline in sitting period s
-- $\beta_{p,k}$ is a cofficient on the $k$th basis spline. 
+- $\sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k}$ is the underlying time trend, modeled using splines: $x_{s,k}$ is the $k$th basis spline in sitting period $s$, and $\beta_{p,k}$ is a cofficient on the $k$th basis spline. 
 - $\delta_{s,p}$ is a structured random effect for each sittiing period and topic. 
 
 The government term $\alpha_{g[s],p}$ assumes there is some underlying mean effect of each government on the topic distribution. We place uninformative priors on each of these parameters:
@@ -215,7 +225,7 @@ $$
 \beta_{p,k} \sim N(0, 100)
 $$
 
-Finally, the sitting period-specific random effect $\delta_{s,p}$ allows for the topic distributions in some sitting periods to be different than expected based on the government/election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-government and non-election events. The $\delta_{s,p}$'s are modeled as 
+Finally, the sitting period-specific random effect $\delta_{s,p}$ allows for the topic distributions in some sitting periods to be different than expected based on the government/election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-government and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{s,p}$'s are modeled as 
 
 $$
 \delta_{s,p} \sim N(0, \sigma_{e[s],p}^2)
@@ -227,34 +237,33 @@ $$
 \sigma_{e[s],p} \sim U(0,3)
 $$
 
-
-RA STUFF:
-
-The full model is:
-
-\begin{align}
-\gamma_{stp} &\sim \mbox{Dirichlet}(\mu_{stp}) (\#eq:distributionforgammas) \\ 
-\log \mu_{stp} &= \alpha_{sp} + \delta_{stp} (\#eq:meanforgammas) \\
-\alpha_{s1} &= 0 (\#eq:zeroconstraint)\\
-\alpha_{sp} &\sim \mbox{Normal}\left(\eta_{g[s]}, \sigma^2_g\right) \mbox{ for } p>1 (\#eq:alphasp) \\
-\delta_{s,t,p} &\sim \mbox{Normal}\left(\delta_{s,t-1,p}, \sigma^2_{\delta}\right) (\#eq:deltasp) \\
-\sigma^2_{\delta} &\sim \mbox{Uniform}(0, 40). (\#eq:randomwalkvariance)  
-\end{align} 
-
-**[Does the variance parameter used in Equation 4 need to be specified too?]**
-
-Equation \@ref(eq:distributionforgammas) describes the proportion of each day within a sitting period given to a particular topic. This is considered as a draw from a Dirichlet distribution parameterised by $\mu_{stp}$. In a sense, $\mu_{stp}$ will be mean topic distributions over whatever time period is of interest. 
-<!-- The Dirichlet distribution is the multivariate extension of the Beta distribution, and the parameter controls where the 'weight' of the distribution lies.  -->
-Equation \@ref(eq:meanforgammas) describes that distribution parameter, $\mu_{stp}$, as the sum of $\alpha_{sp}$, which are sitting period specific topic distributions and mean the model is linear in time for each topic and sitting period, and $\delta_{stp}$, which is a simple time series that allows for a little variation within a sitting period. These are themselves parameters. The primary aim of the modelling task is to find an appropriate and meaningful functional form for $\mu$. 
-
-Equation \@ref(eq:zeroconstraint) constrains the first intercept to zero for identification purposes. Equation \@ref(eq:alphasp) shows how we consider $\alpha_{sp}$ as a draw from a Normal distribution with a mean that depends on **[SOMETHING]** and a variance that depends on **[SOMETHING ELSE]**. Similarly, Equation \@ref(eq:deltasp) show how we model $\delta_{stp}$  as a draw from a Normal distribution with a mean that depends on the preceding $\delta$ and some variance which is drawn from the Uniform distribution in Equation \@ref(eq:randomwalkvariance), that is, a random walk around each intercept.
-
 We run the model in Stan using the \texttt{RStan} package of @RStan. An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation). 
 
 
-**[Probably need to add: 1) where does each covariate come into it and how do they interact; 2) how does correlation work; 3) what are the random effects and fixed effects?]**
 
 
+<!-- RA STUFF: -->
+
+<!-- The full model is: -->
+
+<!-- \begin{align} -->
+<!-- \gamma_{stp} &\sim \mbox{Dirichlet}(\mu_{stp}) (\#eq:distributionforgammas) \\ -->
+<!-- \log \mu_{stp} &= \alpha_{sp} + \delta_{stp} (\#eq:meanforgammas) \\ -->
+<!-- \alpha_{s1} &= 0 (\#eq:zeroconstraint)\\ -->
+<!-- \alpha_{sp} &\sim \mbox{Normal}\left(\eta_{g[s]}, \sigma^2_g\right) \mbox{ for } p>1 (\#eq:alphasp) \\ -->
+<!-- \delta_{s,t,p} &\sim \mbox{Normal}\left(\delta_{s,t-1,p}, \sigma^2_{\delta}\right) (\#eq:deltasp) \\ -->
+<!-- \sigma^2_{\delta} &\sim \mbox{Uniform}(0, 40). (\#eq:randomwalkvariance) -->
+<!-- \end{align} -->
+
+<!-- **[Does the variance parameter used in Equation 4 need to be specified too?]** -->
+
+<!-- Equation \@ref(eq:distributionforgammas) describes the proportion of each day within a sitting period given to a particular topic. This is considered as a draw from a Dirichlet distribution parameterised by $\mu_{stp}$. In a sense, $\mu_{stp}$ will be mean topic distributions over whatever time period is of interest. -->
+
+<!-- Equation \@ref(eq:meanforgammas) describes that distribution parameter, $\mu_{stp}$, as the sum of $\alpha_{sp}$, which are sitting period specific topic distributions and mean the model is linear in time for each topic and sitting period, and $\delta_{stp}$, which is a simple time series that allows for a little variation within a sitting period. These are themselves parameters. The primary aim of the modelling task is to find an appropriate and meaningful functional form for $\mu$. -->
+
+<!-- Equation \@ref(eq:zeroconstraint) constrains the first intercept to zero for identification purposes. Equation \@ref(eq:alphasp) shows how we consider $\alpha_{sp}$ as a draw from a Normal distribution with a mean that depends on **[SOMETHING]** and a variance that depends on **[SOMETHING ELSE]**. Similarly, Equation \@ref(eq:deltasp) show how we model $\delta_{stp}$  as a draw from a Normal distribution with a mean that depends on the preceding $\delta$ and some variance which is drawn from the Uniform distribution in Equation \@ref(eq:randomwalkvariance), that is, a random walk around each intercept. -->
+
+<!-- **[Probably need to add: 1) where does each covariate come into it and how do they interact; 2) how does correlation work; 3) what are the random effects and fixed effects?]** -->
 
 
 
@@ -264,7 +273,7 @@ We run the model in Stan using the \texttt{RStan} package of @RStan. An illustra
 <!-- **[Use tf-idf between them as illustrative instead? Use that other measure of difference?]** -->
 
 
-<!-- We consider events in two ways. The first is in the change in the word usage before and after events and the second is in changes in the topics.  -->
+<!-- We consider events in two ways. The first is in the change in the word usage before and after events and the second is in changes in the topics. -->
 
 <!-- Differences in word usage can be evaluated using the term frequency-inverse document frequency (tf-idf) measure. It will be higher for words that are rarely used across all documents, but commonly used in a document. For instance, in Australian parliamentary text records 'the' is commonly used in many documents and so the fact that it is used in any particular document is not usual. However, 'aboriginal' is less common across, and so if it was especially prevalent in a particular document that may distinguish that document. -->
 
