@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 12 October 2018
+# Last updated: 13 October 2018
 # Prerequisites:
 # Issues:
 
@@ -162,7 +162,10 @@ all_dates <-
     keyEvent = if_else(allDates %in% keyEvents$theDate, 1, 0),
     keyEvent = cumsum(keyEvent)
   ) %>%
-  rename(electionCounter = electionDate)
+  rename(electionCounter = electionDate, governmentCounter = governmentChangeDate) %>% 
+  mutate(electionCounterCharacter = as.character(electionCounter),
+         governmentCounterCharacter = as.character(governmentCounter))
+  
 
 head(all_dates)
 #
@@ -179,12 +182,18 @@ tidy_hansard_reduced <- tidy_hansard_reduced %>%
 tidy_hansard_reduced <- tidy_hansard_reduced %>%
   mutate(
     electionCounter = as.integer(electionCounter),
-    governmentChangeDate = as.integer(governmentChangeDate),
+    governmentCounter = as.integer(governmentCounter),
     keyEvent = as.integer(keyEvent),
     year = year(docid_field),
     year = as.integer(year)
   )
 head(tidy_hansard_reduced)
+
+##### FOR TESTING ######
+tidy_hansard_reduced <- tidy_hansard_reduced %>%
+  filter(year > 2000)
+head(tidy_hansard_reduced)
+##### FOR TESTING ######
 
 rm(
   all_dates,
@@ -228,6 +237,7 @@ rm(tidy_hansard_reduced,
 
 
 #### Testing for the optimal k ####
+# Based on Julia Silge's code
 # Create models with different values for K
 # Takes an age to run
 many_models <-
@@ -307,7 +317,7 @@ k_result %>%
     subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity"
   )
 
-
+# Save the bits and pieces that are important for later
 topic_model_20 <- k_result %>%
   filter(K == 20) %>%
   pull(topic_model) %>%
@@ -379,6 +389,84 @@ read_csv("outputs/topic_models_and_gammas/betas_model_60.csv") %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
   unnest() %>% 
   write_delim(path = "outputs/misc/top_words_60.csv", delim = ";")
+
+
+
+#### Run with model ####
+tic("First model")
+first_model <- stm(
+  documents = hansard_stm$documents,
+  vocab = hansard_stm$vocab,
+  K = 40,
+  prevalence =  ~ s(year) + s(electionCounter) + factor(governmentCounter),
+  data = hansard_stm$meta,
+  max.em.its = 75,
+  init.type = "Spectral",
+  verbose = TRUE
+)
+toc()
+save(first_model, file = "outputs/topic_models_and_gammas/topic_model_first_model.RData")
+
+
+
+
+
+
+
+second_model <- stm(
+  documents = hansard_stm$documents,
+  vocab = hansard_stm$vocab,
+  K = 40,
+  prevalence =  ~ s(year) + s(electionCounter) + governmentCounterCharacter,
+  data = hansard_stm$meta,
+  max.em.its = 75,
+  init.type = "Spectral",
+  verbose = TRUE
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ),
+# .progress = TRUE
+))
+
+
+head(many_models)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
