@@ -190,22 +190,29 @@ knitr::include_graphics("../../figures/topics_example.pdf")
 <!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
 
 
-The main output of the STM that is of interest to us is the proportion of each topic appearing in each document. Specifically, we are interested in how the distribution of topics changes in relation to different types of events. But with around 40 topics for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. 
+The main output of the CTM of interest is the proportion of each topic appearing in each document, that is, the $\theta_d$. For the next stage of the modeling process, we are interested in how the distribution of topics changes in relation to different types of events. But with around 40 topics **[UPDATE]** for each of the roughly 54,331 **[UPDATE]** sitting days across the parliaments and houses the data are still too noisy to easily visualise changes around events. 
 
-As mentioned above, the STM framework allows for covariates to be included in the estimation of prevalence of topcs, $\theta_d$ (see equation **[XX]** above). This theoretically would allow certain types of relationships between topics and events to be assessed. However, there are several limitations to the STM covariate framework in this context:
+One option for relating the topic distributions to events would be to use a Structural Topic Model (STM) [@RobertsStewartAiroldi2016]. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of Hansard, the government or election period, may affect the topics within that document. The STM allows this additional information, or meta-data, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as the LDA method, it is just that this process now includes metadata.
+
+Consider a matrix of covariates $X_d$, where each column relates to a different covariate or aspect of the meta-data, and the row refers to document $d$ value of each covariate. Similar to the CTM, the STM assumes the topics within a document $\theta_d$ are a draw from a logistic Normal distribution with mean $\mu$. However, the STM framework assumes that the mean parameter is a linear function of covariates $X_d$:
+
+$$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)$$
+
+
+The STM framework with covariates could theoretically allow the relationships between topics and certain types of events to be assessed. For example, one covariate within the model could be the government $g$ that was in power during the time corresponding to document $d$. However, there are several limitations to the STM covariate framework in relation to our goal of assess the relationship between topics and events:
 
 - There is no way of specifying more complicated autocorrelated functional forms of the effects of events over time. For example, we believe that the effect of an election would peak at the time of the election, then gradually decay as a function of days since election. In the STM framework, it is possible to specify constant or linear effect of elections over time, or a spline relationship over elections, but it is not possible to restrict the effect of a specific election over time to be monotonically decreasing. 
 - There is no way of implementing partial pooling across groups of similar documents. The STM framework assumes that  documents are independently and identically distributed conditional on the covariates in the model. However, it could be expected that topic distributions within a particular government period, for example, may be more or less likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period. 
-- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 terrorist attacks had an effect on parliamentary discourse, a dummy for 9/11 would have to be included in the STM framework. Ideally, we would like to identify important events based on different-to-expected topic distributions, after account for time trends, government and election effects. 
+- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 terrorist attacks had an effect on parliamentary discourse, a dummy for 9/11 would have to be included in the STM framework. Ideally, we would like to identify important events based on different-to-expected topic distributions, after accounting for time trends, government and election effects. 
 
-To overcome these challenges, we formalize a statistical framework which allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from STM as an input into a Bayesian hierarchical Dirichlet regression framework, which relates proportions of each topic to underlying time trends, changes in goverments and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other, non-scheduled political events. 
+To overcome these challenges, we formalize a statistical framework which allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates proportions of each topic to underlying time trends, changes in goverments and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other, non-scheduled political events. 
 
-Define $\gamma_{dp}$ to be the proportion of topic of topic $p$ on day $d$. Note that the $\gamma_{d,1:P}$ for $p = 1,2,\dots P=40$ are equal to the estimated values of $\theta_d$ from the STM. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods across all years of interest (1901--2017).
+Define $\theta_{dp}$ to be the proportion of topic of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P=40$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods across all years of interest (1901--2017).
 
-The topic proportions on day $d$ are modeled in reference to their membership in a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\gamma_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
+The topic proportions on day $d$ are modeled in reference to their membership in a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
 
 $$
-\gamma_{d,1:P} \sim \mbox{Dirichlet}(\mu_{s[d],1:P})
+\theta_{d,1:P} \sim \mbox{Dirichlet}(\mu_{s[d],1:P})
 $$
 where the notation $s[d]$ refers to the sitting period $s$ which day $d$ belongs to. This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1. 
 
@@ -234,10 +241,11 @@ $$
 The value of the initial effect $\alpha_{e[s],0,p}$ and the AR(1) term $\rho$ both have non-informative priors:
 
 $$
-\alpha_{e[s],0,p} \sim N(0, 100)\\
+\alpha_{e[s],0,p} \sim N(0, 100)
+$$
+$$
 \rho_{e[s],p} \sim U(0,1)
 $$
-
 We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes in the economy, and Australian society and culture. The $x_{s,k}$ for $k = 1,2,\dots K$ are the value of cubic basis splines for sitting period $s$ at knot point $k$. We chose to place knot points every 5 sitting periods as this is the average length of time for a government to sit (**CHECK**). Non-informative priors are placed on the splines coefficients:
 $$
 \beta_{p,k} \sim N(0, 100)
@@ -255,7 +263,7 @@ $$
 \sigma_{e[s],p} \sim U(0,3)
 $$
 
-We run the model in Stan using the \texttt{RStan} package of @RStan. An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation). 
+We run the model in Stan using the \texttt{RStan} package of @RStan. __An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation). __
 
 
 
