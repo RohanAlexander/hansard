@@ -3,7 +3,6 @@ library(lubridate)
 library(rjags)
 library(R2jags)
 library(splines)
-setwd("~/from_monica/")
 source("plottrace.R")
 source("getsplines.R")
 
@@ -147,8 +146,8 @@ for(i in 1:nelections){
   for(j in 1:ntopics)
     mu_res <- rbind(mu_res, tibble(election = i, topic = j, 
                                    median = (median(mcmc.array[,,paste0("rho[",i,",",j,"]")])),
-                                   upper = (quantile(mcmc.array[,,paste0("rho[",i,",",j,"]")], 0.975)),
-                                   lower = (quantile(mcmc.array[,,paste0("rho[",i,",",j,"]")], 0.025))
+                                   upper = (quantile(mcmc.array[,,paste0("rho[",i,",",j,"]")], 0.95)),
+                                   lower = (quantile(mcmc.array[,,paste0("rho[",i,",",j,"]")], 0.05))
     ))
 }
 
@@ -163,6 +162,7 @@ for(i in 1:ngovernments){
     ))
 }
 
+write_csv(mu_res_2, path = "results/mu_gov.csv")
 
 mu_res <- c()
 for(i in 1:nelections){
@@ -174,7 +174,7 @@ for(i in 1:nelections){
     ))
 }
 
-
+write_csv(mu_res, path = "results/mu_election.csv")
 
 mu_res_2 %>% 
   filter(topic%in%1:20, government!=19, government!=32) %>% 
@@ -194,10 +194,12 @@ for(i in 1:nsittings){
   for(j in 1:ntopics)
     alpha_res <- rbind(alpha_res, tibble(sitting = i, topic = j, gov = gov.s[i],
                                          median = (median(mcmc.array[,,paste0("alpha[",i,",",j,"]")])),
-                                         upper = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.975)),
-                                         lower = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.025))
+                                         upper = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.95)),
+                                         lower = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.05))
     ))
 }
+
+write_csv(alpha_res, path = "results/sitting_proportions.csv")
 
 alpha_res %>% 
   ggplot(aes(sitting, median, fill = factor(gov))) + 
@@ -209,10 +211,13 @@ for(i in 1:nsittings){
   for(j in 1:ntopics)
     alpha_res_2 <- rbind(alpha_res_2, tibble(sitting = i, topic = j, gov = gov.s[i],
                                          median = (median(mcmc.array[,,paste0("c0[",i,",",j,"]")])),
-                                         upper = (quantile(mcmc.array[,,paste0("c0[",i,",",j,"]")], 0.975)),
-                                         lower = (quantile(mcmc.array[,,paste0("c0[",i,",",j,"]")], 0.025))
+                                         upper = (quantile(mcmc.array[,,paste0("c0[",i,",",j,"]")], 0.95)),
+                                         lower = (quantile(mcmc.array[,,paste0("c0[",i,",",j,"]")], 0.05))
     ))
 }
+
+
+write_csv(alpha_res_2, path = "results/sitting_proportions_no_delta.csv")
 
 alpha_res_2 %>% 
   ggplot(aes(sitting, median, fill = factor(gov))) + 
@@ -233,3 +238,4 @@ for(i in 1:nelections){
 
 sigma_res <- sigma_res %>% mutate(sigma_median = sqrt(1/median), two_sd = sigma_median*2)
 
+write_csv(sigma_res, path = "results/sigma.csv")

@@ -5,6 +5,7 @@
 # 3. find outliers within each period
 # 4. look at varinace over time
 
+load("mcmc.array_40.Rda")
 
 # 1. different governments ------------------------------------------------
 
