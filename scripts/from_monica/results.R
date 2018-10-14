@@ -1,63 +1,122 @@
-# trying to get results in useable form
+### goals
 
-library(tidyverse)
-load("mcmc.array.Rda")
-
-
-View(dimnames(mcmc.array))
-#
-ngovernments <- 32
-ntopics <- 60
-
-# pull out musi
+# 1. see which mu.govs are significantly different from the last
+# 2. see which mu.elections are dignificantly different
+# 3. find outliers within each period
+# 4. look at varinace over time
 
 
-mu_res <- c()
-for(i in 1:ngovernments){
-  for(j in 1:ntopics)
-    mu_res <- rbind(mu_res, tibble(government = i, topic = j, 
-                                   median = (median(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")])),
-                                   upper = (quantile(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")], 0.95)),
-                                   lower = (quantile(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")], 0.05))
-    ))
+# 1. different governments ------------------------------------------------
+
+
+mu_res_2 <- mu_res_2 %>% arrange(topic, government)
+
+#install.packages("DescTools")
+library(DescTools)
+
+mu_gov_sig <- c()
+
+for(i in 2:nrow(mu_res_2)){
+  sig <- !(c(mu_res_2$lower[i-1], mu_res_2$upper[i-1]) %overlaps% c(mu_res_2$lower[i], mu_res_2$upper[i]))
+  mu_gov_sig <- rbind(mu_gov_sig, tibble(government = mu_res_2$government[i], topic = mu_res_2$topic[i], sig))
 }
 
-mu_res <- mu_res %>% mutate(government = ifelse(government>18, government+1, government))
-write_csv(mu_res, "./governments/mu_res.csv")
+
+num_sig <- mu_gov_sig %>% spread(topic, sig) %>% 
+  select(-government) %>% rowSums()
+
+mu_gov_sig_all <- tibble(government = 1:32, sig = num_sig>0)
+
+# get original numbering 
 
 
-mu_res %>% 
-  filter(topic %in% 1:20) %>% 
-  ggplot(aes(government, median, color = factor(government))) + 
-  geom_point() + geom_errorbar(aes(ymin = lower, ymax = upper)) + 
-  facet_wrap(~topic)
+
+mu_gov_sig_all <- mu_gov_sig_all %>% cbind(original_number = 
+  dr %>% group_by(governmentChangeDate) %>% 
+    summarise(one_obs = n()==20) %>% 
+    filter(one_obs ==FALSE) %>% 
+    select(governmentChangeDate) %>% pull()
+)
+
+# let's see who was different
+
+mu_gov_sig_all %>% filter(sig==TRUE)
+
+# fisher, bruce, page, menzies1, menzies2,  holt, whitlam, fraser, hawke, keating, howard, rudd1, gillard
+
+# 1. different elections ------------------------------------------------
 
 
-alpha_res <- c()
-for(i in 1:nsittings){
-  for(j in 1:ntopics)
-    alpha_res <- rbind(alpha_res, tibble(sitting = i, topic = j, government = election.s[i],
-                                         median = (median(mcmc.array[,,paste0("alpha[",i,",",j,"]")])),
-                                         upper = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.95)),
-                                         lower = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.05))
-    ))
+mu_res <- mu_res %>% arrange(topic, election)
+
+mu_gov_sig <- c()
+
+for(i in 2:nrow(mu_res)){
+  sig <- !(c(mu_res$lower[i-1], mu_res$upper[i-1]) %overlaps% c(mu_res$lower[i], mu_res$upper[i]))
+  mu_gov_sig <- rbind(mu_gov_sig, tibble(election = mu_res$election[i], topic = mu_res$topic[i], sig))
 }
 
-alpha_res <- alpha_res %>% rename(government = election)
-write_csv(alpha_res, "./governments/alpha_res.csv")
 
-sigma_res <- c()
-for(i in 1:ngovernments){
-  sigma_res <- rbind(sigma_res, tibble(government = i,
-                                         median = (median(mcmc.array[,,paste0("sigma.s[",i,"]")])),
-                                         upper = (quantile(mcmc.array[,,paste0("sigma.s[",i,"]")], 0.95)),
-                                         lower = (quantile(mcmc.array[,,paste0("sigma.s[",i,"]")], 0.05))
-    ))
-}
+num_sig <- mu_gov_sig %>% spread(topic, sig) %>% 
+  select(-election) %>% rowSums()
 
-sigma_res <- sigma_res %>% mutate(government = ifelse(government>18, government+1, government))
-write_csv(sigma_res, "./governments/sigma_res.csv")
+mu_election_sig_all <- tibble(election = 1:nelections, sig = num_sig>0)
 
-sigma_res %>% 
-  filter(median<0.3) %>% 
-  ggplot(aes(government, median)) + geom_point() + geom_errorbar(aes(ymin = lower, ymax = upper))
+
+# let's see who was different
+
+mu_election_sig_all %>% filter(sig==TRUE)
+
+# 1949 (menzies 2); 1972 (whitlam); 1983 (hawke); 1996 (howard); 2001 (howard); 2004; 2007 (rudd); 2010 (gillard); 2013 (abbot)
+
+
+# 3. outliers --------------------------------------------------------------
+
+sig_sittings <- alpha_res %>% 
+  arrange(topic, gov, sitting) %>% 
+  group_by(topic, gov) %>% 
+  mutate(min = min(median), max = max(median)) %>% 
+  filter(median==min|median==max) %>% 
+  arrange(topic, gov) %>% 
+  mutate(sig = lower[median==max]>upper[median==min]) %>% 
+  filter(sig==TRUE) %>% 
+  ungroup() %>% 
+  select(sitting) %>% 
+  unique()
+
+sig_sittings <- sig_sittings %>% mutate(sig = TRUE)
+
+dr_long %>% filter(topic ==1) %>% 
+  select(date, group) %>% 
+  rename(sitting = group) %>% 
+  left_join(sig_sittings) %>% 
+  filter(sig==TRUE) %>% 
+  filter(sitting!=1, row_number()==1) %>% 
+  ungroup() %>% 
+  select(date) %>% 
+  filter(year(date)>1948) %>% 
+  pull()
+
+
+# the above process gives too many outliers. try: over 3 sd from mean
+
+alpha_res_2 <- alpha_res_2 %>% left_join(dr_long %>% select(group, electionCounter) %>% rename(sitting = group))
+  
+alpha_res_2 <- alpha_res_2 %>% 
+  rename(election = electionCounter, mean_median = median, mean_lower = lower, mean_upper = upper) %>% 
+  left_join(sigma_res %>% select(election, topic, sigma_median, two_sd)) %>% 
+  left_join(alpha_res %>% select(-gov)) %>% 
+  mutate(bound_upper = mean_median + two_sd, bound_lower = mean_median - two_sd) %>% 
+  mutate(outlier = median>bound_upper|median<bound_lower)
+
+dr_long %>% filter(topic ==1) %>% 
+  select(date, group) %>% 
+  rename(sitting = group) %>% 
+  right_join(alpha_res_2 %>% 
+              filter(outlier==TRUE) %>%  select(sitting) %>% unique()) %>% 
+  group_by(sitting) %>% 
+  filter(row_number()==1, sitting !=1) %>% 
+  select(date) %>% 
+  pull()
+
+# need to work out how to deal with the fact that it's sittings, not days. 

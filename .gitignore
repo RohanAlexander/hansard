@@ -7,3 +7,4 @@ outputs/big_files_do_not_push/
 outputs/hansard/
 scripts/.DS_Store
 scripts/from_monica/mcmc.array.Rda
+scripts/from_monica/mcmc.array_40.Rda

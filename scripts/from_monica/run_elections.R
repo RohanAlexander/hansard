@@ -64,7 +64,7 @@ set.seed(123)
 for(i in 1:ngroups){
   ndays <- dr_long %>% ungroup() %>% filter(group==i) %>% summarise(max(day_number)) %>% pull()
   if(ndays>3){
-    no_days_to_sample <- floor(ndays/3)
+    no_days_to_sample <- floor(ndays/2)
     sampled_days <- sample(1:ndays, no_days_to_sample)
     dr_group_train <- dr_long %>% ungroup() %>% filter(group==i, day_number %in% sampled_days)
     dr_train <- bind_rows(dr_train, dr_group_train)
@@ -99,9 +99,12 @@ for (i in 1:ntopics){
 nsittings <- max(dr_train$group)
 ndays.s <- dr_train %>% group_by(group) %>% summarise(days = max(day_number_train)) %>% dplyr::select(days) %>% pull()
 
-election.s <- (dr_train %>% group_by(group) %>% summarise(election = electionCounter[row_number()==1]) %>% dplyr::select(election) %>% pull()) - min(dr_long$electionCounter) + 1
+election.s <- (dr_train %>% group_by(group) %>% 
+                 summarise(election = governmentChangeDate[row_number()==1]) %>% 
+                 dplyr::select(election) %>% pull()) 
 
-nelections <- length(unique(dr_train$electionCounter))
+nelections <- length(unique(dr_train$governmentChangeDate))
+election.s <- sapply(1:length(election.s), function(i) which(unique(dr_train$governmentChangeDate) == election.s[i]))
 
 # run the model
 
@@ -121,4 +124,40 @@ mod <- jags(data = jags.data,
 max(mod$BUGSoutput$summary[,"Rhat"])
 mcmc.array <- mod$BUGSoutput$sims.array
 save(mcmc.array, file = "mcmc.array.Rda")
-PlotTrace("sigma.s[16]", mcmc.array)
+PlotTrace("mu.alpha[23,27]", mcmc.array)
+
+mu_res <- c()
+for(i in 1:nelections){
+  for(j in 1:ntopics)
+    mu_res <- rbind(mu_res, tibble(election = i, topic = j, 
+                                   median = (median(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")])),
+                                   upper = (quantile(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.alpha[",i,",",j,"]")], 0.025))
+    ))
+}
+write_csv(mu_res, "./governments/mu_res.csv")
+
+mu_res %>% 
+  filter(topic %in% 21:40) %>% 
+  ggplot(aes(election, median, color = factor(election))) + 
+  geom_point() + geom_errorbar(aes(ymin = lower, ymax = upper)) + 
+  facet_wrap(~topic)
+
+alpha_res <- c()
+for(i in 1:nsittings){
+  for(j in 1:ntopics)
+    alpha_res <- rbind(alpha_res, tibble(sitting = i, topic = j, election = election.s[i],
+                                         median = (median(mcmc.array[,,paste0("alpha[",i,",",j,"]")])),
+                                         upper = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.975)),
+                                         lower = (quantile(mcmc.array[,,paste0("alpha[",i,",",j,"]")], 0.025))
+    ))
+}
+write_csv(alpha_res, "./governments/alpha_res.csv")
+
+alpha_res %>% 
+  filter(topic %in% 41:60) %>% 
+  ggplot(aes(sitting, median, color = factor(election))) + geom_line(lwd = 0.2) + geom_point(size = 0.1) + facet_wrap(~topic)
+
+
+
+mod$BUGSoutput$summary[which(mod$BUGSoutput$summary[,"Rhat"]>5),]

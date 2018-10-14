@@ -1,0 +1,41 @@
+model{
+for(s in 1:nsittings){
+for (t in 1:ndays.s[s]){
+    for (p in 1:ntopics){
+      log(a0[s,t,p]) <- alpha[s,p] 
+    }
+    y.stp[s,t,1:ntopics] ~ ddirch(a0[s,t,1:ntopics]) 
+  }
+
+  
+  for(p in 1:ntopics){
+    alpha[s,p] <- mu.gov[gov.s[s], p] + beta[year.s[s], p] # + beta[gov.s[s], p]*s + mu.election[election.s[s], p]*exp(-1*beta.e[election.s[s],p]*days_since_start[s])
+    log(b0[s,p]) <- alpha[s,p]
+    #alpha.gov[s,p] ~ dnorm(mu.gov[gov.s[s], p], tau.g[gov.s[s]])
+  
+  }
+  mu.sp[s,1:ntopics] ~ ddirch(b0[s,1:ntopics])
+} # end sittings
+
+for (e in 1:nelections){
+  for(p in 1:ntopics){
+    beta.e[e,p] ~ dnorm(0, 0.01)
+    mu.election[e, p] ~ dnorm(0, 1)
+    rho[e,p] ~ dunif(0, 1)
+  }
+} # end elections
+
+for (g in 1:ngovernments){
+  for(p in 1:ntopics){
+    mu.gov[g,p] ~ dnorm(0, 0.01)
+  }
+} # end govs
+
+for (y in 1:nyears){
+  for(p in 1:ntopics){
+    beta[y,p] ~ dnorm(0, 0.01)
+  }
+} # end govs
+tau.delta <- pow(sigma.delta, -2)
+sigma.delta ~ dunif(0, 3)
+}
