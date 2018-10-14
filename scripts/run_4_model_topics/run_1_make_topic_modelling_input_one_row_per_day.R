@@ -2,7 +2,7 @@
 # Purpose: This file takes Australian Hansard csv files and it converts them to a tidied tibble of text that can be analysed. The words are lowered and punctuation is removed, but stop words are not removed and they are not stemmed here.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 8 October 2018
+# Last updated: 14 October 2018
 # Prerequisites: You need a folder of csv files e.g. the output of parse_each_pdf_and_save_csv_pdftools.R 
 # To do:
 # - 
