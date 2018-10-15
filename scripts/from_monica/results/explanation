@@ -1,0 +1,10 @@
+mu_government is the mean parameter (with 95% CI) for each topic and government period. these are used to see whether a government mean effect is significantly different to the previous government. NOTE that I made an error and governments 19 and 33 are in there but they have very  large CIs because of very few observations so should be dropped. 
+
+mu_election is the same deal but for election periods
+
+NOTE: the plots that I have generally 
+
+
+sigma: the column sigma_median is the standard deviation of sitting period estimates around the mean election effect. Plotting these over elections (by topic) should tell us whether or not there is an increase or decrease in the variance of topics over time.
+
+Don’t worry about the other two for now - was using for outlier analysis but need to do something else. 

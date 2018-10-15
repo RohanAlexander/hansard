@@ -157,8 +157,8 @@ for(i in 1:ngovernments){
   for(j in 1:ntopics)
     mu_res_2 <- rbind(mu_res_2, tibble(government = i, topic = j, 
                                    median = (median(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")])),
-                                   upper = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.95)),
-                                   lower = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.05))
+                                   upper = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.025))
     ))
 }
 
@@ -169,8 +169,8 @@ for(i in 1:nelections){
   for(j in 1:ntopics)
     mu_res <- rbind(mu_res, tibble(election = i, topic = j, 
                                    median = (median(mcmc.array[,,paste0("mu.election[",i,",",j,"]")])),
-                                   upper = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.95)),
-                                   lower = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.05))
+                                   upper = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.975)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.025))
     ))
 }
 
@@ -202,6 +202,7 @@ for(i in 1:nsittings){
 write_csv(alpha_res, path = "results/sitting_proportions.csv")
 
 alpha_res %>% 
+  filter(sitting %in% 530:570) %>% 
   ggplot(aes(sitting, median, fill = factor(gov))) + 
   geom_line(lwd = 0.2, aes(color = factor(gov))) + geom_point(size = 0.1, aes(color = factor(gov))) + facet_wrap(~topic) + 
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2)
@@ -220,8 +221,11 @@ for(i in 1:nsittings){
 write_csv(alpha_res_2, path = "results/sitting_proportions_no_delta.csv")
 
 alpha_res_2 %>% 
+  filter(sitting %in% 530:570) %>% 
   ggplot(aes(sitting, median, fill = factor(gov))) + 
-  geom_line(lwd = 0.2, aes(color = factor(gov))) + geom_point(size = 0.1, aes(color = factor(gov))) + facet_wrap(~topic) + 
+  geom_line(lwd = 0.2, aes(color = factor(gov))) + 
+  geom_line(data = alpha_res %>% filter(sitting %in% 530:570), aes(sitting, median), color = "black") + 
+  geom_point(size = 0.1, aes(color = factor(gov))) + facet_wrap(~topic) + 
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2)
 
 
@@ -236,6 +240,10 @@ for(i in 1:nelections){
 }
 
 
-sigma_res <- sigma_res %>% mutate(sigma_median = sqrt(1/median), two_sd = sigma_median*2)
+sigma_res <- sigma_res %>% mutate(sigma_median = sqrt(1/median), two_sd = sigma_median*3)
 
 write_csv(sigma_res, path = "results/sigma.csv")
+
+dr_long %>% filter(year(document)%in%2001:2002) %>% 
+  ggplot(aes(document, gamma, color = topic)) + geom_point() + 
+  facet_wrap(~topic)  + geom_vline(xintercept = ymd("2001-09-11")) + geom_vline(xintercept = ymd("2002-10-12"))
