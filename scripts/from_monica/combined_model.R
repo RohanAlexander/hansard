@@ -24,6 +24,8 @@ one_gov <- dr %>% group_by(governmentChangeDate) %>%
   filter(one_obs==TRUE) %>% 
   select(governmentChangeDate) %>% pull()
 
+## THERES NO GOV 23
+
 one_elec <- dr %>% group_by(electionCounter) %>% 
   summarise(one_obs = n()==20) %>% 
   filter(one_obs==TRUE) %>% 
@@ -138,7 +140,7 @@ mcmc.array <- mod$BUGSoutput$sims.array
 
 mod$BUGSoutput$summary[which(mod$BUGSoutput$summary[,"Rhat"]>1.5),]
 
-PlotTrace("tau[31,35]", mcmc.array)
+PlotTrace("alpha[280,2]", mcmc.array)
 
 
 mu_res <- c()
@@ -169,15 +171,15 @@ for(i in 1:nelections){
   for(j in 1:ntopics)
     mu_res <- rbind(mu_res, tibble(election = i, topic = j, 
                                    median = (median(mcmc.array[,,paste0("mu.election[",i,",",j,"]")])),
-                                   upper = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.975)),
-                                   lower = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.025))
+                                   upper = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.95)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.election[",i,",",j,"]")], 0.05))
     ))
 }
 
 write_csv(mu_res, path = "results/mu_election.csv")
 
 mu_res_2 %>% 
-  filter(topic%in%1:20, government!=19, government!=32) %>% 
+  filter(topic%in%1:40, government!=19, government!=32) %>% 
   ggplot(aes(government, median, color = factor(government))) + 
   geom_point() + geom_errorbar(aes(ymin = lower, ymax = upper)) + 
   facet_wrap(~topic)
@@ -247,3 +249,16 @@ write_csv(sigma_res, path = "results/sigma.csv")
 dr_long %>% filter(year(document)%in%2001:2002) %>% 
   ggplot(aes(document, gamma, color = topic)) + geom_point() + 
   facet_wrap(~topic)  + geom_vline(xintercept = ymd("2001-09-11")) + geom_vline(xintercept = ymd("2002-10-12"))
+
+
+
+musp_res <- c()
+for(i in 1:nsittings){
+  for(j in 1:ntopics)
+    musp_res <- rbind(musp_res, tibble(sitting = i, topic = j, gov = gov.s[i],
+                                         median = (median(mcmc.array[,,paste0("mu.sp[",i,",",j,"]")])),
+                                         upper = (quantile(mcmc.array[,,paste0("mu.sp[",i,",",j,"]")], 0.99)),
+                                         lower = (quantile(mcmc.array[,,paste0("mu.sp[",i,",",j,"]")], 0.001))
+    ))
+}
+

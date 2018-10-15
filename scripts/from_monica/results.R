@@ -11,6 +11,7 @@
 
 
 mu_res_2 <- read_csv("results/mu_gov.csv")
+mu_res_2 <- mu_res_2 %>% arrange(topic, government)
 
 #install.packages("DescTools")
 library(DescTools)
@@ -49,6 +50,7 @@ mu_gov_sig_all %>% filter(sig==TRUE)
 
 
 mu_res <- read_csv("results/mu_election.csv")
+mu_res <- mu_res %>% arrange(topic, election)
 
 mu_gov_sig <- c()
 
@@ -96,7 +98,7 @@ dr_long %>% filter(topic ==1) %>%
   rename(sitting = group) %>% 
   left_join(sig_sittings) %>% 
   filter(sig==TRUE) %>% 
-  filter(sitting!=1, row_number()==1) %>% 
+  filter(sitting!=1, dplyr::row_number()==1) %>% 
   ungroup() %>% 
   select(document) %>% 
   filter(year(document)>1948) %>% 
@@ -125,3 +127,11 @@ dr_long %>% filter(topic ==1) %>%
   spread(day, document) %>% View()
 
 # need to work out how to deal with the fact that it's sittings, not days. 
+
+musp_res %>% 
+  left_join(dr_long %>% rename(sitting=group) %>% mutate(topic = as.numeric(topic))) %>% 
+  mutate(sig = gamma>2*upper) %>% 
+  #filter(year(document)==2001, month(document)==9, topic == 17) 
+  filter(sig==TRUE, upper>0.235, lower>0.000001) %>%
+  select(document) %>%
+  pull()

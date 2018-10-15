@@ -7,4 +7,6 @@ NOTE: the plots that I have generally
 
 sigma: the column sigma_median is the standard deviation of sitting period estimates around the mean election effect. Plotting these over elections (by topic) should tell us whether or not there is an increase or decrease in the variance of topics over time.
 
+Outliers: the days which had higher than expected topic proportions
+
 Don’t worry about the other two for now - was using for outlier analysis but need to do something else. 
