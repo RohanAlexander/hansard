@@ -8,13 +8,13 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "The Effect of Events on Discussion in the Australian Federal Parliament (1901--2017)"
-thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, Chris Cochrane and Dan Simpson for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. Comments on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
+thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, Chris Cochrane and Dan Simpson for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. Our dataset is available via an R package detailed at https://hansardr.com. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "We systematically analyse how parliamentary discussion changes in response to different types of events in Australian history. We first create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2017 based on available public records. To reduce the dimensionality of this dataset we use a correlated topic model. We analyse the effect of various events using a Bayesian hierarchical Dirichlet model. We find that: 1) changes in government tend be associated with topic changes even when the party in power does not change; 2) elections that do not result in a change in government are rarely associated with topic changes; 3) economic events, such as financial crises, have less significant and persistent effects than other events such as terrorist attacks. Our findings have implications for how we think about the longer-term trajectory of government policymaking as the media and political cycle becomes increasingly focused on short-term events."
+abstract: "We systematically analyse how parliamentary discussion changes in response to different types of events in Australian history. We first create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2017 based on available public records. To reduce the dimensionality of this dataset we use a correlated topic model, and then analyse the effect of various events using a Bayesian hierarchical Dirichlet model. We find that: changes in government tend be associated with topic changes even when the party in power does not change; elections that do not result in a change in government are rarely associated with topic changes; economic events, such as financial crises, have less significant effects than other events such as terrorist attacks; and the effect of events is much more pronounced in the second half of our sample, and especially in the past two decades. Our findings have implications for how we think about the longer-term trajectory of government policymaking as the media and political cycles becomes increasingly focused on short-term events."
 keywords: "text analysis, politics, Australia"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
@@ -46,22 +46,27 @@ hansard_sources <- read_csv(here::here("outputs/misc/hansard_sources.csv"), col_
 
 
 # Introduction
-Government policy is partly driven by parliamentary discussion. Conversely, that same discussion can indicate a government's priorities. But major events--both expected, such as an election, and unexpected, such as a recession or terrorist attack--can affect the course of parliamentary discussion. For instance, think of how a new government often goes to some trouble to seem different to the one they replace, or how events such as the 9/11 attacks altered government priorities.
+Government policy is partly driven by parliamentary discussion. Conversely, that same discussion can indicate a government's priorities. But major events -- be they expected, such as an election, and unexpected, such as a recession or terrorist attack -- can affect the course of parliamentary discussion. For instance, think of how a new government often goes to some trouble to seem different to the one they replace, or how events such as the 9/11 attacks altered government priorities.
 
-In this paper we examine text records of what was said in the Australian Federal Parliament. We create a dataset based on all sitting days from 1901 through to 2017. This means that we have records for 7,869 days in the House of Representatives and 6,682 days in the Senate, although we drop a handful of days for various reasons. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lowercase, remove numbers and punctuation, join commonly co-located words, and remove stop words.
+In this paper we examine text records of what was said in the Australian Federal Parliament. We create a dataset based on all sitting days from 1901 through to 2017. Although we drop a handful of days for various reasons, we have records for 7,869 days in the House of Representatives and 6,682 days in the Senate. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lowercase, remove numbers and punctuation, join commonly co-located words, and remove stop words.
 
-We use a topic model that allows correlation between topics to reduce the dimensionality of our dataset. We then analyse the topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. These events include: changes in government; elections; changes in economic conditions; and other significant events such as the 9/11 attacks.
+To reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. We then analyse the topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. These events include: changes in government; elections; and other significant events such as an economic recession or terrorism.
 
-We find: 1) changes in government tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. 2) As expected, elections where the party in power also changes, such as Whitlam in 1972, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 2001 and 2004 Howard re-elections stand out as elections where the government was returned yet there was a significant change in topics. 3) Economic events, such as financial crises, have less significant and persistent effects than other events such as terrorist attacks. **[More here on that one.]** **[Do we have different slopes that we could talk about?]**
+We find: 1) changes in government tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. 2) As expected, elections where the party in power also changes, such as Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the government was returned yet there was a significant change in topics. 3) Economic events, such as financial crises, have less significant effects than other events such as terrorism.
 
-Our work contributes to a growing modern quantitative social sciences literature that considers text as an input to more traditional methods, rather than requiring separate analysis. More specifically, we contribute in terms of both data and methods. To the best of our knowledge... **[dataset claim]**. Our dataset is available to other researchers via an accompanying R Package. **[Methods claim...]** The advantage of using our analysis model is that it: allows the events to have more-complicated autocorrelated functional forms; allows us to implement pooling across groups of similar documents; and it identifies outlying topic distributions without the need to pre-specify the event of interest. The main weakness of this approach is that it does not appropriately propagate uncertainty and future models should improve on this. As the digitisation of historical sources continues and computational power becomes cheaper, we expect interest in this approach to only increase.
+As our dataset covers 117 years we are able to see how the effect of events changes over time. We find that the events that we are interested in are rarely significant in the first half of our dataset. With a small number of exceptions, even changes of government where the party in power also changed were not associated with overly large changes in parliamentary discussion. If governments try to more thoroughly distinguish themselves from their predecessor then longer-term policy may be more difficult to enact. Similarly, there is the danger that larger-scale signature-accomplishments of a government may be neglected by their successor for solely political reasons.
+
+Our work contributes to a growing modern quantitative social sciences literature that considers text as an input to more traditional methods, rather than requiring separate analysis. This literature sits across and draws from various historically-separate disciplines including economic history, political science, and applied statistics. We contribute to this literature in terms of both data and methods. To the best of our knowledge we are the first to bring to bear an essentially-complete record of what was said in the Australian Federal Parliament, and we make our dataset available to other researchers via an accompanying R package. From a methods perspective, our analysis model has several advantages over existing methods. These include: allowing the events to have more-complicated autocorrelated functional forms; implementing pooling across groups of similar documents; and identifying outlying topic distributions without the need to pre-specify the event of interest. As the digitisation of historical sources continues and computational power becomes cheaper, we expect interest in this approach to only increase.
 
 
-**[Selling points:]**
-**[Almost complete record. Unique word count.]**
-**[Different events method.]**
-**[Highlight increase in volatility. ADD TO ABSTRACT. DISCUSS IMPLICATIONS IN DISCUSSION. Personality driven.]**
-**[Gary King paper?]**
+
+
+
+<!-- Selling points: -->
+<!-- Almost complete record. Unique word count. -->
+<!-- Different events method. -->
+<!-- Highlight increase in volatility. ADD TO ABSTRACT. DISCUSS IMPLICATIONS IN DISCUSSION. Personality driven. -->
+<!-- Gary King paper? -->
 
 
 
@@ -78,13 +83,13 @@ Following the example of the UK a daily text record called Hansard of what was s
 
 The recent digitisation of the Canadian Hansard, @BeelenEtc2017, allowed @RheaultCochran2018 to examine ideology and party polarisation in Britain and Canada. In the UK, @Duthie2016 analysed Hansard records to examine which politicians made supportive or aggressive statements toward other politicians between 1979 and 1990 and @PetersonSpirling2018 examined polarisation. And as digitisation methods improve older UK records can be analysed, for instance @Dimitruk2018 considers the effect of estate bills on prorogations in seventeenth century England. In New Zealand, @Curran2017 modelled the topics discussed between 2003 and 2016, and @Graham2016 examined unparliamentary language between 1890 and 1950. And in the US @GentzkowShapiroTaddy2018 examined congressional speech records from 1873 to 2016 to find that partisanship has risen in the past few decades.
 
-Parts of Australian Hansard records have been analysed for various purposes. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment.
+Parts of Australian Hansard records have been analysed for various purposes. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment. 
 
 The Australian Federal Parliament makes daily Hansard records available online as PDFs and these are considered the official release. Additionally, XML records are available in some cases.[^XMLfootnote] We detail the sources of our Hansard PDFs in \@ref(hansardsources) and Appendix \@ref(examplehansardpage) provides an example of what a Hansard PDF looks like. There are 14,551 days worth of publicly available Hansard records across both chambers of the Australian Federal Parliament. Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
 
 [^XMLfootnote]: Tim Sherratt makes these XML records available as a single download and also presents them in a website (http://historichansard.net/) that can be used to explore Commonwealth Hansard records from 1901 to 1980. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website.
 
-The formatting of the Hansard records changes over time. We use scripts written in R (@R2018) to convert the PDFs into daily text records. An example of the workflow and some reduced-detail scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they occur more than twice and can be identified.
+We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R (@R2018) to convert the PDFs into daily text records. An example of the workflow and some reduced-detail scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they occur more than twice and can be identified.
 
 The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time. Details of this check are provided in Appendix \@ref(stopwordsgraph). We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multiword names titles and phrases, such as new zealand to new_zealand. Then the sentences are deconstructed and each word considered individually.
 
@@ -92,29 +97,27 @@ The percentage of stop-words in each record is reasonably consistent over time. 
 
 # Model
 
-The goal of our modeling strategy is twofold. Firstly, we want to use topic modeling [@Blei2003latent] to summarise the Hansard text into meaningful topics, which reduce the dimensionality of the text data and capture the main themes discussed in parliament over time. Secondly, we want to relate the resulting topic distributions to temporal trends, changes and events, such as governement changes, elections, and other external events. 
+The goal of our modeling strategy is twofold. Firstly, we want to use topic modeling [@Blei2003latent] to summarise the Hansard text into meaningful topics that reduce the dimensionality of the text data and capture the main themes discussed in parliament over time. Secondly, we want to relate the resulting topic distributions to temporal trends, changes, and events, such as a change in government, elections, and other external events. 
 
-We use a Correlated Topic Model (CTM) @BleiLafferty2007 to obtain estimated topic distributions over time. We consider these topic distributions as reduced dimension inputs that can be analysed within another model. We then formulate a Bayesian hierarchical Dirichlet model to assess changes in the topic distributions in relation to events of interest. In Appendix \@ref(word2vec), we include an alternative approach that follows @Taddy2015 by using word2vec, which more closely uses words, rather than topics, as an input.
+We use the Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as reduced dimension inputs that can be analysed within another model. We then formulate a Bayesian hierarchical Dirichlet model to assess changes in the topic distributions in relation to events of interest. In Appendix \@ref(word2vec), we include an alternative approach that follows @Taddy2015 by using word2vec, which more closely uses words, rather than topics, as an input.
 
-In the following sections, we describe both the topic modeling approach and the Bayesian hierarchical analysis model. Firstly, we describe the Latent Dirichlet Allocation (LDA) model [@Blei2003latent], before moving on the CTM, which is a natural extension of LDA. We then discuss the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. 
+In the following sections, we describe both the topic modeling approach and the Bayesian hierarchical analysis model. Firstly, we describe the Latent Dirichlet Allocation (LDA) model [@Blei2003latent], before moving onto the CTM, which is a natural extension of LDA. We then discuss the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. 
 
 <!-- The models that we use in this paper are the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage, and Bayesian hierarchical Dirichlet analysis model. In a similar way to @MuellerRauh2018, we use topics as an input to another model, in our case to analyse the effect of various events.  -->
 
 <!-- The basis of the STM is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section we provide a brief overview of both the LDA model and the STM. We consider the outputs of the topic model as reduced dimension inputs that can be analysed within another model. We then discuss the Bayesian hierarchical Dirichlet analysis model that we use for this purpose. -->
 
 ## Latent Dirichlet Allocation
-Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. One way to get consistent estimates of the topics discussed in Hansard is to use the LDA method of @Blei2003latent.[^topicmodelsfootnote] 
+Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. One way to get consistent estimates of the topics discussed in Hansard is to use the LDA method of @Blei2003latent.
 
-[^topicmodelsfootnote]: For instance as implemented by the R \texttt{topicmodels} package of @Grun2011.
+The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method. In this sense, this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult. 
 
-The key assumption behind the LDA method is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method. In this sense, this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. This provides more flexibility than other approaches such as a strict word count method. The goal is to have the words found in each day's Hansard group themselves to define topics.
-
-As applied to Hansard, the LDA method considers each statement to be a result of a process where a politician first chooses the topics they want to speak about. After choosing the topics, the speaker then chooses appropriate words to use for each of those topics. More generally, the LDA topic model works by considering each document as having been generated by some probability distribution over topics. Similarly, each topic could be considered a probability distribution over terms. To choose the terms used in each document the speaker picks terms from each topic in the appropriate proportion. Figures \@ref(fig:topicsoverdocuments) and \@ref(fig:topicsoverterms) in Appendix \@ref(LDAexample) illustrates an example with five topics, two documents, and ten terms.
+As applied to Hansard, LDA considers each statement to be a result of a process where a politician first chooses the topics they want to speak about. After choosing the topics, the politician then chooses appropriate words to use for each of those topics. Statistically, LDA considers each document as having been generated by some probability distribution over topics. Similarly, each topic is considered a probability distribution over terms. To choose the terms used in each document, terms are picked from each topic in the appropriate proportion. Figures \@ref(fig:topicsoverdocuments) and \@ref(fig:topicsoverterms) in Appendix \@ref(LDAexample) illustrate an example with five topics, two documents, and ten terms.
 
 Following @BleiLafferty2009, @blei2012 and @GriffithsSteyvers2004, the process by which a document is generated is more formally considered to be:
 
 1. There are $1, 2, \dots, k, \dots, K$ topics and the vocabulary consists of $1, 2, \dots, V$ terms. For each topic, decide the terms that the topic uses by randomly drawing distributions over the terms. The distribution over the terms for the $k$th topic is $\beta_k$. Typically a topic would be a small number of terms and so the Dirichlet distribution with hyperparameter $\boldsymbol{\eta}$ is used: $\beta_k \sim \mbox{Dirichlet}(\boldsymbol{\eta})$, where $\boldsymbol{\eta} = (\eta_1, \eta_2, \dots, \eta_{K})$.[^Dirichletfootnote] In practice, a symmetric Dirichlet distribution is usually used, where all elements of $\boldsymbol{\eta}$ are equal. 
-2. Decide the topics that each document will cover by randomly drawing distributions over the $K$ topics for each of the $1, 2, \dots, d, \dots, D$ documents. The topic distributions for the $d$th document are $\theta_d$, and $\theta_{d,k}$ is the topic distribution for topic $k$ in document $d$. Again, the Dirichlet distribution with the hyperparameter $0<\alpha<1$ is used here because usually a document would only cover a handful of topics: $\theta_d \sim \mbox{Dirichlet}(\boldsymbol{\alpha})$. Again, strictly $\alpha$ is vector of length $K$ of hyperparameters, but in practice each is usually the same value.
+2. Decide the topics that each document will cover by randomly drawing distributions over the $K$ topics for each of the $1, 2, \dots, d, \dots, D$ documents. The topic distributions for the $d$th document are $\theta_d$, and $\theta_{d,k}$ is the topic distribution for topic $k$ in document $d$. Again, the Dirichlet distribution with the hyperparameter $0<\alpha<1$ is used here because usually a document would only cover a handful of topics: $\theta_d \sim \mbox{Dirichlet}(\boldsymbol{\alpha})$. Again, strictly $\boldsymbol{\alpha}$ is vector of length $K$ of hyperparameters and tehy are usually equal.
 3. If there are $1, 2, \dots, n, \dots, N$ terms in the $d$th document, then to choose the $n$th term, $w_{d, n}$:
     a. Randomly choose a topic for that term $n$, in that document $d$, $z_{d,n}$, from the multinomial distribution over topics in that document, $z_{d,n} \sim \mbox{Multinomial}(\theta_d)$.
     b. Randomly choose a term from the relevant multinomial distribution over the terms for that topic, $w_{d,n} \sim \mbox{Multinomial}(\beta_{z_{d,n}})$.
@@ -137,18 +140,18 @@ $$p(\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N} | w_{1:D, 1:N}) = \frac{p\left(\beta
 
 Gibbs sampling or the variational expectation-maximization algorithm can be used to approximate the posterior. A summary of these approaches is provided in Appendix \@ref(LDAposteriorestimation). The choice of the number of topics, *k*, drives the results and must be specified *a priori*. If there is a strong reason for a particular number, then this can be used. Otherwise, one way to choose an appropriate number is to use cross validation.
 
-One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter [@blei2012]. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation.  This motivates the use of the Correlated Topic Model, described in the next section.
+One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter [@blei2012]. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation. This is the Correlated Topic Model, described in the next section.
 
 
 ## Correlated Topic Model
-As mentioned in the previous section, one of the limitations of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. Indeed, the corrleation between topics is not modeled or accounted for. However, in relaity, we would expect Hansard topics related the army may be more commonly found with topics related to the navy, but less commonly with topics related to banking. The goal of the CTM [@BleiLafferty2007] is to account for this correlation between topics, in order to produce more realistic and stable topic distributions over time. 
+As mentioned in the previous section, one of the limitations of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. Correlation between topics is neither modeled nor accounted for by LDA, but in reality often topics are related. For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. The goal of the CTM [@BleiLafferty2007] is to account for this correlation between topics, in order to produce more realistic and stable topic distributions over time. The models are very similar, and the key difference is the underlying distributions that are drawn from.
 
-As with LDA, the process assumed to generate the documents is the key aspect as this will be reversed to estimate the topics. The document generation process of @Blei2003latent discussed earlier, is slightly modified. Rather than assuming that the distribution of topics in a document, $\theta_d$, are a draw from a Dirichlet distribution, as in step 2 in LDA above, CTM assumes
+As with LDA, the process assumed to generate the documents is the key aspect as this will be reversed to estimate the topics. The document generation process of @Blei2003latent discussed earlier, is just slightly modified. Rather than assuming that the distribution of topics in a document, $\theta_d$, are a draw from a Dirichlet distribution, as in step 2 in LDA above, CTM assumes
 
 $$\theta_d \sim \mbox{Logistic Normal}(\mu, \Sigma)$$
-This is the main addition of CTM over LDA, in that it replaces the assumption of the Dirichlet distribution with a more flexible logistic Normal distribution, which incorporates a covariance structure across the topics. The remainder of the steps of the document generating process are identical to LDA. 
+This is, the main difference between the CTM and LDA is that it replaces the assumption of the Dirichlet distribution with a more flexible logistic Normal distribution. That distribution can incorporate a covariance structure across the topics. The remainder of the steps of the document generating process are identical to LDA. 
 
-However, the replacement of the Dirichlet distribution, which is conjugate to the multinomial, with the logistic Normal distribution adds a level of computational complexity to CTM. The posterior distributions of the parameters of interest ($\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}$) can no longer be obtained using standard simulation techniques such as Gibbs Sampling. @BleiLafferty2007 develop a fast variational inference procedure for estimating the CTM. This estimation approach has also been extended by @RobertsStewartAiroldi2016 as part of their work on Structural Topic Models. 
+However, the replacement of the Dirichlet distribution, which is conjugate to the multinomial, with the logistic Normal distribution adds a level of computational complexity to CTM. The posterior distributions of the parameters of interest ($\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}$) can no longer be obtained using standard simulation techniques such as Gibbs Sampling. @BleiLafferty2007 develop a fast variational inference procedure for estimating the CTM. CTM itself has also been extended by @RobertsStewartAiroldi2016 as part of their work on Structural Topic Models. The main difference is to add a covariate to $\mu$ which allows consideration of additional information such as metadata.
 
 
 <!-- The distinguishing aspect of the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 is that it considers more than just a document's content when constructing topics. For instance, we generally have some information about the author and the date that a document was created. In the case of Hansard, we know who was speaking and the date they spoke. The STM allows this additional information to affect the construction of topics, though influencing either topical prevalence or topical content. That said, the assumption that there is some document generation process is the same as the LDA method, it is just that this process now includes metadata. -->
@@ -169,7 +172,7 @@ However, the replacement of the Dirichlet distribution, which is conjugate to th
 
 <!-- We primarily implement the STM on the daily-level parliamentary text data described earlier using the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. We consider both topic prevalence and content to be functions of time. The choice of the number of topics to use in the model is a situation-specific compromise. We use a standard diagnostic approach to decide on 80 **[UPDATE]** topics. More detail on this selection process is available in Appendix \@ref(selecttopicnumber). -->
 
-Figure \@ref(fig:exampletopics) illustrates an output of the CTM This illustrative example only shows five per cent of data from the House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be allocated to a topic and highlights how the prominence of these topics changes over time.
+Figure \@ref(fig:exampletopics) illustrates a CTM output only a five per cent sample from the Australian House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time.
 
 ```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
 knitr::include_graphics("../../figures/topics_example.pdf")
@@ -221,7 +224,7 @@ where:
 
 The government term $\alpha_{g[s],p}$ assumes there is some underlying mean effect of each government on the topic distribution. We place uninformative priors on each of these parameters:
 $$
-\alpha_{g[s],p} \sim N(0, 100)
+\alpha_{g[s],p} \sim \mbox{Normal}(0, 100)
 $$
 
 The election term $\alpha_{e[s],d,p}$ assumes there is an initial effect of an election on the topic distribution, which then decays as a function of days since election, $d$. In particular, we model this as an AR(1) in $d$:
@@ -232,29 +235,29 @@ $$
 The value of the initial effect $\alpha_{e[s],0,p}$ and the AR(1) term $\rho$ both have non-informative priors:
 
 $$
-\alpha_{e[s],0,p} \sim N(0, 100)
+\alpha_{e[s],0,p} \sim \mbox{Normal}(0, 100)
 $$
 $$
-\rho_{e[s],p} \sim U(0,1)
+\rho_{e[s],p} \sim \mbox{Uniform}(0,1)
 $$
 We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes in the economy, and Australian society and culture. The $x_{s,k}$ for $k = 1,2,\dots K$ are the value of cubic basis splines for sitting period $s$ at knot point $k$. We chose to place knot points every 5 sitting periods as this is the average length of time for a government to sit (**CHECK**). Non-informative priors are placed on the splines coefficients:
 $$
-\beta_{p,k} \sim N(0, 100)
+\beta_{p,k} \sim \mbox{Normal}(0, 100)
 $$
 
 Finally, the sitting period-specific random effect $\delta_{s,p}$ allows for the topic distributions in some sitting periods to be different than expected based on the government/election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-government and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{s,p}$'s are modeled as 
 
 $$
-\delta_{s,p} \sim N(0, \sigma_{e[s],p}^2)
+\delta_{s,p} \sim \mbox{Normal}(0, \sigma_{e[s],p}^2)
 $$
 
 The variance parameters $\sigma_{e[s],p}^2$ give an indication of the how the variation in topics is changing over election periods. If the estimates of the variance are larger, then there is more variation in the topics discussed within an election period. Non-informative priors are placed on the variance parameters:
 
 $$
-\sigma_{e[s],p} \sim U(0,3)
+\sigma_{e[s],p} \sim \mbox{Uniform}(0,3)
 $$
 
-We run the model in Stan using the \texttt{RStan} package of @RStan. __An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation). __
+We run the model in JAGS using the \texttt{rjags} package of @Plummer2018. __An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation). __
 
 
 
@@ -361,7 +364,9 @@ Text analysis has well-known biases and weaknesses and is a complement to more d
 While using text as data has well-known shortcomings, it allows larger-scale analysis that would not be viable using less-automated approaches and so it can identify patterns that may otherwise be overlooked.
 
 
-Add discussions about weakenss of the model.
+Add discussions about weakenss of the model. The main weakness of this approach is that it does not appropriately propagate uncertainty and future models should improve on this. 
+
+Add discussion of the weakness of the dataset.
 
 Add other discussion that I thought of and now forget.
 
