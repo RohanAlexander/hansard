@@ -42,7 +42,7 @@ mu_gov_sig_all <- mu_gov_sig_all %>% cbind(original_number =
 
 # let's see who was different
 
-mu_gov_sig_all %>% filter(sig==TRUE)
+mu_gov_sig_all %>% filter(sig==TRUE) %>% select(original_number) %>% pull()
 
 # fisher, bruce, page, menzies1, menzies2,  holt, whitlam, fraser, hawke, keating, howard, rudd1, gillard
 
@@ -68,7 +68,7 @@ mu_election_sig_all <- tibble(election = 1:nelections, sig = num_sig>0)
 
 # let's see who was different
 
-mu_election_sig_all %>% filter(sig==TRUE)
+mu_election_sig_all %>% filter(sig==TRUE) %>% select(election) %>% pull()
 
 # 1949 (menzies 2); 1972 (whitlam); 1983 (hawke); 1996 (howard); 2001 (howard); 2004; 2007 (rudd); 2010 (gillard); 2013 (abbot)
 
@@ -133,5 +133,5 @@ musp_res %>%
   mutate(sig = gamma>2*upper) %>% 
   #filter(year(document)==2001, month(document)==9, topic == 17) 
   filter(sig==TRUE, upper>0.235, lower>0.000001) %>%
-  select(document) %>%
-  pull()
+  select(document) %>% 
+  write_csv(path = "results/outliers.csv")
