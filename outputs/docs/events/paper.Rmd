@@ -42,6 +42,14 @@ top_words <- read_csv2(here::here("outputs/misc/top_words_40.csv"), col_types = 
 missing_days <- read_csv(here::here("outputs/misc/missing_days.csv"), col_types = cols())
 hansard_sources <- read_csv(here::here("outputs/misc/hansard_sources.csv"), col_types = cols())
 
+elections_results <- read_csv(here::here("outputs/results-analysis_model/results-elections.csv"), col_types = cols()) %>% 
+  filter(Significant %in% c("Yes", "No"))
+
+governments_results <- read_csv(here::here("outputs/results-analysis_model/results-governments.csv"), col_types = cols()) %>% 
+  filter(Significant %in% c("Yes", "No")) %>% 
+  select(-Party, -`Died in Office`)
+
+
 ```
 
 
@@ -151,7 +159,7 @@ As with LDA, the process assumed to generate the documents is the key aspect as 
 $$\theta_d \sim \mbox{Logistic Normal}(\mu, \Sigma)$$
 This is, the main difference between the CTM and LDA is that it replaces the assumption of the Dirichlet distribution with a more flexible logistic Normal distribution. That distribution can incorporate a covariance structure across the topics. The remainder of the steps of the document generating process are identical to LDA. 
 
-However, the replacement of the Dirichlet distribution, which is conjugate to the multinomial, with the logistic Normal distribution adds a level of computational complexity to CTM. The posterior distributions of the parameters of interest ($\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}$) can no longer be obtained using standard simulation techniques such as Gibbs Sampling. @BleiLafferty2007 develop a fast variational inference procedure for estimating the CTM. CTM itself has also been extended by @RobertsStewartAiroldi2016 as part of their work on Structural Topic Models. The main difference is to add a covariate to $\mu$ which allows consideration of additional information such as metadata.
+However, the replacement of the Dirichlet distribution, which is conjugate to the multinomial, with the logistic Normal distribution adds a level of computational complexity to CTM. The posterior distributions of the parameters of interest ($\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}$) can no longer be obtained using standard simulation techniques such as Gibbs Sampling. @BleiLafferty2007 develop a fast variational inference procedure for estimating the CTM. CTM itself has also been extended by @RobertsStewartAiroldi2016 as part of their work on Structural Topic Models. The main difference is to add a covariate to $\mu$ which allows consideration of additional information.
 
 
 <!-- The distinguishing aspect of the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 is that it considers more than just a document's content when constructing topics. For instance, we generally have some information about the author and the date that a document was created. In the case of Hansard, we know who was speaking and the date they spoke. The STM allows this additional information to affect the construction of topics, though influencing either topical prevalence or topical content. That said, the assumption that there is some document generation process is the same as the LDA method, it is just that this process now includes metadata. -->
@@ -172,7 +180,7 @@ However, the replacement of the Dirichlet distribution, which is conjugate to th
 
 <!-- We primarily implement the STM on the daily-level parliamentary text data described earlier using the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. We consider both topic prevalence and content to be functions of time. The choice of the number of topics to use in the model is a situation-specific compromise. We use a standard diagnostic approach to decide on 80 **[UPDATE]** topics. More detail on this selection process is available in Appendix \@ref(selecttopicnumber). -->
 
-Figure \@ref(fig:exampletopics) illustrates a CTM output only a five per cent sample from the Australian House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time.
+Figure \@ref(fig:exampletopics) illustrates a CTM output based on a five per cent sample from the Australian House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time.
 
 ```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
 knitr::include_graphics("../../figures/topics_example.pdf")
@@ -184,43 +192,42 @@ knitr::include_graphics("../../figures/topics_example.pdf")
 <!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
 
 
-The main output of the CTM of interest is the proportion of each topic appearing in each document, that is, the $\theta_d$. For the next stage of the modeling process, we are interested in how the distribution of topics changes in relation to different types of events. But with 40 topics for each of the roughly 14,551 **[UPDATE]** house-sitting-days the data are still too noisy to easily visualise changes around events. 
+The CTM output of interest is the proportion of each topic appearing in each document, that is, the $\theta_d$. The aim of this stage of the modeling process is to analyse how the distribution of topics changes in relation to different types of events. But with 40 topics for each of the roughly 14,551 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
 
-One option for relating the topic distributions to events would be to use a Structural Topic Model (STM) [@RobertsStewartAiroldi2016]. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of Hansard, the government or election period, may affect the topics within that document. The STM allows this additional information, or meta-data, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as the LDA method, it is just that this process now includes metadata.
+One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of Hansard, the government or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
 
-Consider a matrix of covariates $X_d$, where each column relates to a different covariate or aspect of the meta-data, and the row refers to document $d$ value of each covariate. Similar to the CTM, the STM assumes the topics within a document $\theta_d$ are a draw from a logistic Normal distribution with mean $\mu$. However, the STM framework assumes that the mean parameter is a linear function of covariates $X_d$:
+More specifically, consider a matrix of covariates. $X_d$, where each column relates to a different covariate or metadata aspect, and each row refers to a document. Then a cell has the value of each covariate for a particular document. Similar to the CTM, the STM assumes the topics within a document $\theta_d$ are a draw from a logistic Normal distribution with mean $\mu$. However, the STM framework assumes that the mean parameter is a linear function of covariates $X_d$:
 
 $$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)$$
 
+Using the STM framework with covariates could theoretically allow the relationships between topics and certain types of events to be assessed. For instance, one covariate could be the government $g$ that was in power during the time corresponding to document $d$. However, the STM covariate framework has several limitations in terms of our goal to assess the relationship between topics and events:
 
-The STM framework with covariates could theoretically allow the relationships between topics and certain types of events to be assessed. For example, one covariate within the model could be the government $g$ that was in power during the time corresponding to document $d$. However, there are several limitations to the STM covariate framework in relation to our goal of assess the relationship between topics and events:
+- There is no way of specifying more complicated autocorrelated functional forms of the effects of events over time. For example, we believe that the effect of an election would peak at the time of the election, then gradually decay as a function of days since election. In the STM framework, it is possible to specify a constant or linear effect of elections over time, or a spline relationship over elections, but it is not possible to restrict the effect of a specific election over time to be monotonically decreasing. 
+- There is no way to implement partial pooling across groups of similar documents. The STM framework assumes that  documents are independently and identically distributed, conditional on the model covariates. However, it could be expected that topic distributions within a particular government, for example, may be more- or less-likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period. 
+- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 attacks had an effect on parliamentary discourse, then a dummy for 9/11 would have to be included in the STM framework, but the specifics of the dummy construction affect the results. Ideally, we would like to identify important events based on different-to-expected topic distributions, after accounting for time trends, government and election effects. 
 
-- There is no way of specifying more complicated autocorrelated functional forms of the effects of events over time. For example, we believe that the effect of an election would peak at the time of the election, then gradually decay as a function of days since election. In the STM framework, it is possible to specify constant or linear effect of elections over time, or a spline relationship over elections, but it is not possible to restrict the effect of a specific election over time to be monotonically decreasing. 
-- There is no way of implementing partial pooling across groups of similar documents. The STM framework assumes that  documents are independently and identically distributed conditional on the covariates in the model. However, it could be expected that topic distributions within a particular government period, for example, may be more or less likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period. 
-- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 terrorist attacks had an effect on parliamentary discourse, a dummy for 9/11 would have to be included in the STM framework. Ideally, we would like to identify important events based on different-to-expected topic distributions, after accounting for time trends, government and election effects. 
+To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in goverments and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-To overcome these challenges, we formalize a statistical framework which allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates proportions of each topic to underlying time trends, changes in goverments and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other, non-scheduled political events. 
+Define $\theta_{dp}$ to be the proportion of topic of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P=40$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods over the period 1901 to 2017 inclusive.
 
-Define $\theta_{dp}$ to be the proportion of topic of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P=40$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods across all years of interest (1901--2017).
-
-The topic proportions on day $d$ are modeled in reference to their membership in a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
+The topic proportions on day $d$ are modeled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
 
 $$
 \theta_{d,1:P} \sim \mbox{Dirichlet}(\mu_{s[d],1:P})
 $$
-where the notation $s[d]$ refers to the sitting period $s$ which day $d$ belongs to. This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1. 
+where the notation $s[d]$ refers to the sitting period $s$ to which day $d$ belongs. This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1. 
 
-The goal of the model is to relate these proportions to the government $g$ of time $d$, and also the days since the most recent election, $e$, while account for underlying time trends. The mean parameters $\mu_{sp}$ are modeled on the log scale as
+The goal of the model is to relate these proportions to government $g$ at time $d$, and also the days since the most recent election, $e$, while account for underlying time trends. The mean parameters $\mu_{sp}$ are modeled on the log scale as
 
 $$
 \log \mu_{s,p} = \alpha_{g[s],p} + \cdot\alpha_{e[s],d,p}  + \sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k} + \delta_{s,p}
 $$
 where:
 
-- $\alpha_{g[s],p}$ is the mean effect for government $g$ (which covers sitting period $s$) and topic $p$
-- $\alpha_{e[s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$) for topic $p$ on day $d$ since the election
-- $\sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k}$ is the underlying time trend, modeled using splines: $x_{s,k}$ is the $k$th basis spline in sitting period $s$, and $\beta_{p,k}$ is a cofficient on the $k$th basis spline. 
-- $\delta_{s,p}$ is a structured random effect for each sittiing period and topic. 
+- $\alpha_{g[s],p}$ is the mean effect for government $g$ (which covers sitting period $s$) and topic $p$;
+- $\alpha_{e[s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$) for topic $p$ on day $d$ since the election;
+- $\sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k}$ is the underlying time trend, modeled using splines: $x_{s,k}$ is the $k$th basis spline in sitting period $s$ and $\beta_{p,k}$ is a cofficient on the $k$th basis spline; and
+- $\delta_{s,p}$ is a structured random, or levels, effect for each sitting period and topic. 
 
 The government term $\alpha_{g[s],p}$ assumes there is some underlying mean effect of each government on the topic distribution. We place uninformative priors on each of these parameters:
 $$
@@ -232,7 +239,7 @@ The election term $\alpha_{e[s],d,p}$ assumes there is an initial effect of an e
 $$
 \alpha_{e[s],d,p} = \rho_{e[s],p} \cdot \alpha_{e[s],d-1,p}
 $$
-The value of the initial effect $\alpha_{e[s],0,p}$ and the AR(1) term $\rho$ both have non-informative priors:
+The value of the initial effect, $\alpha_{e[s],0,p}$, and the AR(1) term, $\rho$, both have non-informative priors:
 
 $$
 \alpha_{e[s],0,p} \sim \mbox{Normal}(0, 100)
@@ -240,12 +247,12 @@ $$
 $$
 \rho_{e[s],p} \sim \mbox{Uniform}(0,1)
 $$
-We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes in the economy, and Australian society and culture. The $x_{s,k}$ for $k = 1,2,\dots K$ are the value of cubic basis splines for sitting period $s$ at knot point $k$. We chose to place knot points every 5 sitting periods as this is the average length of time for a government to sit (**CHECK**). Non-informative priors are placed on the splines coefficients:
+We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes in the economy, and Australian society and culture. The $x_{s,k}$ for $k = 1,2,\dots, K$ are the value of cubic basis splines for sitting period $s$ at knot point $k$. We place knot points every five sitting periods as this is the average length of time for a government to sit (**CHECK**). Non-informative priors are placed on the splines coefficients:
 $$
 \beta_{p,k} \sim \mbox{Normal}(0, 100)
 $$
 
-Finally, the sitting period-specific random effect $\delta_{s,p}$ allows for the topic distributions in some sitting periods to be different than expected based on the government/election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-government and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{s,p}$'s are modeled as 
+Finally, the sitting period-specific random effect $\delta_{s,p}$ allows for the topic distributions in some sitting periods to be different than expected based on government and election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-government and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{s,p}$ values are modeled as:
 
 $$
 \delta_{s,p} \sim \mbox{Normal}(0, \sigma_{e[s],p}^2)
@@ -302,55 +309,75 @@ We run the model in JAGS using the \texttt{rjags} package of @Plummer2018. __An 
 
 
 # Results
-We are interested in considering the effect of various events on what is talked about in the Australian Federal Parliament.
-<!-- Each of the parliaments and their houses are treated independently here. Future work could expand the model to better understand, and allow, for correlation between them.  -->
-Political events are those related to a change of government or an election. Other events are defined by substantial changes in various economic measures, such as the onset of the Great Depression or floating the currency; events of a historical magnitude, such as entering into a war or the 9/11 attacks; or events that had a significant effect on Australian life, such as hosting the Olympics, or the Mabo decision. The full list of events that we consider are detailed in Appendix \@ref(eventdetails).
+We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. Political events are those related to a change of government or an election. As Australia has a parliamentary system, it is possible for the government to change without an election. We define a government based on who is the prime minister, and do not distinguish between terms or cabinet composition as is sometimes done. If a person was prime minster more than once then these are considered separately. If the mean parameter for a government or election period is outside the 95 per cent credible interval, then we consider that period to be different.
 
-First considering the mean topic distributions over governments, Figures \@ref(fig:mu1to20) - \@ref(fig:mu41to60).
+We summarise our results in terms of elections Table \@ref(tab:electionsresults) and in terms of governments in Table \@ref(tab:governmentsresults). Those tables focus on elections and governments that were different to the ones that preceeded them. 
 
-```{r mu1to20, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics("../../figures/mu_topic1-20.pdf")
+```{r electionsresults, echo = FALSE, results = 'asis'}
+
+elections_results %>%
+  kable(booktabs = T, caption = "Significant elections, and neighours") %>%
+  kable_styling(font_size = 12)
+
 ```
 
 
-```{r mu21to40, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics("../../figures/mu_topic21-40.pdf")
+```{r governmentsresults, echo = FALSE, results = 'asis'}
+
+governments_results %>%
+  kable(booktabs = T, caption = "Governments that were significantly different to their predecessor, and neighbours") %>%
+  kable_styling(font_size = 12)
+
+```
+
+In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate differences between governments and elections, respectively.
+
+<!-- 12;war, defence, country, ill, soldiers -->
+<!-- 13;industry, trade, countries, development, country -->
+<!-- 17;security, time, world, war, country -->
+<!-- 22;war, country, matter, production, time -->
+<!-- 23;defence, time, national, service, vietnam -->
+<!-- 24;time, budget, tax, billion, million -->
+<!-- 29;education, schools, students, school, university -->
+<!-- 30;oil, energy, industry, nuclear, research -->
+<!-- 32;industry, wheat, wool, growers, farmers -->
+<!-- 33;per_cent, budget, time, tax, business -->
+<!-- 35;community, time, health, support, local -->
+<!-- 39;health, services, funding, care, million -->
+
+
+```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "Government level effects on selected topics", out.width = '100%'}
+knitr::include_graphics("../../figures/mu_gov.pdf")
 ```
 
 
-```{r mu41to60, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics("../../figures/mu_topic41-60.pdf")
+```{r muelection, cache = TRUE, echo = FALSE, fig.cap = "Elections level effects on selected topics", out.width = '100%'}
+knitr::include_graphics("../../figures/mu_election.pdf")
 ```
 
-Topics related to Federation such as the British Empire and the constitution decrease in importance over time. A substantial increase in the importance of issues dealing with 
 
-Increasing from 20th gov: 2, 4, 8, 12, 
+**[Add some nice for specific changes for the discussion section?]**
 
-32 increases and then decreases
+Although we do not explicitly include them in the model, the non-political events that we look for when considering periods of significant change are defined by substantial changes in various economic measures, such as the onset of the Great Depression or floating the currency; events of a historical magnitude, such as entering into a war or the 9/11 attacks; or events that had a significant effect on Australian life, such as hosting the Olympics, or the Mabo decision. The full list of events that we consider are detailed in Appendix \@ref(eventdetails). Note that we consider each chamber separately and future work could expand the model to better understand, and allow, for correlation between them.
 
-Increases only recently: 33, 35
-
-Breakpoint: 23, 25, 49, 48, 46, 47, 41
+We summarise the periods where parliamentary discussion was significantly different in Table X. **[Oh boy.]**
 
 
-Figure \@ref(fig:electionsevents) shows the grouping by election. If elections had significant effects on the discussion in parliament then there would be considerable change between groups. However changes generally appear to be longer-term rather than election to election. 
 
+We summarise our results over time by looking at the standard deviation of sitting period estaimtes, around the mean election effect (Figure \@ref(fig:sigmaelection))
+
+
+```{r sigmaelection, cache = TRUE, echo = FALSE, fig.cap = "Elections level effects on selected topics", out.width = '100%'}
+knitr::include_graphics("../../figures/sigma.pdf")
+```
+
+
+
+
+# Discussion
 Groupings by government. This can be different to election groupings, for instance, the change from the Rudd to Gillard governments happened without an election. Similarly, John Howard's three terms are all considered the one government for our purposes.
 
-Here we see much more difference between adjacent events. This suggests that new governments tend to talk about different topics than the government they replace.
 
-
-
-
-For instance, all of the incrementing variables have a significant effect on the prevalence of Topic 1. Table \@ref(tab:topwordssig) shows that this has to do with tariffs and trade. On the other hand, Topic 2 has to do with aspects of daily life such as community and children, and Topic 3 has to do with legal issues and neither is significant. This is not surprising given the centrality of these concerns at all times.
-
-```{r topwordssig, echo = FALSE, results = 'asis'}
-
-top_words %>% 
-  kable(booktabs = T, caption = "Top words for each topic") %>%
-  kable_styling(font_size = 8)
-
-```
 
 
 
@@ -364,7 +391,7 @@ Text analysis has well-known biases and weaknesses and is a complement to more d
 While using text as data has well-known shortcomings, it allows larger-scale analysis that would not be viable using less-automated approaches and so it can identify patterns that may otherwise be overlooked.
 
 
-Add discussions about weakenss of the model. The main weakness of this approach is that it does not appropriately propagate uncertainty and future models should improve on this. 
+Add discussions about weakness of the model. The main weakness of this approach is that it does not appropriately propagate uncertainty and future models should improve on this. 
 
 Add discussion of the weakness of the dataset.
 
