@@ -47,3 +47,38 @@ Rohan Alexander:
 Monica Alexander:
 	Lol you’ve got a more developed research agenda than most people I know 
 	Take it to the market mate 
+
+
+
+
+
+
+
+## Hansard sources {#hansardsources}
+
+Hansard records are available from a variety of sources, as detailed in Table \ref{tab:hansardsourcestable}.
+
+
+```{r hansardsourcestable, cache = TRUE, echo = FALSE, results = 'asis'}
+
+hansard_sources %>%
+  kable(
+    booktabs = T,
+    align = c('l', 'r', 'r', 'r'),
+    caption = "Hansard sources and notes") %>%
+  kable_styling(font_size = 10)
+
+# Break cachee
+
+```
+
+Detail where from, and which years are being used and why.
+
+Which years are being used (not non-OCRd)
+
+
+
+In Appendix \@ref(word2vec), we include an alternative approach that follows @Taddy2015 by using word2vec, which more closely uses words, rather than topics, as an input.
+
+# word2vec alternative {#word2vec}
+An alternative approach that follows @Taddy2015. 

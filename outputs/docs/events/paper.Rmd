@@ -8,7 +8,7 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "The Effect of Events on Discussion in the Australian Federal Parliament (1901--2017)"
-thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, Chris Cochrane and Dan Simpson for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. Our dataset is available via an R package detailed at https://hansardr.com. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
+thanks: "Thank you to John Tang, Zach Ward, Tim Hatton, Martine Mariotti, Tianyi Wang, Matt Jacob, Leslie Root, Jill Sheppard, Matthew Kerby, Chris Cochrane and Dan Simpson for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto
@@ -64,7 +64,7 @@ We find: 1) changes in government tend be associated with topic changes even whe
 
 As our dataset covers 117 years we are able to see how the effect of events changes over time. We find that the events that we are interested in are rarely significant in the first half of our dataset. With a small number of exceptions, even changes of government where the party in power also changed were not associated with overly large changes in parliamentary discussion. If governments try to more thoroughly distinguish themselves from their predecessor then longer-term policy may be more difficult to enact. Similarly, there is the danger that larger-scale signature-accomplishments of a government may be neglected by their successor for solely political reasons.
 
-Our work contributes to a growing modern quantitative social sciences literature that considers text as an input to more traditional methods, rather than requiring separate analysis. This literature sits across and draws from various historically-separate disciplines including economic history, political science, and applied statistics. We contribute to this literature in terms of both data and methods. To the best of our knowledge we are the first to bring to bear an essentially-complete record of what was said in the Australian Federal Parliament, and we make our dataset available to other researchers via an accompanying R package. From a methods perspective, our analysis model has several advantages over existing methods. These include: allowing the events to have more-complicated autocorrelated functional forms; implementing pooling across groups of similar documents; and identifying outlying topic distributions without the need to pre-specify the event of interest. As the digitisation of historical sources continues and computational power becomes cheaper, we expect interest in this approach to only increase.
+Our work contributes to a growing modern quantitative social sciences literature that considers text as an input to more traditional methods, rather than requiring separate analysis. This literature sits across and draws from various historically-separate disciplines including economic history, political science, and applied statistics. We contribute to this literature in terms of both data and methods. To the best of our knowledge we are the first to bring to bear an essentially-complete record of what was said in the Australian Federal Parliament, and we make our dataset available to other researchers via the R package \texttt{hansardr}. From a methods perspective, our analysis model has several advantages over existing methods. These include: allowing the events to have more-complicated autocorrelated functional forms; implementing pooling across groups of similar documents; and identifying outlying topic distributions without the need to pre-specify the event of interest. As the digitisation of historical sources continues and computational power becomes cheaper, we expect interest in this approach to only increase.
 
 
 
@@ -93,7 +93,7 @@ The recent digitisation of the Canadian Hansard, @BeelenEtc2017, allowed @Rheaul
 
 Parts of Australian Hansard records have been analysed for various purposes. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment. 
 
-The Australian Federal Parliament makes daily Hansard records available online as PDFs and these are considered the official release. Additionally, XML records are available in some cases.[^XMLfootnote] We detail the sources of our Hansard PDFs in \@ref(hansardsources) and Appendix \@ref(examplehansardpage) provides an example of what a Hansard PDF looks like. There are 14,551 days worth of publicly available Hansard records across both chambers of the Australian Federal Parliament. Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
+The Australian Federal Parliament makes daily Hansard records available online as PDFs and these are considered the official release. Additionally, XML records are available in some cases.[^XMLfootnote] We provide an example of a Hansard PDF page in Appendix \@ref(examplehansardpage). There are 14,551 days worth of publicly available Hansard records across both chambers of the Australian Federal Parliament. Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
 
 [^XMLfootnote]: Tim Sherratt makes these XML records available as a single download and also presents them in a website (http://historichansard.net/) that can be used to explore Commonwealth Hansard records from 1901 to 1980. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website.
 
@@ -107,7 +107,7 @@ The percentage of stop-words in each record is reasonably consistent over time. 
 
 The goal of our modeling strategy is twofold. Firstly, we want to use topic modeling [@Blei2003latent] to summarise the Hansard text into meaningful topics that reduce the dimensionality of the text data and capture the main themes discussed in parliament over time. Secondly, we want to relate the resulting topic distributions to temporal trends, changes, and events, such as a change in government, elections, and other external events. 
 
-We use the Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as reduced dimension inputs that can be analysed within another model. We then formulate a Bayesian hierarchical Dirichlet model to assess changes in the topic distributions in relation to events of interest. In Appendix \@ref(word2vec), we include an alternative approach that follows @Taddy2015 by using word2vec, which more closely uses words, rather than topics, as an input.
+We use the Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as reduced dimension inputs that can be analysed within another model. We then formulate a Bayesian hierarchical Dirichlet model to assess changes in the topic distributions in relation to events of interest. 
 
 In the following sections, we describe both the topic modeling approach and the Bayesian hierarchical analysis model. Firstly, we describe the Latent Dirichlet Allocation (LDA) model [@Blei2003latent], before moving onto the CTM, which is a natural extension of LDA. We then discuss the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. 
 
@@ -264,7 +264,7 @@ $$
 \sigma_{e[s],p} \sim \mbox{Uniform}(0,3)
 $$
 
-We run the model in JAGS using the \texttt{rjags} package of @Plummer2018. __An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation). __
+We run the model in JAGS using the \texttt{rjags} package of @Plummer2018. __[An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation).] __
 
 
 
@@ -311,7 +311,7 @@ We run the model in JAGS using the \texttt{rjags} package of @Plummer2018. __An 
 # Results
 We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. Political events are those related to a change of government or an election. As Australia has a parliamentary system, it is possible for the government to change without an election. We define a government based on who is the prime minister, and do not distinguish between terms or cabinet composition as is sometimes done. If a person was prime minster more than once then these are considered separately. If the mean parameter for a government or election period is outside the 95 per cent credible interval, then we consider that period to be different.
 
-We summarise our results in terms of elections Table \@ref(tab:electionsresults) and in terms of governments in Table \@ref(tab:governmentsresults). Those tables focus on elections and governments that were different to the ones that preceeded them. 
+We summarise our results in terms of elections Table \@ref(tab:electionsresults) and in terms of governments in Table \@ref(tab:governmentsresults). These tables focus on elections and governments that were different to the ones that preceeded them. 
 
 ```{r electionsresults, echo = FALSE, results = 'asis'}
 
@@ -330,20 +330,7 @@ governments_results %>%
 
 ```
 
-In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate differences between governments and elections, respectively.
-
-<!-- 12;war, defence, country, ill, soldiers -->
-<!-- 13;industry, trade, countries, development, country -->
-<!-- 17;security, time, world, war, country -->
-<!-- 22;war, country, matter, production, time -->
-<!-- 23;defence, time, national, service, vietnam -->
-<!-- 24;time, budget, tax, billion, million -->
-<!-- 29;education, schools, students, school, university -->
-<!-- 30;oil, energy, industry, nuclear, research -->
-<!-- 32;industry, wheat, wool, growers, farmers -->
-<!-- 33;per_cent, budget, time, tax, business -->
-<!-- 35;community, time, health, support, local -->
-<!-- 39;health, services, funding, care, million -->
+In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate differences between governments and elections, respectively. 
 
 
 ```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "Government level effects on selected topics", out.width = '100%'}
@@ -355,17 +342,25 @@ knitr::include_graphics("../../figures/mu_gov.pdf")
 knitr::include_graphics("../../figures/mu_election.pdf")
 ```
 
-
-**[Add some nice for specific changes for the discussion section?]**
+The topics that we have focused on here are:
+12: war, defence, country, ill, soldiers; 
+13: industry, trade, countries, development, country; 
+17: security, time, world, war, country; 
+22: war, country, matter, production, time; 
+23: defence, time, national, service, vietnam; 
+24: time, budget, tax, billion, million; 
+29: education, schools, students, school, university; 
+30: oil, energy, industry, nuclear, research; 
+32: industry, wheat, wool, growers, farmers; 
+33: per_cent, budget, time, tax, business; 
+35: community, time, health, support, local; and
+39: health, services, funding, care, million.
 
 Although we do not explicitly include them in the model, the non-political events that we look for when considering periods of significant change are defined by substantial changes in various economic measures, such as the onset of the Great Depression or floating the currency; events of a historical magnitude, such as entering into a war or the 9/11 attacks; or events that had a significant effect on Australian life, such as hosting the Olympics, or the Mabo decision. The full list of events that we consider are detailed in Appendix \@ref(eventdetails). Note that we consider each chamber separately and future work could expand the model to better understand, and allow, for correlation between them.
 
-We summarise the periods where parliamentary discussion was significantly different in Table X. **[Oh boy.]**
+We summarise the periods where parliamentary discussion was significantly different in Table X. **[Oh boy. Not sure what to do here.]**
 
-
-
-We summarise our results over time by looking at the standard deviation of sitting period estaimtes, around the mean election effect (Figure \@ref(fig:sigmaelection))
-
+Finally, we summarise our results over time by looking at the standard deviation of sitting period estaimtes, around the mean election effect (Figure \@ref(fig:sigmaelection))
 
 ```{r sigmaelection, cache = TRUE, echo = FALSE, fig.cap = "Elections level effects on selected topics", out.width = '100%'}
 knitr::include_graphics("../../figures/sigma.pdf")
@@ -375,8 +370,21 @@ knitr::include_graphics("../../figures/sigma.pdf")
 
 
 # Discussion
+
+
+Of the 36 different governments, we find that 12 of them are significantly different to the government that preceeded them. However, two of these -- Page and the first Menezies government -- are likely due to the short length of the Page Government, and should be ignored, leaving only ten. The earliest of these is the second Menzies government starting in 1949, and these ten are concentrated in the second half of our sample, with three of them being in the past twenty years.
+
+The significant difference of the second Menzies Government is associated with a variety of changes. The Chifley Government that preceeded it had finsih  For instance there was a large increase in the number of lower house seats at the 1949 election. This brought many new politicians into the house and it may be that they brought different topics.
+
+
+Of the 45 general elections that have been held we find that 12 of them define periods that were significantly different to their immediate predecessor. 1974, 1980, 1990, 1998, 2004, and 2007 stand out as elections where the government did not change, but the model suggests there was considerable change in the topics discussed in parliament.
+
 Groupings by government. This can be different to election groupings, for instance, the change from the Rudd to Gillard governments happened without an election. Similarly, John Howard's three terms are all considered the one government for our purposes.
 
+
+
+
+**[Add some nice for specific changes for the discussion section?]**
 
 
 
@@ -409,27 +417,6 @@ Add other discussion that I thought of and now forget.
 
 # Hansard details
 
-## Hansard sources {#hansardsources}
-
-Hansard records are available from a variety of sources, as detailed in Table \ref{tab:hansardsourcestable}.
-
-
-```{r hansardsourcestable, cache = TRUE, echo = FALSE, results = 'asis'}
-
-hansard_sources %>%
-  kable(
-    booktabs = T,
-    align = c('l', 'r', 'r', 'r'),
-    caption = "Hansard sources and notes") %>%
-  kable_styling(font_size = 10)
-
-# Break cachee
-
-```
-
-Detail where from, and which years are being used and why.
-
-Which years are being used (not non-OCRd)
 
 
 ## Example Hansard page {#examplehansardpage}
@@ -480,15 +467,6 @@ And @Benoit2018 for compounding multiword expressions.
 ## Stopwords over time {#stopwordsgraph}
 Insert graph of stop words over time.
 
-
-\newpage
-
-
-
-
-
-# word2vec alternative {#word2vec}
-An alternative approach that follows @Taddy2015. 
 
 
 

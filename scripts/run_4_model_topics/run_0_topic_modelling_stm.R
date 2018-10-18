@@ -27,68 +27,62 @@ library(tm)
 
 
 #### Load corpus
-tm_corpus <- tm::Corpus(DirSource(directory = "/Volumes/Backup/senate_topic_modelling_prep_2"))
+tm_corpus <-
+  tm::Corpus(DirSource(directory = "/Volumes/Backup/senate_topic_modelling_prep_2"))
 hansard <- corpus(tm_corpus)
 summary(hansard)
+rm(tm_corpus)
 
 
-# Load the metadata
-election_dates <-
-  read_csv("inputs/misc/misc_elections_data.csv", col_types = cols())
-hansard_dates <-
-  read_csv("inputs/misc/hansard_dates.csv", col_types = cols())
-governmentChanges <-
-  read_csv("inputs/misc/change_of_pm.csv", col_types = cols())
-keyEvents <-
-  read_csv("inputs/misc/key_events.csv", col_types = cols())
-
-
-
-# Add metadata
-all_dates <-
-  tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) %>%  # Make a column of all the dates from Federation
-  mutate(
-    electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
-    electionDate = cumsum(electionDate),
-    governmentChangeDate = if_else(allDates %in% governmentChanges$end, 1, 0),
-    governmentChangeDate = cumsum(governmentChangeDate),
-    keyEvent = if_else(allDates %in% keyEvents$theDate, 1, 0),
-    keyEvent = cumsum(keyEvent),
-    electionOrGovernmentDate = if_else(allDates %in% c(election_dates$electionDate, governmentChanges$end), 1, 0),
-    electionOrGovernmentDate = cumsum(electionOrGovernmentDate)) %>%
-  rename(
-    electionCounter = electionDate,
-    governmentCounter = governmentChangeDate,
-    electionOrGovernmentCounter = electionOrGovernmentDate
-  )
-  
-head(all_dates)
-
-# all_dates <- all_dates %>%
-#   select(-keyEconomicChange, -keyOtherChange) %>%
-#   mutate(governmentChangeDate = governmentChangeDate + 1) %>%
-#   filter(allDates > "1901-03-29")
+# NEED TO COME BACK AND ADD METADATA
+# # Load the metadata
+# election_dates <-
+#   read_csv("inputs/misc/misc_elections_data.csv", col_types = cols())
+# hansard_dates <-
+#   read_csv("inputs/misc/hansard_dates.csv", col_types = cols())
+# governmentChanges <-
+#   read_csv("inputs/misc/change_of_pm.csv", col_types = cols())
+# keyEvents <-
+#   read_csv("inputs/misc/key_events.csv", col_types = cols())
 #
-# write_csv(all_dates, "dates_of_gov_and_election.csv")
-
-tidy_hansard_reduced <- tidy_hansard_reduced %>%
-  left_join(all_dates, by = c("docid_field" = "allDates"))
-
-head(tidy_hansard_reduced)
-tail(tidy_hansard_reduced)
-
-tidy_hansard_reduced <- tidy_hansard_reduced %>%
-  mutate(
-    electionCounter = as.integer(electionCounter),
-    governmentCounter = as.integer(governmentCounter),
-    electionOrGovernmentCounter = as.integer(electionOrGovernmentCounter),
-    keyEvent = as.integer(keyEvent),
-    year = year(docid_field),
-    year = as.integer(year)
-  )
-head(tidy_hansard_reduced)
-tail(tidy_hansard_reduced)
-
+# all_dates <-
+#   tibble(allDates = seq(ymd('1901-01-01'), ymd('2017-12-31'), by = 'days')) %>%  # Make a column of all the dates from Federation
+#   mutate(
+#     electionDate = if_else(allDates %in% election_dates$electionDate, 1, 0),
+#     electionDate = cumsum(electionDate),
+#     governmentChangeDate = if_else(allDates %in% governmentChanges$end, 1, 0),
+#     governmentChangeDate = cumsum(governmentChangeDate),
+#     keyEvent = if_else(allDates %in% keyEvents$theDate, 1, 0),
+#     keyEvent = cumsum(keyEvent),
+#     electionOrGovernmentDate = if_else(allDates %in% c(election_dates$electionDate, governmentChanges$end), 1, 0),
+#     electionOrGovernmentDate = cumsum(electionOrGovernmentDate)) %>%
+#   rename(
+#     electionCounter = electionDate,
+#     governmentCounter = governmentChangeDate,
+#     electionOrGovernmentCounter = electionOrGovernmentDate
+#   )
+#
+# head(all_dates)
+#
+#
+# tidy_hansard_reduced <- tidy_hansard_reduced %>%
+#   left_join(all_dates, by = c("docid_field" = "allDates"))
+#
+# head(tidy_hansard_reduced)
+# tail(tidy_hansard_reduced)
+#
+# tidy_hansard_reduced <- tidy_hansard_reduced %>%
+#   mutate(
+#     electionCounter = as.integer(electionCounter),
+#     governmentCounter = as.integer(governmentCounter),
+#     electionOrGovernmentCounter = as.integer(electionOrGovernmentCounter),
+#     keyEvent = as.integer(keyEvent),
+#     year = year(docid_field),
+#     year = as.integer(year)
+#   )
+# head(tidy_hansard_reduced)
+# tail(tidy_hansard_reduced)
+#
 
 
 
@@ -111,43 +105,11 @@ head(docsTM)
 # head(hansard_stm)
 names(hansard_stm)
 
-
 # Clean up
-rm(hansard_corpus,
-   docsTM,
+rm(docsTM,
    vocabTM,
    metaTM,
    hansard_dfm)
-# Comment while testing!
-# rm(tidy_hansard_reduced)
-
-library(stm)
-test <- stm(
-  documents = hansard_stm$documents,
-  vocab = hansard_stm$vocab,
-  K = 10,
-  data = hansard_stm$meta,
-  max.em.its = 75,
-  init.type = "Spectral",
-  verbose = TRUE
-)
-
-
-tidy(test,
-     matrix = "beta") %>% 
-  arrange(beta) %>%
-  group_by(topic) %>%
-  top_n(5, beta) %>%
-  arrange(-beta) %>%
-  select(topic, term) %>%
-  summarise(terms = list(term)) %>%
-  mutate(terms = map(terms, paste, collapse = ", ")) %>%
-  unnest()
-     
-
-
-
-
 
 
 #### Testing for the optimal k ####
@@ -155,8 +117,7 @@ tidy(test,
 # Create models with different values for K
 # Takes an age to run
 many_models <-
-  data_frame(K = c(20, 40, 60)) %>%
-  # data_frame(K = c(20, 40, 60, 80, 100)) %>%
+  data_frame(K = c(20, 40, 60, 80, 100)) %>%
   mutate(topic_model = map(
     # mutate(topic_model = future_map(
     K,
@@ -164,14 +125,11 @@ many_models <-
       documents = hansard_stm$documents,
       vocab = hansard_stm$vocab,
       K = .,
-      # prevalence =  ~ s(as.numeric(docid_field)),
       data = hansard_stm$meta,
       max.em.its = 75,
       init.type = "Spectral",
       verbose = TRUE
     )
-    # ),
-    # .progress = TRUE
   ))
 
 head(many_models)
@@ -205,12 +163,12 @@ k_result %>% transmute(
   `Semantic coherence` = map_dbl(semantic_coherence, mean),
   `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")
 ) %>%
-  gather(Metric, Value,-K) %>%
+  gather(Metric, Value, -K) %>%
   ggplot(aes(K, Value, color = Metric)) +
   geom_line(size = 1.5,
             alpha = 0.7,
             show.legend = FALSE) +
-  facet_wrap( ~ Metric, scales = "free_y") +
+  facet_wrap(~ Metric, scales = "free_y") +
   labs(x = "K (number of topics)",
        y = NULL,
        title = "Model diagnostics by number of topics")
@@ -243,9 +201,9 @@ tidy(topic_model_20,
   write_csv("outputs/topic_models_and_gammas/gammas_model_20.csv")
 tidy(topic_model_20,
      matrix = "beta",
-     document_names = hansard_stm$meta$docid_field) %>% 
+     document_names = hansard_stm$meta$docid_field) %>%
   write_csv("outputs/topic_models_and_gammas/betas_model_20.csv")
-read_csv("outputs/topic_models_and_gammas/betas_model_20.csv") %>% 
+read_csv("outputs/topic_models_and_gammas/betas_model_20.csv") %>%
   arrange(beta) %>%
   group_by(topic) %>%
   top_n(5, beta) %>%
@@ -253,7 +211,7 @@ read_csv("outputs/topic_models_and_gammas/betas_model_20.csv") %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
-  unnest() %>% 
+  unnest() %>%
   write_delim(path = "outputs/misc/top_words_20.csv", delim = ";")
 
 topic_model_40 <- k_result %>%
@@ -267,9 +225,9 @@ tidy(topic_model_40,
   write_csv("outputs/topic_models_and_gammas/gammas_model_40.csv")
 tidy(topic_model_40,
      matrix = "beta",
-     document_names = hansard_stm$meta$docid_field) %>% 
+     document_names = hansard_stm$meta$docid_field) %>%
   write_csv("outputs/topic_models_and_gammas/betas_model_40.csv")
-read_csv("outputs/topic_models_and_gammas/betas_model_40.csv") %>% 
+read_csv("outputs/topic_models_and_gammas/betas_model_40.csv") %>%
   arrange(beta) %>%
   group_by(topic) %>%
   top_n(5, beta) %>%
@@ -277,7 +235,7 @@ read_csv("outputs/topic_models_and_gammas/betas_model_40.csv") %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
-  unnest() %>% 
+  unnest() %>%
   write_delim(path = "outputs/misc/top_words_40.csv", delim = ";")
 
 topic_model_60 <- k_result %>%
@@ -291,9 +249,9 @@ tidy(topic_model_60,
   write_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
 tidy(topic_model_60,
      matrix = "beta",
-     document_names = hansard_stm$meta$docid_field) %>% 
+     document_names = hansard_stm$meta$docid_field) %>%
   write_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
-read_csv("outputs/topic_models_and_gammas/betas_model_60.csv") %>% 
+read_csv("outputs/topic_models_and_gammas/betas_model_60.csv") %>%
   arrange(beta) %>%
   group_by(topic) %>%
   top_n(5, beta) %>%
@@ -301,8 +259,9 @@ read_csv("outputs/topic_models_and_gammas/betas_model_60.csv") %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
-  unnest() %>% 
+  unnest() %>%
   write_delim(path = "outputs/misc/top_words_60.csv", delim = ";")
+
 
 
 
@@ -326,13 +285,13 @@ first_estimates <- estimateEffect(
   first_model,
   meta = hansard_stm$meta,
   uncertainty = "Global"
-) 
+)
 
 # Warning message:
 #   In estimateEffect(1:3 ~ s(year) + s(electionCounter) + factor(governmentCounter),  :
 #                       Covariate matrix is singular.  See the details of ?estimateEffect() for some common causes.
 #                     Adding a small prior 1e-5 for numerical stability.
-                    
+
 ##
 tic("Second model")
 second_model <- stm(
@@ -354,7 +313,7 @@ second_estimates <- estimateEffect(
   second_model,
   meta = hansard_stm$meta,
   uncertainty = "Global"
-) 
+)
 
 # Warning message:
 #   In estimateEffect(1:3 ~ s(year) + s(electionCounter) + factor(governmentCounter),  :
@@ -384,17 +343,49 @@ third_estimates <- estimateEffect(
   meta = hansard_stm$meta,
   uncertainty = "Global"
 ) %>%
-  tidy() 
+  tidy()
 
 
-third_estimates %>% 
-  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
-  ggplot(aes(x = term, y = p.value, color = as.factor(topic))) +
+third_estimates %>%
+  filter(
+    term %in% c(
+      "factor(electionOrGovernmentCounter)69",
+      "factor(electionOrGovernmentCounter)70",
+      "factor(electionOrGovernmentCounter)72",
+      "factor(electionOrGovernmentCounter)73",
+      "factor(electionOrGovernmentCounter)74",
+      "factor(electionOrGovernmentCounter)75",
+      "factor(electionOrGovernmentCounter)77",
+      "factor(electionOrGovernmentCounter)78",
+      "factor(electionOrGovernmentCounter)79"
+    )
+  ) %>%
+  ggplot(aes(
+    x = term,
+    y = p.value,
+    color = as.factor(topic)
+  )) +
   geom_jitter(width = 0.05)
 
-third_estimates %>% 
-  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
-  ggplot(aes(x = term, y = estimate, color = as.factor(topic))) +
+third_estimates %>%
+  filter(
+    term %in% c(
+      "factor(electionOrGovernmentCounter)69",
+      "factor(electionOrGovernmentCounter)70",
+      "factor(electionOrGovernmentCounter)72",
+      "factor(electionOrGovernmentCounter)73",
+      "factor(electionOrGovernmentCounter)74",
+      "factor(electionOrGovernmentCounter)75",
+      "factor(electionOrGovernmentCounter)77",
+      "factor(electionOrGovernmentCounter)78",
+      "factor(electionOrGovernmentCounter)79"
+    )
+  ) %>%
+  ggplot(aes(
+    x = term,
+    y = estimate,
+    color = as.factor(topic)
+  )) +
   geom_jitter(width = 0.05)
 
 
@@ -420,17 +411,49 @@ third_estimates <- estimateEffect(
   meta = hansard_stm$meta,
   uncertainty = "Global"
 ) %>%
-  tidy() 
+  tidy()
 
 
-third_estimates %>% 
-  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
-  ggplot(aes(x = term, y = p.value, color = as.factor(topic))) +
+third_estimates %>%
+  filter(
+    term %in% c(
+      "factor(electionOrGovernmentCounter)69",
+      "factor(electionOrGovernmentCounter)70",
+      "factor(electionOrGovernmentCounter)72",
+      "factor(electionOrGovernmentCounter)73",
+      "factor(electionOrGovernmentCounter)74",
+      "factor(electionOrGovernmentCounter)75",
+      "factor(electionOrGovernmentCounter)77",
+      "factor(electionOrGovernmentCounter)78",
+      "factor(electionOrGovernmentCounter)79"
+    )
+  ) %>%
+  ggplot(aes(
+    x = term,
+    y = p.value,
+    color = as.factor(topic)
+  )) +
   geom_jitter(width = 0.05)
 
-third_estimates %>% 
-  filter(term %in% c("factor(electionOrGovernmentCounter)69", "factor(electionOrGovernmentCounter)70", "factor(electionOrGovernmentCounter)72", "factor(electionOrGovernmentCounter)73", "factor(electionOrGovernmentCounter)74", "factor(electionOrGovernmentCounter)75", "factor(electionOrGovernmentCounter)77", "factor(electionOrGovernmentCounter)78", "factor(electionOrGovernmentCounter)79")) %>% 
-  ggplot(aes(x = term, y = estimate, color = as.factor(topic))) +
+third_estimates %>%
+  filter(
+    term %in% c(
+      "factor(electionOrGovernmentCounter)69",
+      "factor(electionOrGovernmentCounter)70",
+      "factor(electionOrGovernmentCounter)72",
+      "factor(electionOrGovernmentCounter)73",
+      "factor(electionOrGovernmentCounter)74",
+      "factor(electionOrGovernmentCounter)75",
+      "factor(electionOrGovernmentCounter)77",
+      "factor(electionOrGovernmentCounter)78",
+      "factor(electionOrGovernmentCounter)79"
+    )
+  ) %>%
+  ggplot(aes(
+    x = term,
+    y = estimate,
+    color = as.factor(topic)
+  )) +
   geom_jitter(width = 0.05)
 
 
@@ -491,7 +514,8 @@ head(many_models)
 
 
 
-betas_model_60 <- read_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
+betas_model_60 <-
+  read_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
 betas_model_60 %>%
   arrange(beta) %>%
   group_by(topic) %>%
@@ -500,7 +524,7 @@ betas_model_60 %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
-  unnest() %>% 
+  unnest() %>%
   write_delim(path = "outputs/misc/top_words_60.csv", delim = ";")
 
 
@@ -669,7 +693,8 @@ labelTopics(model_prevalence_years_k_20)
 
 
 load("outputs/topic_models_and_gammas/topic_model_60.RData")
-gammas_model_60 <- read_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
+gammas_model_60 <-
+  read_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
 betas_model_60 <- tidy(topic_model_60)
 td_beta
 
@@ -680,7 +705,8 @@ head(gammas_model_60)
 
 
 load("outputs/topic_models_and_gammas/topic_model_20.RData")
-gammas_model_60 <- read_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
+gammas_model_60 <-
+  read_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
 betas_model_20 <- tidy(topic_model_20)
 td_beta
 
@@ -714,7 +740,7 @@ top_terms <- betas_model_40 %>%
 
 
 
-the20 <- tidy(topic_model_20) %>% 
+the20 <- tidy(topic_model_20) %>%
   arrange(beta) %>%
   group_by(topic) %>%
   top_n(15, beta) %>%
@@ -770,12 +796,7 @@ election_dates <- election_dates %>%
   mutate(lastElectionWinner = lag(electionWinner)) %>%
   mutate(changedPartyOfGovernment = if_else(electionWinner == lastElectionWinner, 0, 1)) %>%
   mutate(electionNumber = 1:n()) %>%
-  select(-year,
-         -election,
-         -seatsTotalNumber,
-         -electionWinner,
-         -comment,
-         -lastElectionWinner)
+  select(-year,-election,-seatsTotalNumber,-electionWinner,-comment,-lastElectionWinner)
 
 
 gamme_summarises_diff_summary <-
@@ -1049,7 +1070,7 @@ hist(errs)
 library(ldatuning)
 
 data("AssociatedPress", package = "topicmodels")
-dtm <- AssociatedPress[1:10,]
+dtm <- AssociatedPress[1:10, ]
 
 result <- FindTopicsNumber(
   dtm,
@@ -1134,7 +1155,7 @@ relevant_dates <- all_dates %>%
   fill(tenAfterElectionDay, .direction = "up") %>%
   mutate(tenAfterElectionDay = na_if(tenAfterElectionDay, 2)) %>%
   mutate(dateOfInterest = tenAfterElectionDay) %>%
-  select(-tenAfterElectionDay, -elevenBeforeElectionDay, -hansardDate) %>%
+  select(-tenAfterElectionDay,-elevenBeforeElectionDay,-hansardDate) %>%
   filter(electionDate == 0) %>%
   filter(dateOfInterest == 1) %>%
   mutate(beforeAfter = c(rep(c(
@@ -1156,5 +1177,5 @@ relevant_dates$allDates
 # Filter to just the dates that are the date nearest each side of an election
 head(all_hansard_words)
 some_days_hansard_words <-
-  all_hansard_words[which(all_hansard_words$date %in% relevant_dates$allDates),]
+  all_hansard_words[which(all_hansard_words$date %in% relevant_dates$allDates), ]
 rm(all_hansard_words)
