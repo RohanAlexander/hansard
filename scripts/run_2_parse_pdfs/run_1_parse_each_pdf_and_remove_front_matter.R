@@ -3,7 +3,7 @@
 # Purpose: This file takes Australian Hansard PDF files and it converts them to CSVs of text data that can be analysed.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 8 October 2018
+# Last updated: 16 October 2018
 # Prerequisites: You need to have downloaded the PDFs from the parliament's website. There are many GBs of PDFs and they are saved on an external drive - have fun finding that future-Rohan - and also the Berkeley Demography server. For testing purposes there should be some in the /inputs/for_testing_hansard_pdf folder.
 # To do:
 # - Check which footers need to be replaced
@@ -28,11 +28,14 @@ plan(multiprocess)
 
 #### Create lists of PDFs to read and file names to save text as ####
 # Change the path as required:
-use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
+# use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
+use_this_path_to_get_pdfs  <- "/Volumes/Backup/senate"
 # use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
 
+
 # use_this_path_to_save_csv_files  <- "outputs/hansard/temp"
-use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
+# use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
+use_this_path_to_save_csv_files  <- "/Volumes/Backup/senate_temp"
 
 # Get list of Hansard PDF filenames
 file_names <-
@@ -72,6 +75,7 @@ get_text_from_PDFs <-
     # Read in the document, based on the filename list
     # name_of_input_PDF_file <- "/Volumes/Backup/hansard_pdfs/1953-10-21.pdf"
     # name_of_input_PDF_file <- "inputs/for_testing_hansard_pdf/1971-10-05.pdf" # uncomment for testing
+    # name_of_input_PDF_file <- "inputs/for_testing_senate_pdf/1901-06-06.pdf" # uncomment for testing
     pdf_document <- pdf_text(name_of_input_PDF_file)
     
     # Convert to tibble so that tidyverse can be used
@@ -180,6 +184,9 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "took 'the chair|took the nhair", "took the chair")
     
+    pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "PBESIEENT|FREBIDKKT|PBUSIOTNT|PBEaroBNT", "PRESIDENT")
+    
 
     ## Identify page headers and footers and remove them
     pdf_document_tibble <- pdf_document_tibble %>%
@@ -201,11 +208,14 @@ get_text_from_PDFs <-
     pdf_document_tibble <- pdf_document_tibble %>%
       mutate(
         firstSpeakerRow = str_detect(text, "SPEAKER"),
+        firstPresidentRow = str_detect(text, "PRESIDENT"),
         firstJointHouseRow = str_detect(text, "JOINT HOUSE"),
         firstTookTheChairRow = str_detect(text, "took the chair"),
         firstTheChairAtRow = str_detect(text, "the chair at")
       )
     pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <-
+      NA
+    pdf_document_tibble$firstPresidentRow[pdf_document_tibble$firstPresidentRow == FALSE] <-
       NA
     pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == FALSE] <-
       NA
@@ -217,6 +227,8 @@ get_text_from_PDFs <-
     # Get the row and corresponding page and then filter to only pages from that page
     row_of_first_SPEAKER <-
       pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == TRUE] %>% which() %>% first()
+    row_of_first_PRESIDENT <-
+      pdf_document_tibble$firstPresidentRow[pdf_document_tibble$firstPresidentRow == TRUE] %>% which() %>% first()
     row_of_first_JOINTHOUSE <-
       pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == TRUE] %>% which() %>% first()
     row_of_first_TookTheChair <-
@@ -226,6 +238,8 @@ get_text_from_PDFs <-
     
     first_page_of_interest_SPEAKER <-
       pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer()
+    first_page_of_interest_PRESIDENT <-
+      pdf_document_tibble[row_of_first_PRESIDENT, "pageNumbers"] %>% as.integer()
     first_page_of_interest_JOINTHOUSE <-
       pdf_document_tibble[row_of_first_JOINTHOUSE, "pageNumbers"] %>% as.integer()
     first_page_of_interest_TookTheChair <-
@@ -241,6 +255,7 @@ get_text_from_PDFs <-
         !is.na(first_page_of_interest_TookTheChair) ~ first_page_of_interest_TookTheChair,
         !is.na(first_page_of_interest_TheChairAt) ~ first_page_of_interest_TheChairAt,
         !is.na(first_page_of_interest_SPEAKER) ~ first_page_of_interest_SPEAKER,
+        !is.na(first_page_of_interest_PRESIDENT) ~ first_page_of_interest_PRESIDENT,
         TRUE ~ first_page_of_interest_JOINTHOUSE
       )
 
@@ -248,19 +263,22 @@ get_text_from_PDFs <-
     pdf_document_tibble <- pdf_document_tibble %>%
       filter(pageNumbers >= filter_from_here) %>%
       select(-firstSpeakerRow,
+             -firstPresidentRow,
              -firstJointHouseRow,
              -firstTookTheChairRow,
              -firstTheChairAtRow)
     
     rm(
-      first_page_of_interest_SPEAKER,
       row_of_first_SPEAKER,
       row_of_first_TookTheChair,
+      row_of_first_PRESIDENT,
+      row_of_first_JOINTHOUSE,
+      row_of_first_TheChairAt,
+      first_page_of_interest_SPEAKER,
+      first_page_of_interest_PRESIDENT,
       first_page_of_interest_JOINTHOUSE,
       first_page_of_interest_TookTheChair,
       first_page_of_interest_TheChairAt,
-      row_of_first_JOINTHOUSE,
-      row_of_first_TheChairAt,
       filter_from_here
     )
     

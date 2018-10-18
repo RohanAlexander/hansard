@@ -3,7 +3,7 @@
 # Purpose: This file takes Australian Hansard CSV files and it splits the ones that were in two column format. The PDFs until (not including) 2013-11-12 are arranged as two columns on each page and so most rows are two different speeches and those columns need to be separated.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 11 October 2018
+# Last updated: 17 October 2018
 # Prerequisites: You need to have downloaded the PDFs and read them from PDF to a CSV. For testing purposes there should be some in the /outputs/hansard/ folder.
 # To do:
 
@@ -25,7 +25,8 @@ plan(multiprocess)
 #### Create lists of CSVs to read ####
 # Change the path as required:
 # use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
-use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
+# use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
+use_this_path_to_get_csvs <- "/Volumes/Backup/senate_temp"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -51,8 +52,9 @@ rm(file_names_tibble)
 
 #Sometimes it's useful to seperate the input and the output, but otherwise might prefer to overwrite
 # use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
-use_this_path_to_save_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
+# use_this_path_to_save_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
 # use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
+use_this_path_to_save_csvs  <- "/Volumes/Backup/senate_split"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
@@ -63,6 +65,8 @@ split_columns <-
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
     # name_of_input_csv_file <- "outputs/hansard/temp/1971-10-05.csv" # uncomment for testing
+    # name_of_input_csv_file <- "senate.csv" # uncomment for testing
+    
     csv_to_split <-
       read_csv(name_of_input_csv_file,
                trim_ws = FALSE,
@@ -74,9 +78,9 @@ split_columns <-
     csv_to_split <- csv_to_split %>%
       mutate(
         line_type = case_when(
-          str_detect(text, "^\\s{26,}") == TRUE ~ "secondColumnOnly",
-          # If there is at least 26 spaces in a row at the start then assume there is only content in the second column.
-          # 26 seems to be the minimum, but could fine-tune this.
+          str_detect(text, "^\\s{21,}") == TRUE ~ "secondColumnOnly",
+          # If there is at least 21 spaces in a row at the start then assume there is only content in the second column.
+          # 21 seems to be the minimum, but could fine-tune this.
           nchar(text) < 48 ~ "firstColumnOnly",
           # If there is less than 48 characters then assume there is only content in the first column.
           # We do another parse later on.
@@ -144,6 +148,8 @@ split_columns <-
       select(-reg_pattern,-length)
     
     # Push those back together
+    lines_with_both_columns <- lines_with_both_columns %>% 
+      filter(split == TRUE)
     lines_with_both_columns <-
       rbind(lines_with_both_columns,
             lines_with_both_columns_middle_space)
