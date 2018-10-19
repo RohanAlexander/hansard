@@ -29,13 +29,13 @@ plan(multiprocess)
 #### Create lists of PDFs to read and file names to save text as ####
 # Change the path as required:
 # use_this_path_to_get_pdfs  <- "/Volumes/Backup/hansard_pdfs"
-use_this_path_to_get_pdfs  <- "/Volumes/Backup/senate"
+use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
 # use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
 
 
 # use_this_path_to_save_csv_files  <- "outputs/hansard/temp"
 # use_this_path_to_save_csv_files  <- "/Volumes/Backup/hansard_csv"
-use_this_path_to_save_csv_files  <- "/Volumes/Backup/senate_temp"
+use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard PDF filenames
 file_names <-

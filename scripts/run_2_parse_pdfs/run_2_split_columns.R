@@ -26,7 +26,7 @@ plan(multiprocess)
 # Change the path as required:
 # use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
 # use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
-use_this_path_to_get_csvs <- "/Volumes/Backup/senate_temp"
+use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -50,11 +50,11 @@ file_names_tibble <- file_names_tibble %>%
 file_names <- file_names_tibble$file_name
 rm(file_names_tibble)
 
-#Sometimes it's useful to seperate the input and the output, but otherwise might prefer to overwrite
+#Sometimes it's useful to seperate the input and the output, but otherwise might prefer to overwrite - if you split it make sure to get the one column ones into the new folder
 # use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing"
 # use_this_path_to_save_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
 # use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
-use_this_path_to_save_csvs  <- "/Volumes/Backup/senate_split"
+use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
