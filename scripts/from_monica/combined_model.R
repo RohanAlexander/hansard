@@ -262,3 +262,15 @@ for(i in 1:nsittings){
     ))
 }
 
+
+# for stacked bar charts, need to calculate median of distribution 
+
+i <- 1
+k <- 1
+test <- c()
+for(j in 1:ntopics){
+  test <- c(test, c(mcmc.array[,,paste0("mu.sp[",i,",",j,"]")])[k])
+}
+
+
+

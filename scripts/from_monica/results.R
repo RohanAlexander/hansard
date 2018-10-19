@@ -46,6 +46,8 @@ mu_gov_sig_all %>% filter(sig==TRUE) %>% select(original_number) %>% pull()
 
 # fisher, bruce, page, menzies1, menzies2,  holt, whitlam, fraser, hawke, keating, howard, rudd1, gillard
 
+mu_res_2 %>% 
+  ggplot(aes(government, median, fill = factor(topic))) + geom_bar(stat = "identity")
 # 1. different elections ------------------------------------------------
 
 
@@ -135,3 +137,37 @@ musp_res %>%
   filter(sig==TRUE, upper>0.235, lower>0.000001) %>%
   select(document) %>% 
   write_csv(path = "results/outliers.csv")
+
+## WAR PLOT
+
+musp_res %>% 
+  left_join(dr_long %>% 
+              filter(topic==1) %>% 
+              group_by(group) %>% 
+              filter(row_number()==1) %>% 
+              rename(sitting = group) %>% 
+              select(sitting, document)) %>% 
+  group_by(sitting) %>% 
+  mutate(med_norm = median/sum(median)) %>% 
+  filter(topic %in% c(12, 17, 22, 23)) %>% 
+  ggplot(aes(document, med_norm, fill = factor(topic))) + 
+  geom_bar(stat = "identity", width = 100) + 
+  scale_fill_viridis_d(name = "Topic") + 
+  theme_classic() + ylab("Proportion") + xlab("Date") 
+ggsave("../../outputs/figures/war_stack.pdf", width = 10, height = 8, units = "in")
+
+
+musp_res %>% 
+  left_join(dr_long %>% 
+              filter(topic==1) %>% 
+              group_by(group) %>% 
+              filter(row_number()==1) %>% 
+              rename(sitting = group) %>% 
+              select(sitting, document)) %>% 
+  group_by(sitting) %>% 
+  mutate(med_norm = median/sum(median)) %>% 
+  filter(topic==17) %>% 
+  arrange(-median)
+
+
+dr_long %>%  filter(topic==17, year(document)==1991) 
