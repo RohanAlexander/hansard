@@ -46,8 +46,25 @@ mu_gov_sig_all %>% filter(sig==TRUE) %>% select(original_number) %>% pull()
 
 # fisher, bruce, page, menzies1, menzies2,  holt, whitlam, fraser, hawke, keating, howard, rudd1, gillard
 
-mu_res_2 %>% 
-  ggplot(aes(government, median, fill = factor(topic))) + geom_bar(stat = "identity")
+prop_gov <- c()
+
+set.seed(1)
+for(i in 1:ngovernments){
+  test_alpha <- mu_res_2 %>% filter(government==i) %>% select(median) %>% pull()
+  props <- rdirichlet(1000, exp(test_alpha))
+  mean_props <- apply(props, 2, mean)
+  prop_gov <- rbind(prop_gov, tibble(government = i, topic = 1:40, prop = mean_props))
+}
+
+
+prop_gov %>% 
+#  filter(!(government %in% c(15, 19, 32))) %>% 
+  ggplot(aes(government, prop, fill = topic)) + 
+  geom_bar(stat = "identity") + 
+  scale_fill_viridis_c(name = "Topic") + 
+  theme_classic() + ylab("Proportion") + xlab("Government") 
+ggsave("../../outputs/figures/gov_stack.pdf", width = 10, height = 8, units = "in")
+
 # 1. different elections ------------------------------------------------
 
 
@@ -74,6 +91,25 @@ mu_election_sig_all %>% filter(sig==TRUE) %>% select(election) %>% pull()
 
 # 1949 (menzies 2); 1972 (whitlam); 1983 (hawke); 1996 (howard); 2001 (howard); 2004; 2007 (rudd); 2010 (gillard); 2013 (abbot)
 
+
+prop_election <- c()
+
+set.seed(1)
+for(i in 1:nelections){
+  test_alpha <- mu_res %>% filter(election==i) %>% select(median) %>% pull()
+  props <- rdirichlet(1000, exp(test_alpha))
+  mean_props <- apply(props, 2, mean)
+  prop_election <- rbind(prop_election, tibble(election = i, topic = 1:40, prop = mean_props))
+}
+
+
+prop_election %>% 
+  #  filter(!(government %in% c(15, 19, 32))) %>% 
+  ggplot(aes(election, prop, fill = topic)) + 
+  geom_bar(stat = "identity") + 
+  scale_fill_viridis_c(name = "Topic") + 
+  theme_classic() + ylab("Proportion") + xlab("Election") 
+#ggsave("../../outputs/figures/gov_stack.pdf", width = 10, height = 8, units = "in")
 
 # 3. outliers --------------------------------------------------------------
 
@@ -171,3 +207,5 @@ musp_res %>%
 
 
 dr_long %>%  filter(topic==17, year(document)==1991) 
+
+
