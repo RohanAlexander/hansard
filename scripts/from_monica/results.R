@@ -15,6 +15,7 @@ mu_res_2 <- mu_res_2 %>% arrange(topic, government)
 
 #install.packages("DescTools")
 library(DescTools)
+library(MCMCpack)
 
 mu_gov_sig <- c()
 
@@ -25,7 +26,7 @@ for(i in 2:nrow(mu_res_2)){
 
 
 num_sig <- mu_gov_sig %>% spread(topic, sig) %>% 
-  select(-government) %>% rowSums()
+  dplyr::select(-government) %>% rowSums()
 
 mu_gov_sig_all <- tibble(government = 1:ngovernments, sig = num_sig>0)
 
@@ -37,12 +38,12 @@ mu_gov_sig_all <- mu_gov_sig_all %>% cbind(original_number =
   dr %>% group_by(governmentChangeDate) %>%
     summarise(one_obs = n()==20) %>%
     filter(one_obs ==FALSE) %>%
-    select(governmentChangeDate) %>% pull()
+    dplyr::select(governmentChangeDate) %>% pull()
 )
 
 # let's see who was different
 
-mu_gov_sig_all %>% filter(sig==TRUE) %>% select(original_number) %>% pull()
+mu_gov_sig_all %>% filter(sig==TRUE) %>% dplyr::select(original_number) %>% pull()
 
 # fisher, bruce, page, menzies1, menzies2,  holt, whitlam, fraser, hawke, keating, howard, rudd1, gillard
 
@@ -50,7 +51,7 @@ prop_gov <- c()
 
 set.seed(1)
 for(i in 1:ngovernments){
-  test_alpha <- mu_res_2 %>% filter(government==i) %>% select(median) %>% pull()
+  test_alpha <- mu_res_2 %>% filter(government==i) %>% dplyr::select(median) %>% pull()
   props <- rdirichlet(1000, exp(test_alpha))
   mean_props <- apply(props, 2, mean)
   prop_gov <- rbind(prop_gov, tibble(government = i, topic = 1:40, prop = mean_props))
@@ -58,11 +59,15 @@ for(i in 1:ngovernments){
 
 
 prop_gov %>% 
+  left_join(mu_gov_sig_all) %>% 
+  mutate(sig_alpha = ifelse(is.na(sig), 0, ifelse(sig==TRUE, 1, 0.6))) %>% 
 #  filter(!(government %in% c(15, 19, 32))) %>% 
-  ggplot(aes(government, prop, fill = topic)) + 
+  ggplot(aes(original_number, prop, fill = topic, alpha = sig_alpha)) + 
   geom_bar(stat = "identity") + 
   scale_fill_viridis_c(name = "Topic") + 
-  theme_classic() + ylab("Proportion") + xlab("Government") 
+  scale_alpha(guide = FALSE) + 
+  theme_classic() + 
+  ylab("Proportion") + xlab("Government") 
 ggsave("../../outputs/figures/gov_stack.pdf", width = 10, height = 8, units = "in")
 
 # 1. different elections ------------------------------------------------
