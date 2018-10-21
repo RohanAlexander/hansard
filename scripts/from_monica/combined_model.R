@@ -159,8 +159,8 @@ for(i in 1:ngovernments){
   for(j in 1:ntopics)
     mu_res_2 <- rbind(mu_res_2, tibble(government = i, topic = j, 
                                    median = (median(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")])),
-                                   upper = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.975)),
-                                   lower = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.025))
+                                   upper = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.95)),
+                                   lower = (quantile(mcmc.array[,,paste0("mu.gov[",i,",",j,"]")], 0.05))
     ))
 }
 
