@@ -173,9 +173,9 @@ dr_long %>% filter(topic ==1) %>%
 
 musp_res %>% 
   left_join(dr_long %>% rename(sitting=group) %>% mutate(topic = as.numeric(topic))) %>% 
-  mutate(sig = gamma>2*upper) %>% 
-  #filter(year(document)==2001, month(document)==9, topic == 17) 
-  filter(sig==TRUE, upper>0.235, lower>0.000001) %>%
+  mutate(sig = gamma>2.9*upper) %>% 
+  #filter(year(document)==2001, month(document)==9, topic==17) %>% 
+  filter(sig==TRUE, upper>0.15&gamma>0.3, lower>0.000000001) %>%
   dplyr::select(document) %>% 
   write_csv(path = "results/outliers.csv")
 

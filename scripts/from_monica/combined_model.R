@@ -242,7 +242,7 @@ for(i in 1:nelections){
 }
 
 
-sigma_res <- sigma_res %>% mutate(sigma_median = sqrt(1/median), two_sd = sigma_median*3)
+sigma_res <- sigma_res %>% mutate(sigma_median = sqrt(1/median), two_sd = sigma_median*4)
 
 write_csv(sigma_res, path = "results/sigma.csv")
 
