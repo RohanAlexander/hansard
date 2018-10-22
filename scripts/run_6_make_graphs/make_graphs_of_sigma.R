@@ -3,10 +3,11 @@ library(tidyverse)
 sigma <- read_csv("scripts/from_monica/results/sigma.csv")
 
 sigma %>% 
-  filter(topic %in% c(4:15)) %>% 
+  # filter(topic %in% c(4:15)) %>% 
   ggplot(aes(x = election, y = sigma_median)) +
   geom_point() +
-  facet_wrap(vars(topic), nrow = 4, ncol = 3) +
+  # facet_wrap(vars(topic), nrow = 4, ncol = 3) +
+  facet_wrap(vars(topic)) +
   theme_minimal()
 
 ggsave(

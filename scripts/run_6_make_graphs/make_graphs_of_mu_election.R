@@ -53,13 +53,39 @@ ggsave(
   units = "in"
 )
 
+all_differerences <- mu_election %>% 
+  select(election, topic, median) %>% 
+  mutate(previousElection = lag(median, 40)) %>% 
+  mutate(diff = abs(median - previousElection))
 
 mu_election %>% 
-  filter(election %in% c(28, 29)) %>% 
-  # filter(!topic %in% c(1, 16)) %>% 
-  gather(elections, medians, election:median) %>% 
-  mutate(diff = median[election == 29] - median[election == 28])
-ggplot(aes(x = as.factor(election), y = median, group = as.factor(topic), colour = as.factor(topic), label = as.factor(topic))) +
-  geom_line() +
-  geom_text(check_overlap = TRUE) +
-  theme_classic()
+  select(election, topic, median) %>% 
+  mutate(previousElection = lag(median, 40)) %>% 
+  mutate(diff = abs(median - previousElection)) %>% 
+  mutate(grouper = case_when(election %in% c(26) ~ "Menzies-Holt",
+                             election %in% c(29) ~ "Whitlam",
+                             election %in% c(39, 40, 41) ~ "Howard",
+                             TRUE ~ "Other")) %>% 
+  filter(election %in% c(26, 29, 39, 40, 41)) %>%
+  ggplot(aes(x = topic, y = diff, color = as.factor(election))) +
+  geom_point(data = all_differerences, aes(x = topic, y = diff), color = "grey90") +
+  geom_point() +
+  labs(y = "Absolute difference with previous", 
+       x = "Topic") +
+  coord_flip() +
+  scale_color_viridis_d(name = "Election") +
+  facet_wrap(vars(grouper)) +
+  theme_minimal()
+  
+ggsave(
+  "outputs/figures/mu_election-differences.pdf",
+  height = 10,
+  width = 8,
+  units = "in"
+)
+
+
+# library(rmarkdown)
+# draft("myslides.Rmd", template="metropolis", package="binb", edit=FALSE)
+# setwd("myslides")  ## template creates a new subdir
+# render("myslides.Rmd")

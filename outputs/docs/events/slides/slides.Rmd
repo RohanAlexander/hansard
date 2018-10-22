@@ -1,0 +1,129 @@
+---
+title: The Effect of Events on Discussion in the Australian Federal Parliament (1901--2017)
+subtitle: 
+author:
+- Monica Alexander, University of Toronto\newline
+- Rohan Alexander, Australian National University
+date: 24 October 2018
+institute: Presentation at SPIR, ANU.
+output: binb::metropolis
+fontsize: 12pt
+---
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+```
+
+# Summary
+
+## Approach
+
+- Create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2017 based on available public records. 
+- Use a correlated topic model to reduce dimemsionality.
+- Analyse the effect of various events using a Bayesian hierarchical Dirichlet model. 
+
+## Findings
+
+- Changes in government tend be associated with topic changes even when the party in power does not change;
+- Elections that do not result in a change in government are rarely associated with topic changes; 
+- Economic events, such as financial crises, have less significant effects than other events such as terrorist attacks; 
+- and the effect of events is much more pronounced in the second half of our sample, and especially in the past two decades. 
+
+
+# Data
+
+## Hansard
+- A daily text record called Hansard of what was said in the Australian Federal Parliament has been made available since it was established in 1901. It's not vertatim, but it's pretty close.
+- Hansard records have been used in other counties but not really at scale in Australia.
+- Daily PDFs are available Hansard records available online as PDFs and these are considered the official release. 
+- There are 14,551 days worth of publicly available Hansard records across both chambers of the Australian Federal Parliament.
+
+## Example PDF page
+Add photo.
+
+## PDF parsing
+- We use scripts written in R to convert the PDFs into daily text records.
+- Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they occur more than twice and can be identified.
+
+The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time. Details of this check are provided in Appendix \@ref(stopwordsgraph). We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new zealand to new_zealand. Then the sentences are de-constructed and each word considered individually.
+
+
+
+# Model
+
+
+# Results
+
+
+# Future work
+
+
+## Typography
+
+```
+The theme provides sensible defaults to
+\emph{emphasize} text, \alert{accent} parts
+or show \textbf{bold} results.
+
+In Markdown, you can also use _emphasize_ and **bold**.
+```
+
+\begin{center}becomes\end{center}
+
+The theme provides sensible defaults to \emph{emphasize} text,
+\alert{accent} parts or show \textbf{bold} results.
+
+In Markdown, you can also use _emphasize_ and **bold**.
+
+
+## Math
+
+\begin{equation*}
+    e = \lim_{n\to \infty} \left(1 + \frac{1}{n}\right)^n
+\end{equation*}
+
+
+## R Figure Example
+
+The following code generates the plot on the next slide (taken from
+`help(bxp)` and modified slightly):
+
+```{r pressureCode, eval=FALSE}
+library(stats)
+set.seed(753)
+bx.p <- boxplot(split(rt(100, 4),
+                      gl(5, 20)), plot=FALSE)
+bxp(bx.p, notch = FALSE, boxfill = "lightblue",
+    frame = FALSE, outl = TRUE,
+    main = "Example from help(bxp)")
+```  
+
+
+## R Figure Example
+  
+```{r pressureFig, echo=FALSE}
+library(stats)
+set.seed(753)
+bx.p <- boxplot(split(rt(100, 4),
+                      gl(5, 20)), plot=FALSE)
+bxp(bx.p, notch = FALSE, boxfill = "lightblue",
+    frame = FALSE, outl = TRUE,
+    main = "Example from help(bxp)")
+```  
+
+## R Table Example
+  
+A simple `knitr::kable` example:  
+
+```{r kableEx}
+knitr::kable(mtcars[1:5, 1:8],
+             caption="(Parts of) the mtcars dataset")
+```
+
+## Resources
+
+### For more information:
+- See the [Metropolis repository](https://github.com/matze/mtheme) for more on Metropolis
+- See the [RMarkdown repository](https://github.com/rstudio/rmarkdown) for more on RMarkdown
+- See the [binb repository](https://github.com/eddelbuettel/binb) for more on binb 
+- See the [binb vignettes](https://github.com/eddelbuettel/binb/vignettes) for more examples.

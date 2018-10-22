@@ -8,11 +8,12 @@ mu_election %>%
   facet_wrap(vars(topic)) 
   
 mu_election %>% 
-  filter(topic %in% c(12, 13, 17, 22, 23, 24, 29, 30, 32, 33, 35, 39)) %>% 
+  filter(topic %in% c(12, 13, 17, 22, 23, 24, 29, 30, 32, 33, 35, 39)) %>%
   ggplot(aes(x = election, y = median)) +
   geom_point() +
   geom_errorbar(aes(ymin = lower, ymax = upper)) +
   facet_wrap(vars(topic), nrow = 4, ncol = 3) +
+  # facet_wrap(vars(topic)) +
   theme_minimal()
 
 ggsave(
@@ -32,7 +33,7 @@ mu_gov %>%
   facet_wrap(vars(topic)) 
 
 mu_gov %>% 
-  filter(!government %in% c(19, 32)) %>% 
+  filter(!government %in% c(19, 32)) %>%
   filter(topic %in% c(12, 13, 17, 22, 23, 24, 29, 30, 32, 33, 35, 39)) %>% 
   ggplot(aes(x = government, y = median)) +
   geom_point() +
