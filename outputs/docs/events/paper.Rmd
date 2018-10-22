@@ -313,9 +313,39 @@ We run the model in JAGS using the \texttt{rjags} package of @Plummer2018.
 
 
 # Results
-We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. Political events are those related to a change of government or an election. As Australia has a parliamentary system, it is possible for the government to change without an election. We define a government based on who is the prime minister, and do not distinguish between terms or cabinet composition as is sometimes done. If a person was prime minister more than once then these are considered separately. 
 
-We identify differences between neighbouring governments and between neighbouring elections based on calculating 95 per cent credible intervals based on posterior samples. When these do not overlap we consider that the model finds a significant difference between either the neighbouring governments or elections. 
+Firstly, we describe the results of the CTM approach, which defined 40 unique topics over the period 1901-2017. We then describe the results of the Bayesian analysis model, which identified governments, elections and other events that were associated with a change in the topics discussed. 
+
+## Topic modeling
+
+We applied the CTM approach discussed in Section 3.2 on the processed Hansard text database outlined in Section 2. The main output of interest are the types of topics identified by the model, and the prevalence of each topic on of each day of parliamentary discussion. 
+
+The remainder of the results refer to a topic model which had a total of 40 distinct topics define. **ROHAN PLEASE ADD WHY 40**
+
+Table \@ref(tab:topwords) lists the top five words associated with each of the forty topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Note that some topics seem to somewhat overlap with their content: for example, topics 12, 17, 22 and 23 all relate to war and conflict. 
+
+```{r topwords, echo = FALSE, results = 'asis'}
+
+top_words %>% 
+  kable(booktabs = T, caption = "Top words associated with each topic") %>%
+  kable_styling(font_size = 10)
+
+```
+
+## Analysis model
+
+We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. As discussion in Section 3.3, the next stage of the modeling process takes the topic proportions estimated in the CTM approach, and models the association between these topic distributions and outside events. 
+
+There are several outputs of interest from this modeling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by governments or elections tend not to provide enough variability. For instance, examining Topics 12, 17, 22 and 23, which have to do with war and conflict illustrates Australia's involvement in World War I, World War II, the Korean War, the Vietnam War, the first Gulf War, and the war in Afghanistan and the second Gulf War (Figure \@ref(fig:wartopicsgraph)).
+
+```{r wartopicsgraph, cache = TRUE, echo = FALSE, fig.cap = "Model estimates of topic prevalance by sitting period for those related to war and conflict", out.width = '100%'}
+knitr::include_graphics("../../figures/war_stack.pdf")
+```
+
+
+One of the main goals of the analysis model is to see which political events are associated with changes in the prevalance of topics over time. Political events are those related to a change of government or an election. As Australia has a parliamentary system, it is possible for the government to change without an election. We define a government based on who is the prime minister, and do not distinguish between terms or cabinet composition as is sometimes done. If a person was prime minister more than once then these are considered separately. 
+
+As detailed in Section 3.3, the model estimates a mean level effect for each government, $\alpha_g$ and each election, $\alpha_e$. We identify differences between neighbouring governments and between neighbouring elections based on calculating 95 per cent credible intervals based on posterior samples of these respective mean effects. When these do not overlap we consider that the model finds a significant difference between either the neighbouring governments or elections. 
 
 We summarise our results in terms of governments in Table \@ref(tab:governmentsresults) and in terms of elections in Table \@ref(tab:electionsresults). These tables focus on elections and governments that were different to the ones that preceded them. 
 
@@ -395,12 +425,6 @@ The Whitlam government is interesting as we find a difference in the topics afte
 The Howard Government is interesting because of the significant differences between elections. For instance, each of the election periods is associated with fairly substantial differences compared with the preceding election periods, and all apart from 2001 are actually significantly different at the 95 per cent level. Figure \@ref(fig:muelectionall) compares the topics that are significant in the different Howard terms.
 
 To a certain extent the change after the November 2001 election is expected because of the 9/11 terrorist attacks that had only occurred two months earlier, the Bali Bombings that occurred in October 2002, and the dramatic increase in the discussion related to terrorism and conflict over these years. However the change in 1998 and 2004 is more unexpected. Although the Howard Government is the second-longest serving government and commonly thought of as a period of stability because the senior ministers were consistent as well, it might be that it is better to think of the Howard Government as a combination of three or four different periods and that the Howard Government reinvented itself over this period.
-
-The model also provides estimates of topic prevalence by sitting period. This provides nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by governments or elections tend not to provide enough variability For instance, examining Topics 12, 17, 22 and 23, which have to do with war and conflict illustrates Australia's involvement in World War I, World War II, the Korean War, the Vietnam War, the first Gulf War, and the war in Afghanistan and the second Gulf War (Figure \@ref(fig:wartopicsgraph)).
-
-```{r wartopicsgraph, cache = TRUE, echo = FALSE, fig.cap = "Model estimates of topic prevalance by sitting period for those related to war and conflict", out.width = '100%'}
-knitr::include_graphics("../../figures/war_stack.pdf")
-```
 
 One advantage of our analysis model, compared with using the STM approach is that we can create a measure that is equivalent to testing for outliers in a model where the underlying variables were not latent. 
 
