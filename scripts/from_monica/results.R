@@ -197,6 +197,31 @@ musp_res %>%
   theme_classic() + ylab("Proportion") + xlab("Date") 
 ggsave("../../outputs/figures/war_stack.pdf", width = 10, height = 8, units = "in")
 
+musp_res %>% 
+  left_join(dr_long %>% 
+              filter(topic==1) %>% 
+              group_by(group) %>% 
+              filter(row_number()==1) %>% 
+              rename(sitting = group) %>% 
+              dplyr::select(sitting, document)) %>% 
+  group_by(sitting) %>% 
+  mutate(med_norm = median/sum(median)) %>% 
+  filter(topic %in% c(12, 17, 22, 23)) %>% 
+  ggplot(aes(document, med_norm, fill = factor(topic))) + 
+  geom_bar(stat = "identity", width = 100) + 
+  scale_fill_viridis_d(name = "Topic") + 
+  theme_classic() + ylab("Proportion") + xlab("Date") +
+  theme(text = element_text(size = 20)) +
+  theme(
+    panel.background = element_rect(fill = "transparent") # bg of the panel
+    , plot.background = element_rect(fill = "transparent", color = NA) # bg of the plot
+    , panel.grid.major = element_blank() # get rid of major grid
+    , panel.grid.minor = element_blank() # get rid of minor grid
+    , legend.background = element_rect(fill = "transparent") # get rid of legend bg
+    , legend.box.background = element_rect(fill = "transparent") # get rid of legend panel bg
+  )
+ggsave("../../outputs/figures/war_stack-slides.pdf", width = 10, height = 8, units = "in")
+
 
 musp_res %>% 
   left_join(dr_long %>% 
