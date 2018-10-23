@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Presentation Ninja</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Yihui Xie" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/jquery/jquery.min.js"></script>
+    <link href="libs/leaflet/leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet/leaflet.js"></script>
+    <link href="libs/leafletfix/leafletfix.css" rel="stylesheet" />
+    <script src="libs/Proj4Leaflet/proj4-compressed.js"></script>
+    <script src="libs/Proj4Leaflet/proj4leaflet.js"></script>
+    <link href="libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-binding/leaflet.js"></script>
+    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding/datatables.js"></script>
+    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Presentation Ninja
+## ⚔<br/>with xaringan
+### Yihui Xie
+### 2016/12/12 (updated: 2018-10-23)
+
+---
+
+
+
+
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
+
+???
+
+Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sharingan_triple.svg)
+
+---
+class: center, middle
+
+# xaringan
+
+### /ʃæ.'riŋ.ɡæn/
+
+---
+class: inverse, center, middle
+
+# Get Started
+
+---
+
+# Hello World
+
+Install the **xaringan** package from [Github](https://github.com/yihui/xaringan):
+
+
+```r
+devtools::install_github("yihui/xaringan")
+```
+
+--
+
+You are recommended to use the [RStudio IDE](https://www.rstudio.com/products/rstudio/), but you do not have to.
+
+- Create a new R Markdown document from the menu `File -&gt; New File -&gt; R Markdown -&gt; From Template -&gt; Ninja Presentation`;&lt;sup&gt;1&lt;/sup&gt;
+
+--
+
+- Click the `Knit` button to compile it;
+
+--
+
+- or use the [RStudio Addin](https://rstudio.github.io/rstudioaddins/)&lt;sup&gt;2&lt;/sup&gt; "Infinite Moon Reader" to live preview the slides (every time you update and save the Rmd document, the slides will be automatically reloaded in RStudio Viewer.
+
+.footnote[
+[1] 中文用户请看[这份教程](http://slides.yihui.name/xaringan/zh-CN.html)
+
+[2] See [#2](https://github.com/yihui/xaringan/issues/2) if you do not see the template or addin in RStudio.
+]
+
+---
+background-image: url(https://github.com/yihui/xaringan/releases/download/v0.0.2/karl-moustache.jpg)
+background-position: 50% 50%
+class: center, bottom, inverse
+
+# You only live once!
+
+---
+
+# Hello Ninja
+
+As a presentation ninja, you certainly should not be satisfied by the "Hello World" example. You need to understand more about two things:
+
+1. The [remark.js](https://remarkjs.com) library;
+
+1. The **xaringan** package;
+
+Basically **xaringan** injected the chakra of R Markdown (minus Pandoc) into **remark.js**. The slides are rendered by remark.js in the web browser, and the Markdown source needed by remark.js is generated from R Markdown (**knitr**).
+
+---
+
+# remark.js
+
+You can see an introduction of remark.js from [its homepage](https://remarkjs.com). You should read the [remark.js Wiki](https://github.com/gnab/remark/wiki) at least once to know how to
+
+- create a new slide (Markdown syntax&lt;sup&gt;*&lt;/sup&gt; and slide properties);
+
+- format a slide (e.g. text alignment);
+
+- configure the slideshow;
+
+- and use the presentation (keyboard shortcuts).
+
+It is important to be familiar with remark.js before you can understand the options in **xaringan**.
+
+.footnote[[*] It is different with Pandoc's Markdown! It is limited but should be enough for presentation purposes. Come on... You do not need a slide for the Table of Contents! Well, the Markdown support in remark.js [may be improved](https://github.com/gnab/remark/issues/142) in the future.]
+
+---
+background-image: url(https://github.com/yihui/xaringan/releases/download/v0.0.2/karl-moustache.jpg)
+background-size: cover
+class: center, bottom, inverse
+
+# I was so happy to have discovered remark.js!
+
+---
+class: inverse, middle, center
+
+# Using xaringan
+
+---
+
+# xaringan
+
+Provides an R Markdown output format `xaringan::moon_reader` as a wrapper for remark.js, and you can use it in the YAML metadata, e.g.
+
+```yaml
+---
+title: "A Cool Presentation"
+output:
+  xaringan::moon_reader
+    yolo: true
+    nature:
+      autoplay: 30000
+---
+```
+
+See the help page `?xaringan::moon_reader` for all possible options that you can use.
+
+---
+
+# remark.js vs xaringan
+
+Some differences between using remark.js (left) and using **xaringan** (right):
+
+.pull-left[
+1. Start with a boilerplate HTML file;
+
+1. Plain Markdown;
+
+1. Write JavaScript to autoplay slides;
+
+1. Manually configure MathJax;
+
+1. Highlight code with `*`;
+
+1. Edit Markdown source and refresh browser to see updated slides;
+]
+
+.pull-right[
+1. Start with an R Markdown document;
+
+1. R Markdown (can embed R/other code chunks);
+
+1. Provide an option `autoplay`;
+
+1. MathJax just works;&lt;sup&gt;*&lt;/sup&gt;
+
+1. Highlight code with `{{}}`;
+
+1. The RStudio addin "Infinite Moon Reader" automatically refreshes slides on changes;
+]
+
+.footnote[[*] Not really. See next page.]
+
+---
+
+# Math Expressions
+
+You can write LaTeX math expressions inside a pair of dollar signs, e.g. &amp;#36;\alpha+\beta$ renders `\(\alpha+\beta\)`. You can use the display style with double dollar signs:
+
+```
+$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+```
+
+`$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$`
+
+Limitations:
+
+1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
+
+1. There should not be spaces after the opening `$` or before the closing `$`.
+
+1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
+
+---
+
+# R Code
+
+
+```r
+# a boring regression
+fit = lm(dist ~ 1 + speed, data = cars)
+coef(summary(fit))
+```
+
+```
+#               Estimate Std. Error   t value     Pr(&gt;|t|)
+# (Intercept) -17.579095  6.7584402 -2.601058 1.231882e-02
+# speed         3.932409  0.4155128  9.463990 1.489836e-12
+```
+
+```r
+dojutsu = c('地爆天星', '天照', '加具土命', '神威', '須佐能乎', '無限月読')
+grep('天', dojutsu, value = TRUE)
+```
+
+```
+# [1] "地爆天星" "天照"
+```
+
+---
+
+# R Plots
+
+
+```r
+par(mar = c(4, 4, 1, .1))
+plot(cars, pch = 19, col = 'darkgray', las = 1)
+abline(fit, lwd = 2)
+```
+
+![](test_files/figure-html/cars-1.svg)&lt;!-- --&gt;
+
+---
+
+# Tables
+
+If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+
+
+```r
+knitr::kable(head(iris), format = 'html')
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Sepal.Length &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sepal.Width &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Petal.Length &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Petal.Width &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# HTML Widgets
+
+I have not thoroughly tested HTML widgets against **xaringan**. Some may work well, and some may not. It is a little tricky.
+
+Similarly, the Shiny mode (`runtime: shiny`) does not work. I might get these issues fixed in the future, but these are not of high priority to me. I never turn my presentation into a Shiny app. When I need to demonstrate more complicated examples, I just launch them separately. It is convenient to share slides with other people when they are plain HTML/JS applications.
+
+See the next page for two HTML widgets.
+
+---
+
+
+```r
+library(leaflet)
+leaflet() %&gt;% addTiles() %&gt;% setView(-93.65, 42.0285, zoom = 17)
+```
+
+<div id="htmlwidget-b71cdfe30291f7c7118f" style="width:100%;height:432px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b71cdfe30291f7c7118f">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
+
+---
+
+
+```r
+DT::datatable(
+  head(iris, 10),
+  fillContainer = FALSE, options = list(pageLength = 8)
+)
+```
+
+<div id="htmlwidget-2fe984edb0b0d675e42e" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2fe984edb0b0d675e42e">{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sepal.Length<\/th>\n      <th>Sepal.Width<\/th>\n      <th>Petal.Length<\/th>\n      <th>Petal.Width<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+# Some Tips
+
+- When you use the "Infinite Moon Reader" addin in RStudio, your R session will be blocked by default. You can click the red button on the right of the console to stop serving the slides, or use the _daemonized_ mode so that it does not block your R session. To do the latter, you can set the option
+
+    ```r
+    options(servr.daemon = TRUE)
+    ```
+    
+    in your current R session, or in `~/.Rprofile` so that it is applied to all future R sessions. I do the latter by myself.
+    
+    To know more about the web server, see the [**servr**](https://github.com/yihui/servr) package.
+
+--
+
+- Do not forget to try the `yolo` option of `xaringan::moon_reader`.
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        yolo: true
+    ```
+
+---
+
+# Some Tips
+
+- Slides can be automatically played if you set the `autoplay` option under `nature`, e.g. go to the next slide every 30 seconds in a lightning talk:
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        nature:
+          autoplay: 30000
+    ```
+
+--
+
+- A countdown timer can be added to every page of the slides using the `countdown` option under `nature`, e.g. if you want to spend one minute on every page when you give the talk, you can set:
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        nature:
+          countdown: 60000
+    ```
+
+    Then you will see a timer counting down from `01:00`, to `00:59`, `00:58`, ... When the time is out, the timer will continue but the time turns red.
+    
+---
+
+# Some Tips
+
+- The title slide is created automatically by **xaringan**, but it is just another remark.js slide added before your other slides.
+
+    The title slide is set to `class: center, middle, inverse, title-slide` by default. You can change the classes applied to the title slide with the `titleSlideClass` option of `nature` (`title-slide` is always applied).
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        nature:
+          titleSlideClass: [top, left, inverse]
+    ```
+    
+--
+
+- If you'd like to create your own title slide, disable **xaringan**'s title slide with the `seal = FALSE` option of `moon_reader`.
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        seal: false
+    ```
+
+---
+
+# Some Tips
+
+- There are several ways to build incremental slides. See [this presentation](https://slides.yihui.name/xaringan/incremental.html) for examples.
+
+- The option `highlightLines: true` of `nature` will highlight code lines that start with `*`, or are wrapped in `{{ }}`, or have trailing comments `#&lt;&lt;`;
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        nature:
+          highlightLines: true
+    ```
+
+    See examples on the next page.
+
+---
+
+# Some Tips
+
+
+.pull-left[
+An example using a leading `*`:
+
+    ```r
+    if (TRUE) {
+    ** message("Very important!")
+    }
+    ```
+Output:
+```r
+if (TRUE) {
+* message("Very important!")
+}
+```
+
+This is invalid R code, so it is a plain fenced code block that is not executed.
+]
+
+.pull-right[
+An example using `{{}}`:
+
+    ```{r tidy=FALSE}
+    if (TRUE) {
+    *{{ message("Very important!") }}
+    }
+    ```
+Output:
+
+```r
+if (TRUE) {
+* message("Very important!") 
+}
+```
+
+```
+## Very important!
+```
+
+It is valid R code so you can run it. Note that `{{}}` can wrap an R expression of multiple lines.
+]
+
+---
+
+# Some Tips
+
+An example of using the trailing comment `#&lt;&lt;` to highlight lines:
+
+````markdown
+```{r tidy=FALSE}
+library(ggplot2)
+ggplot(mtcars) + 
+  aes(mpg, disp) + 
+  geom_point() +   #&lt;&lt;
+  geom_smooth()    #&lt;&lt;
+```
+````
+
+Output:
+
+
+```r
+library(ggplot2)
+ggplot(mtcars) + 
+  aes(mpg, disp) + 
+* geom_point() +
+* geom_smooth()
+```
+
+---
+
+# Some Tips
+
+- To make slides work offline, you need to download a copy of remark.js in advance, because **xaringan** uses the online version by default (see the help page `?xaringan::moon_reader`).
+
+- You can use `xaringan::summon_remark()` to download the latest or a specified version of remark.js. By default, it is downloaded to `libs/remark-latest.min.js`.
+
+- Then change the `chakra` option in YAML to point to this file, e.g.
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        chakra: libs/remark-latest.min.js
+    ```
+
+- If you used Google fonts in slides (the default theme uses _Yanone Kaffeesatz_, _Droid Serif_, and _Source Code Pro_), they won't work offline unless you download or install them locally. The Heroku app [google-webfonts-helper](https://google-webfonts-helper.herokuapp.com/fonts) can help you download fonts and generate the necessary CSS.
+
+---
+
+# Macros
+
+- remark.js [allows users to define custom macros](https://github.com/yihui/xaringan/issues/80) (JS functions) that can be applied to Markdown text using the syntax `![:macroName arg1, arg2, ...]` or `![:macroName arg1, arg2, ...](this)`. For example, before remark.js initializes the slides, you can define a macro named `scale`:
+
+    ```js
+    remark.macros.scale = function (percentage) {
+      var url = this;
+      return '&lt;img src="' + url + '" style="width: ' + percentage + '" /&gt;';
+    };
+    ```
+
+    Then the Markdown text
+
+    ```markdown
+    ![:scale 50%](image.jpg)
+    ```
+
+    will be translated to
+    
+    ```html
+    &lt;img src="image.jpg" style="width: 50%" /&gt;
+    ```
+
+---
+
+# Macros (continued)
+
+- To insert macros in **xaringan** slides, you can use the option `beforeInit` under the option `nature`, e.g.,
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        nature:
+          beforeInit: "macros.js"
+    ```
+
+    You save your remark.js macros in the file `macros.js`.
+
+- The `beforeInit` option can be used to insert arbitrary JS code before `remark.create()`. Inserting macros is just one of its possible applications.
+
+---
+
+# CSS
+
+Among all options in `xaringan::moon_reader`, the most challenging but perhaps also the most rewarding one is `css`, because it allows you to customize the appearance of your slides using any CSS rules or hacks you know.
+
+You can see the default CSS file [here](https://github.com/yihui/xaringan/blob/master/inst/rmarkdown/templates/xaringan/resources/default.css). You can completely replace it with your own CSS files, or define new rules to override the default. See the help page `?xaringan::moon_reader` for more information.
+
+---
+
+# CSS
+
+For example, suppose you want to change the font for code from the default "Source Code Pro" to "Ubuntu Mono". You can create a CSS file named, say, `ubuntu-mono.css`:
+
+```css
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+```
+
+Then set the `css` option in the YAML metadata:
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: ["default", "ubuntu-mono.css"]
+```
+
+Here I assume `ubuntu-mono.css` is under the same directory as your Rmd.
+
+See [yihui/xaringan#83](https://github.com/yihui/xaringan/issues/83) for an example of using the [Fira Code](https://github.com/tonsky/FiraCode) font, which supports ligatures in program code.
+
+---
+
+# Themes
+
+Don't want to learn CSS? Okay, you can use some user-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
+
+
+```r
+names(xaringan:::list_css())
+```
+
+```
+##  [1] "default-fonts"    "default"          "duke-blue"       
+##  [4] "hygge-duke"       "hygge"            "metropolis-fonts"
+##  [7] "metropolis"       "middlebury-fonts" "middlebury"      
+## [10] "rladies-fonts"    "rladies"          "robot-fonts"     
+## [13] "robot"            "rutgers-fonts"    "rutgers"         
+## [16] "tamu-fonts"       "tamu"             "uo-fonts"        
+## [19] "uo"
+```
+
+---
+
+# Themes
+
+To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+```
+
+If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.name/en/2017/10/xaringan-themes).
+
+---
+class: inverse, middle, center
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/3/39/Naruto_Shiki_Fujin.svg)
+background-size: contain
+
+# Naruto
+
+---
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
+background-size: 100px
+background-position: 90% 8%
+
+# Sharingan
+
+The R package name **xaringan** was derived&lt;sup&gt;1&lt;/sup&gt; from **Sharingan**, a dōjutsu in the Japanese anime _Naruto_ with two abilities:
+
+- the "Eye of Insight"
+
+- the "Eye of Hypnotism"
+
+I think a presentation is basically a way to communicate insights to the audience, and a great presentation may even "hypnotize" the audience.&lt;sup&gt;2,3&lt;/sup&gt;
+
+.footnote[
+[1] In Chinese, the pronounciation of _X_ is _Sh_ /ʃ/ (as in _shrimp_). Now you should have a better idea of how to pronounce my last name _Xie_.
+
+[2] By comparison, bad presentations only put the audience to sleep.
+
+[3] Personally I find that setting background images for slides is a killer feature of remark.js. It is an effective way to bring visual impact into your presentations.
+]
+
+---
+
+# Naruto terminology
+
+The **xaringan** package borrowed a few terms from Naruto, such as
+
+- [Sharingan](http://naruto.wikia.com/wiki/Sharingan) (写輪眼; the package name)
+
+- The [moon reader](http://naruto.wikia.com/wiki/Moon_Reader) (月読; an attractive R Markdown output format)
+
+- [Chakra](http://naruto.wikia.com/wiki/Chakra) (查克拉; the path to the remark.js library, which is the power to drive the presentation)
+
+- [Nature transformation](http://naruto.wikia.com/wiki/Nature_Transformation) (性質変化; transform the chakra by setting different options)
+
+- The [infinite moon reader](http://naruto.wikia.com/wiki/Infinite_Tsukuyomi) (無限月読; start a local web server to continuously serve your slides)
+
+- The [summoning technique](http://naruto.wikia.com/wiki/Summoning_Technique) (download remark.js from the web)
+
+You can click the links to know more about them if you want. The jutsu "Moon Reader" may seem a little evil, but that does not mean your slides are evil.
+
+---
+
+class: center
+
+# Hand seals (印)
+
+Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
+
+![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+
+
+# Summary
+
+## Approach
+
+- Create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2017 based on available public records. 
+- Use a correlated topic model to reduce dimemsionality.
+- Analyse the effect of various events using a Bayesian hierarchical Dirichlet model. 
+
+&lt;div class="notes"&gt;
+Test
+&lt;/div&gt;
+
+## Findings
+
+- Changes in government tend be associated with topic changes even when the party in power does not change.
+- Elections that do not result in a change in government are rarely associated with topic changes.
+- Economic events, such as financial crises, have less significant effects than other events such as terrorist attacks.
+- The effect of events is much more pronounced in the second half of our sample, and especially in the past two decades.
+
+
+
+# Data
+
+## Hansard
+- A daily text record called Hansard of what was said in the Australian Federal Parliament has been made available since it was established in 1901. It's not vertatim, but it's pretty close.
+- Hansard records have been used in other counties but not really at scale in Australia (although others are also starting to use them).
+- Daily PDFs are available Hansard records available online as PDFs and these are considered the official release. 
+- There are 14,551 days of publicly available Hansard records across both chambers of the Australian Federal Parliament.
+
+## Example PDF page
+
+&lt;img src="../../../figures/example_hansard_page.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+## PDF parsing
+- We use scripts written in R to convert the PDFs into daily text records.
+- Some error is introduced at this stage:
+    - because many of the records are in a two-column format that need to be separated; and 
+    - the PDF parsing is not always accurate especially for older records e.g. 'the' is often parsed as 'thc'.
+- We remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new zealand to new_zealand. Then the sentences are de-constructed and each word considered individually.
+
+
+
+
+# Topic Model
+
+## Latent Dirichlet Allocation - Overview
+
+- Each document is assumed to be from a speaker who decides the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. 
+- A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. 
+- The topics are not specified *ex ante*; they are an outcome of the method -- this is an unsupervised machine learning method.
+
+
+## Latent Dirichlet Allocation - Topic distribution for documents
+
+![](test_files/figure-html/topicsoverdocuments-1.png)&lt;!-- --&gt;
+
+&lt;!-- Statistically, LDA considers each document as having been generated by some probability distribution over topics. Similarly, each topic is considered a probability distribution over terms. To choose the terms used in each document, terms are picked from each topic in the appropriate proportion.  --&gt;
+
+
+## Latent Dirichlet Allocation - Term distribution over topics
+
+![](test_files/figure-html/topicsoverterms-1.png)&lt;!-- --&gt;
+
+
+## Latent Dirichlet Allocation - Data generation process
+
+1. There are `\(K\)` topics and the vocabulary consists of `\(V\)` terms. For each topic, decide the terms by randomly drawing distributions over the terms. The distribution over the terms for the `\(k\)`th topic is `\(\beta_k\)`. Use the Dirichlet distribution with hyper-parameter `\(\boldsymbol{\eta}\)`: `\(\beta_k \sim \mbox{Dirichlet}(\boldsymbol{\eta})\)`, where `\(\boldsymbol{\eta} = (\eta_1, \eta_2, \dots, \eta_{K})\)`.
+
+## Latent Dirichlet Allocation - Data generation process (cont.)
+
+2. Decide the topics that each document will cover by randomly drawing distributions over the `\(K\)` topics for each of the `\(D\)` documents. The topic distributions for the `\(d\)`th document are `\(\theta_d\)`, and `\(\theta_{d,k}\)` is the topic distribution for topic `\(k\)` in document `\(d\)`. Again, the Dirichlet distribution with the hyper-parameter `\(0&lt;\alpha&lt;1\)` is used here because usually a document would only cover a handful of topics: `\(\theta_d \sim \mbox{Dirichlet}(\boldsymbol{\alpha})\)`.
+
+## Latent Dirichlet Allocation - Data generation process (cont.)
+3. If there are `\(N\)` terms in the `\(d\)`th document, then to choose the `\(n\)`th term, `\(w_{d, n}\)`:
+    a. Randomly choose a topic for that term `\(n\)`, in that document `\(d\)`, `\(z_{d,n}\)`, from the multinomial distribution over topics in that document, `\(z_{d,n} \sim \mbox{Multinomial}(\theta_d)\)`.
+    b. Randomly choose a term from the relevant multinomial distribution over the terms for that topic, `\(w_{d,n} \sim \mbox{Multinomial}(\beta_{z_{d,n}})\)`.
+
+## Latent Dirichlet Allocation - Data generation process (cont.)
+Given this set-up, we have a joint distribution for the variables and the analysis problem, discussed next, is to compute a posterior over `\(\beta_{1:K}\)` and `\(\theta_{1:D}\)`, given `\(w_{1:D, 1:N}\)`. This is intractable directly, but can be approximated.
+
+
+## Latent Dirichlet Allocation - Analysis problem
+- After the documents are created, they are all that we have to analyse. The term usage in each document, `\(w_{1:D, 1:N}\)`, is observed, but the topics are hidden, or 'latent'. 
+- We do not know the topics of each document, nor how terms defined the topics. In a sense we are trying to reverse the document generation process.
+- If the earlier process around how the documents were generated is assumed and we observe the terms in each document, then we can obtain estimates of the topics. 
+
+## Latent Dirichlet Allocation - Analysis problem (cont.)
+- The outcomes of the LDA process are probability distributions and these define the topics. Each term will be given a probability of being a member of a particular topic, and each document will be given a probability of being about a particular topic. 
+- That is, we are trying to calculate the posterior distribution of the topics given the terms observed in each document.
+- The choice of the number of topics, *k*, drives the results and must be specified *a priori*. 
+
+&lt;!-- If there is a strong reason for a particular number, then this can be used. Otherwise, one way to choose an appropriate number is to use cross validation. --&gt;
+
+&lt;!-- One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation. This is the Correlated Topic Model, described in the next section. --&gt;
+
+## Correlated Topic Model
+Modification of LDA - rather than assuming that the distribution of topics in a document, `\(\theta_d\)`, are a draw from a Dirichlet distribution, as in step 2 in LDA above, CTM assumes
+`$$\theta_d \sim \mbox{Logistic Normal}(\mu, \Sigma)$$`
+Essentially it swaps the Dirichlet for the Logistic Multivariate Normal. This sounds easy, but it's hard to implement.
+
+## Correlated Topic Model - Example output
+
+&lt;embed src="../../../figures/topics_example-slides.pdf" width="100%" type="application/pdf" /&gt;
+
+
+
+## Structural Topic Model
+The Structural Topic Model approach then adds a covariate to `\(\mu\)` which allows consideration of additional information. 
+`$$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)$$`
+Again, sounds easy, but hard to implement, and they have a very nice solutions algorithm.
+
+
+
+## Why not use STM?
+STM is great, but it is specific to various contexts and ours is slightly outside them:
+
+- No way to specify more complicated auto-correlated functional forms of the effects of events over time. 
+- There is no way to implement partial pooling across groups of similar documents. 
+- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model.
+In an ideal world we could modify the STM code, but instead we build a similar, but different, analysis model.
+
+&lt;!-- Also you don't really understand something until you code it yourself. --&gt;
+
+
+
+
+# Analysis model
+
+## Analysis model - Overview
+- We use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework.
+- This relates the proportions of each topic to underlying time trends, changes in governments and elections. 
+- This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
+
+## Analysis model - Set-up
+- Define `\(\theta_{dp}\)` to be the proportion of topic of topic `\(p\)` on day `\(d\)`. Note that the `\(\theta_{d,1:P}\)` for `\(p = 1,2,\dots P=40\)` are equal to the estimated values of `\(\theta_d\)` from the CTM. 
+- We assume that the majority of variation in topics is across sitting periods `\(s\)`, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods over the period 1901 to 2017 inclusive.
+
+## Analysis model - Daily distribution
+The topic proportions on day `\(d\)` are modelled in reference to their membership of a particular sitting period `\(s\)`. Firstly, we assume that each distribution of topics, `\(\theta_{d,1:P}\)` for each day is a draw from a Dirichlet distribution with mean parameter `\(\mu_{s[d],1:P}\)`:
+
+$$
+\theta_{d,1:P} \sim \mbox{Dirichlet}(\mu_{s[d],1:P})
+$$
+
+&lt;!-- where the notation `\(s[d]\)` refers to the sitting period `\(s\)` to which day `\(d\)` belongs. This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must equal 1.  --&gt;
+
+The goal of the model is to relate these proportions to government `\(g\)` at time `\(d\)`, and also the days since the most recent election, `\(e\)`, while account for underlying time trends. 
+
+
+## Analysis model - Mean parameters
+
+The mean parameters `\(\mu_{s,p}\)` are modelled on the log scale as:
+$$
+\log \mu_{s,p} = \alpha_{g[s],p} + \cdot\alpha_{e[s],d,p}  + \sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k} + \delta_{s,p}
+$$
+
+- `\(\alpha_{g[s],p}\)` is the mean effect for government `\(g\)` (which covers sitting period `\(s\)`) and topic `\(p\)`;
+- `\(\alpha_{e[s],d,p}\)` is the effect of election `\(e\)` (which occurs in sitting period `\(s\)`) for topic `\(p\)` on day `\(d\)` since the election;
+- `\(\sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k}\)` is the underlying time trend, modelled using splines: `\(x_{s,k}\)` is the `\(k\)`th basis spline in sitting period `\(s\)` and `\(\beta_{p,k}\)` is a coefficient on the `\(k\)`th basis spline; and
+- `\(\delta_{s,p}\)` is a structured random, or levels, effect for each sitting period and topic. 
+
+## Analysis model - Government effects
+
+The government term `\(\alpha_{g[s],p}\)` assumes there is some underlying mean effect of each government on the topic distribution. We place uninformative priors on each of these parameters: `\(\alpha_{g[s],p} \sim \mbox{Normal}(0, 100)\)`
+
+## Analysis model - Election effects
+
+The election term `\(\alpha_{e[s],d,p}\)` assumes there is an initial effect of an election on the topic distribution, which then decays as a function of days since election, `\(d\)`. In particular, we model this as an AR(1) in `\(d\)`:
+$$
+\alpha_{e[s],d,p} = \rho_{e[s],p} \cdot \alpha_{e[s],d-1,p}
+$$
+
+We use non-informative priors.
+
+&lt;!-- One advantage of our model over using the STM is that we can restrict the effect of an election to be monotonically decreasing. This allows us to identify differences between government and election effects even when there is a one-term government. We use non-informative priors. --&gt;
+
+
+## Analysis model - Time effects
+
+We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes in the economy, and Australian society and culture. The `\(x_{s,k}\)` for `\(k = 1,2,\dots, K\)` are the value of cubic basis splines for sitting period `\(s\)` at knot point `\(k\)`. We place knot points every five sitting periods as this is the average length of time for a government to sit. 
+
+&lt;!-- Non-informative priors are placed on the splines coefficients: --&gt;
+&lt;!-- $$ --&gt;
+&lt;!-- \beta_{p,k} \sim \mbox{Normal}(0, 100) --&gt;
+&lt;!-- $$ --&gt;
+
+
+## Analysis model - Sitting period effects
+
+&lt;!-- This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-government and non-election events. In addition, this set up also partially pools effects across sitting periods.  --&gt;
+
+The sitting period-specific random effect `\(\delta_{s,p}\)` allows the topic distributions in some sitting periods to be different than expected based on government and election effects:
+$$
+\delta_{s,p} \sim \mbox{Normal}(0, \sigma_{e[s],p}^2)
+$$
+
+The variance parameters `\(\sigma_{e[s],p}^2\)` give an indication of the how the variation in topics is changing over election periods. If the estimates of the variance are larger, then there is more variation in the topics discussed within an election period. Non-informative priors are placed on the variance parameters:
+$$
+\sigma_{e[s],p} \sim \mbox{Uniform}(0,3)
+$$
+
+We run the model in JAGS using the \texttt{rjags} package.
+
+
+
+# Results
+
+
+## Topic modelling
+
+&lt;!-- We applied the CTM approach discussed in Section 3.2 on the processed Hansard text database outlined in Section 2. The main output of interest are the types of topics identified by the model, and the prevalence of each topic on of each day of parliamentary discussion.  --&gt;
+
+&lt;!-- The remainder of the results refer to a topic model that had 40 distinct topics defined. The choice of 40 topics was made as a trade-off between semantic coherence and exclusivity with 40 topics performing better on both measures than 20. Measures such as residuals and held-out likelihood suggest a larger number of topics would be more appropriate. --&gt;
+
+&lt;!-- Table \@ref(tab:topwords) lists the top five words associated with each of the forty topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Note that some topics seem to somewhat overlap with their content: for example, topics 12, 17, 22 and 23 all relate to war and conflict.  --&gt;
+
+We choose 40 topics because it is the minimum needed to have meaningful results.
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; topic &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; terms &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; constitution, parliament, rights, powers, constitutional &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bank, money, country, per_cent, budget &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tax, income, taxation, treasurer, per_cent &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; department, service, officers, office, estimates &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; court, law, royal, evidence, attorneygeneral &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; war, defence, country, ill, soldiers &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+## Analysis model - Estimates by sitting period
+
+&lt;!-- There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by governments or elections tend not to provide enough variability. For instance, examining Topics 12, 17, 22 and 23, which have to do with war and conflict illustrates Australia's involvement in World War I, World War II, the Korean War, the Vietnam War, the first Gulf War, and the war in Afghanistan and the second Gulf War (Figure \@ref(fig:wartopicsgraph)). --&gt;
+
+&lt;embed src="../../../figures/war_stack.pdf" width="100%" type="application/pdf" /&gt;
+
+
+
+&lt;!-- One of the main goals of the analysis model is to see which political events are associated with changes in the prevalence of topics over time. Political events are those related to a change of government or an election. As Australia has a parliamentary system, it is possible for the government to change without an election. We define a government based on who is the prime minister, and do not distinguish between terms or cabinet composition as is sometimes done. If a person was prime minister more than once then these are considered separately.  --&gt;
+
+&lt;!-- As detailed in Section 3.3, the model estimates a mean level effect for each government, `\(\alpha_g\)` and each election, `\(\alpha_e\)`. We identify differences between neighbouring governments and between neighbouring elections based on calculating 95 per cent credible intervals based on posterior samples of these respective mean effects. When these do not overlap we consider that the model finds a significant difference between either the neighbouring governments or elections.  --&gt;
+
+&lt;!-- We summarise our results in terms of governments in Table \@ref(tab:governmentsresults) and in terms of elections in Table \@ref(tab:electionsresults). These tables focus on elections and governments that were different to the ones that preceded them.  --&gt;
+
+## Analysis model - Significantly different elections
+
+&lt;table class="table" style="font-size: 10px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Number &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Year &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total seats &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Election winner &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1949 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1949-12-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 121 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1972-12-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 125 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1974 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1974-05-18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 127 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1975 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1975-12-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 127 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1980 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1980-10-18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 125 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1983 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1983-03-05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 125 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1990 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1990-03-24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 148 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1996 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1996-03-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 148 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1998 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1998-10-03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 148 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2004 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2004-10-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 150 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 150 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Labor &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2013 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-09-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 150 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-labor &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+## Analysis model - Significantly different governments
+
+&lt;table class="table" style="font-size: 10px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Number &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Government &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Start &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; End &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Bruce &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1923-02-09 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1929-10-22 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Page &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1939-04-07 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1939-04-26 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 16 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Menzies 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1939-04-26 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1941-08-28 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Menzies 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1949-12-19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1966-01-26 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Holt &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1966-01-26 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1967-12-19 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 25 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; McMahon &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1971-03-10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1972-12-05 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 26 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Whitlam &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1972-12-05 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1975-11-11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Fraser &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1975-11-11 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1983-03-11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 28 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Hawke &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1983-03-11 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1991-12-20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 30 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Howard &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1996-03-11 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-12-03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 31 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Rudd 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-12-03 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2010-06-24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 32 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gillard &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2010-06-24 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-06-27 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+## Analysis model - All governments
+
+&lt;!-- In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate differences between governments and elections, respectively. In the graphs, the points show the estimated value of `\(\alpha_g\)` and `\(\alpha_e\)`, respectively, for each of the topics specified. The error bars represent 95 per cent Bayesian credible intervals. The topics that we have focused on here are: --&gt;
+&lt;!-- 12, 17, 22, 23 which have to do with conflict, defence and security; 13 and 32 which have to do with commerce and trade; 24 and 33 which have to do with the budget, tax and spending; 29 which is to do with education and 39 which has to do with health. --&gt;
+
+
+&lt;embed src="../../../figures/mu_gov.pdf" width="100%" type="application/pdf" /&gt;
+
+
+## Analysis model - All elections
+
+&lt;embed src="../../../figures/mu_election.pdf" width="100%" type="application/pdf" /&gt;
+
+
+## Analysis model - Events
+&lt;!-- Although we do not explicitly include them in the model, the non-political events that we look for when considering periods of significant change are defined by substantial changes in various economic measures, such as the onset of the Great Depression or floating the currency; events of a historical magnitude, such as entering into a war or the 9/11 attacks; or events that had a significant effect on Australian life, such as hosting the Olympics, or the Mabo decision. The full list of events that we consider are detailed in Appendix \@ref(eventdetails). Note that we consider each chamber separately and future work could expand the model to better understand, and allow, for correlation between them. --&gt;
+
+&lt;!-- We estimate sitting-period level-effects (essentially a mean for each topic by sitting period). The difference between this mean distribution and a particular day's topic distribution defines a measure that can be thought of as essentially a residual which allows us to identify outlying days. This approach means that the model generates dates that are interesting without us having to specify interesting dates.  --&gt;
+
+&lt;!-- More specifically, we define a day to be 'outlying' or 'different-to-expected' if the topic distribution on that particular day is more than three standard deviations different to the mean topic distribution for the relevant sitting period. Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week. --&gt;
+
+&lt;table class="table" style="font-size: 10px; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Days that were significantly different to other days in their sitting period&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; date &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1905-07-26 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1906-08-03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1913-11-06 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1918-11-26 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1918-11-29 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1928-08-29 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1931-06-11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1945-02-21 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1945-03-01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1961-09-07 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1965-10-01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1970-09-18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1974-09-17 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1981-08-18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1982-08-17 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1986-02-11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2001-09-17 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2002-10-14 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2007-09-18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2010-02-25 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+&lt;!-- Finally, Figure \@ref(fig:sigmaelection) illustrates the estimated standard deviation of topic distributions, around the mean election effect, over time. In general, the estimates of standard deviation are increasing over time, suggesting that discussed topics are more variable in more recent election periods compared to historical periods.  --&gt;
+
+&lt;!-- ```{r sigmaelection, cache = TRUE, echo = FALSE, fig.cap = "Elections level effects on selected topics", out.width = '100%'} --&gt;
+&lt;!-- knitr::include_graphics("../../figures/sigma.pdf") --&gt;
+&lt;!-- ``` --&gt;
+
+
+
+## Menzies-Holt
+
+&lt;!-- Of the 36 different governments over this period, we find that 14 of them are significantly different to the government that preceded them. However, two of these results -- the significance of the Page  Government and the first Menzies Government -- are likely due to the short length of the Page Government and should be ignored, leaving only 12. The earliest of these are the Second and Third Fisher Governments, which were different to the Third Deakin Government and the Cook Government respectively. To a certain extent this is likely tied up with changes due to World War I. --&gt;
+
+&lt;!-- The Second Menzies Government, starting in 1949, is the next government that is significantly different to a predecessor. The rest of the ones that are different are concentrated in the second half of our sample, with three of them being in the past twenty years. Similarly, of the 45 general elections that have been held we find that 14 of them define periods that were significantly different to their immediate predecessor. 1974, 1980, 1990, 1998, 2004, and 2007 stand out as elections where the government did not change, but the model suggests there was considerable change in the topics discussed in parliament. --&gt;
+
+&lt;!-- The second Menzies Government was associated with a variety of changes compared with the preceding Chifley Government. The Chifley Government had governed through the end of World War II and the difficult economic times that followed. There was also a large increase in the number of seats in the House of Representatives at the 1949 election. Many new politicians entered parliament and this changed representation may also have been partly to do with the changed distribution of discussion topics. The sixteen-year length of the second Menzies Government, and better economic conditions over this time make it understandable why parliamentary discussion would have been different.  --&gt;
+
+&lt;!-- There were six elections within the second Menzies Government. However we do not find that any of those elections was associated with a significant change in the topics discussed. In this sense it was a period of consistency, especially when compared with shorter-term Whitlam Government, or the longer-term Howard Government.  --&gt;
+
+&lt;!-- The Menzies Government was succeeded by the Holt Government in January 1966. This is an example where there was a change in government without an election, as the next election only happened in November 1966. We find that the Holt Government is significantly different to the Menzies Government. In Figures \@ref(fig:muelectionall) we compare the topics during the final term of the Menzies Government with the topics of the Holt Government. --&gt;
+
+&lt;embed src="../../../figures/mu_election-differences-menziesholt.pdf" width="100%" type="application/pdf" /&gt;
+
+
+## Whitlam stability
+
+&lt;embed src="../../../figures/mu_election-differences-whitlam.pdf" width="100%" type="application/pdf" /&gt;
+
+
+
+
+&lt;!-- The Whitlam government is interesting as we find a difference in the topics after it was first elected in December 1972, compared with its second election win in May 1974. Figure \@ref(fig:muelectionall) compares the topics that are significant in the first Whitlam term and then compares them to those in the second Whitlam government. --&gt;
+
+---
+
+## Howard instability
+
+&lt;embed src="../../../figures/mu_election-differences-howard.pdf" width="100%" type="application/pdf" /&gt;
+
+
+
+&lt;!-- The Howard Government is interesting because of the significant differences between elections. For instance, each of the election periods is associated with fairly substantial differences compared with the preceding election periods, and all apart from 2001 are actually significantly different at the 95 per cent level. Figure \@ref(fig:muelectionall) compares the topics that are significant in the different Howard terms. --&gt;
+
+&lt;!-- To a certain extent the change after the November 2001 election is expected because of the 9/11 terrorist attacks that had only occurred two months earlier, the Bali Bombings that occurred in October 2002, and the dramatic increase in the discussion related to terrorism and conflict over these years. However the change in 1998 and 2004 is more unexpected. Although the Howard Government is the second-longest serving government and commonly thought of as a period of stability because the senior ministers were consistent as well, it might be that it is better to think of the Howard Government as a combination of three or four different periods and that the Howard Government reinvented itself over this period. --&gt;
+
+&lt;!-- One advantage of our analysis model, compared with using the STM approach is that we can create a measure that is equivalent to testing for outliers in a model where the underlying variables were not latent. The results of this reduction in supervision are promising, but suggest specifics of our process need further refinement. For instance, our approach appropriately identifies the sitting day that first follows 11 September 2001 and 12 October 2002, which were the dates of the 9/11 Attacks and Bali Bombings respectively. It also appropriately identifies some of other key events that we were interested in. However there are many dates that we would have expected to be identified that were not, and similarly some of the dates that were identified are surprising. Further work is needed to improve this approach. For instance, our approach may not be appropriately considering step-changes. --&gt;
+
+---
+
+
+# Issues/tradeoffs
+
+---
+
+## Issues/tradeoffs
+- Even after cleaning the dataset remains imperfect and is more fit-for-purpose than of broad applicability.
+- Topic interpretation is difficult. 
+- Inputs have to be fine-tuned.
+- Assuming government effects are is constant across the whole period. 
+- Assuming the effect of elections is monotonically decreasing across days since election. 
+- Identification of unusual periods could also be improved. 
+- Propogation of uncertainty is inappropriate.
+
+---
+
+# Future work
+
+## Future work
+- Group identity: which is more important?
+-
+
+---
+
+## Questions?
+- rohan.alexander@anu.edu.au
+- @RohanAlexander
+- rohanalexander.com
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -53,7 +53,6 @@ governments_results <- read_csv(here::here("outputs/results-analysis_model/resul
 
 key_events_results <- read_csv(here::here("outputs/results-analysis_model/results-outliers.csv"), col_types = cols())
 
-
 ```
 
 
@@ -444,7 +443,7 @@ The way that we identify unusual periods could also be improved. We defined sitt
 
 Finally, the current modelling and analysis set-up is a two-stage process: we take the output of a topic model, and use this as the input to a second model. However, this approach does not appropriately propagate uncertainty in topic distribution estimation. Future methodological work will focus on how to combine these two modelling steps by extending the STM approach into a more flexible framework. 
 
-Watching our politicians at work can sometimes be a little disheartening. It can be hard to believe that not only are those in charge shouting insults that would not be tolerated in a schoolyard, but that we voted to put them there. Nonetheless, our work suggests that reasonable debate of important topics does occur in parliament. It is easy to look back and think that we live in uniquely tumultuous times, but our analysis suggests events have always driven debate and that periods of stability may be the exception. However, we do find that since the 1980s differences between government and election periods are greater than they used to be. It is, of course, reasonable that a government should act on the mandate they receive, but the longer-term nature of important policymaking means that progress may be held back if the media and political cycles become too focused on short-term events.
+Watching our politicians at work can sometimes be a little disheartening. It can be hard to believe that not only are those in charge shouting insults that would not be tolerated in a schoolyard, but that we voted to put them there. Nonetheless, our work suggests that reasonable debate of important topics does occur in parliament. It is easy to look back and think that we live in uniquely tumultuous times, but our analysis suggests events have always driven debate and that periods of stability may be the exception. However, we do find that since the 1980s differences between government and election periods are greater than they used to be. It is, of course, reasonable that a government should act on the mandate they receive, but it takes a long time to get policy right, and we may find progress being held back if the media and political cycles become too focused on short-term events.
 
 
 

@@ -1,0 +1,16 @@
+base
+here
+kableExtra
+knitr
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats
+bindrcpp
+leaflet
+DT
