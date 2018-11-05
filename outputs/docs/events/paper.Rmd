@@ -8,7 +8,7 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "The Effect of Events on Discussion in the Australian Federal Parliament (1901--2017)"
-thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
+thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU School of Politics and International Relations, the ANU Research School of Economics, and the Parliamentary Library. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto
@@ -61,7 +61,7 @@ Government policy is partly driven by parliamentary discussion. Conversely, that
 
 In this paper we examine text records of what was said in the Australian Federal Parliament. We create a dataset based on all sitting days from 1901 through to 2017. We have records for 7,869 days in the House of Representatives and 6,682 days in the Senate. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lower-case, remove numbers and punctuation, join commonly co-located words, and remove stop words.
 
-We systematically analyse the text using two main statistical techniques. To reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. We then analyse the topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. These events include: changes in government; elections; and other significant events such as an economic recession or terrorism.
+We systematically analyse the text using two main statistical techniques. To reduce the dimensionality of our dataset we first use a topic model that allows correlation between topics. We then analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. These events include: changes in government; elections; and other significant events such as an economic recession or terrorism.
 
 We find: 1) changes in government tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. 2) As expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the government was returned yet there was a significant change in topics. 3) Economic events, such as financial crises, have less significant effects than other events such as terrorism.
 
@@ -186,7 +186,7 @@ However, the replacement of the Dirichlet distribution with the logistic multiva
 Figure \@ref(fig:exampletopics) illustrates a CTM output based on a five per cent sample from the Australian House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time.
 
 ```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with Topic 17 highlighted", out.width = '100%'}
-knitr::include_graphics("../../figures/topics_example.pdf")
+# knitr::include_graphics("../../figures/topics_example.pdf")
 ```
 
 
@@ -471,7 +471,16 @@ knitr::include_graphics("../../figures/example_hansard_page.png")
 
 \newpage
 
-## Known Hansard issues {#knownhansardissues}
+## Summary statistics
+
+```{r countsbyyear, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '90%'}
+knitr::include_graphics("../../figures/counts_by_year.pdf")
+```
+
+
+\newpage
+
+## Compared with parliamentary website {#knownhansardissues}
 Comparing the sitting days to the dates that we have suggests some issues with the dataset (Table \@ref(tab:missingdays)).)
 
 ```{r missingdays, echo = FALSE, results = 'asis'}
@@ -612,7 +621,7 @@ For background on the Premiers' Plan see @Copland1934.
 
 For background on the Gruen tariff cut see @Gruen1975.
 
-Add the graphs and procedures.
+Add the graphs and procedures. **[TBD]**
 
 
 \newpage

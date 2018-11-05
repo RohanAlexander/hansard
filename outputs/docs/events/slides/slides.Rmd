@@ -4,8 +4,8 @@ subtitle:
 author:
 - Monica Alexander, University of Toronto\newline
 - Rohan Alexander, Australian National University
-date: 24 October 2018
-institute: Presentation at the School of Politics and International Relations, Australian National University, Canberra, Australia.
+date: 25 October 2018
+institute: Presentation at the Research School of Economics, Australian National University, Canberra, Australia.
 output: binb::metropolis
 # output: ioslides_presentation
 fontsize: 12pt
@@ -37,7 +37,7 @@ governments_results <- read_csv(here::here("outputs/results-analysis_model/resul
   select(-Party, -`Died in Office`)
 
 key_events_results <- read_csv(here::here("outputs/results-analysis_model/results-outliers.csv"), col_types = cols())
-
+#breka
 ```
 
 # Summary
@@ -65,13 +65,13 @@ Test
 
 ## Hansard
 - A daily text record called Hansard of what was said in the Australian Federal Parliament has been made available since it was established in 1901. It's not vertatim, but it's pretty close.
-- Hansard records have been used in other counties but not really at scale in Australia (although others are also starting to use them).
+- Hansard records have been used in other counties but not really at scale in Australia (although others, such as Patrick Leslie, also use them).
 - Daily PDFs are available Hansard records available online as PDFs and these are considered the official release. 
 - There are 14,551 days of publicly available Hansard records across both chambers of the Australian Federal Parliament.
 
 ## Example PDF page
 
-```{r pressureFig, echo=FALSE, out.width = '50%', fig.align="center"}
+```{r pressureFig, echo=FALSE, out.width = '75%', fig.align="center"}
 
 knitr::include_graphics("../../../figures/example_hansard_page.png")
 
@@ -192,8 +192,8 @@ Essentially it swaps the Dirichlet for the Logistic Multivariate Normal. This so
 
 ## Correlated Topic Model - Example output
 
-```{r exampletopics, cache = TRUE, echo=FALSE, out.width = '100%'}
-knitr::include_graphics("../../../figures/topics_example-slides.pdf")
+```{r exampletopics, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("../../../figures/topics_example-slides.png")
 ```
 
 
@@ -231,7 +231,6 @@ In an ideal world we could modify the STM code, but instead we build a similar, 
 
 ## Analysis model - Daily distribution
 The topic proportions on day $d$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
-
 $$
 \theta_{d,1:P} \sim \mbox{Dirichlet}(\mu_{s[d],1:P})
 $$
@@ -326,8 +325,8 @@ top_words %>%
 
 <!-- There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by governments or elections tend not to provide enough variability. For instance, examining Topics 12, 17, 22 and 23, which have to do with war and conflict illustrates Australia's involvement in World War I, World War II, the Korean War, the Vietnam War, the first Gulf War, and the war in Afghanistan and the second Gulf War (Figure \@ref(fig:wartopicsgraph)). -->
 
-```{r wartopicsgraph, cache = TRUE, echo = FALSE, out.width = '100%'}
-knitr::include_graphics("../../../figures/war_stack.pdf")
+```{r wartopicsgraph, cache = TRUE, echo = FALSE, out.width = '100%', fig.align="center"}
+knitr::include_graphics("../../../figures/war_stack-slides.pdf")
 ```
 
 
@@ -368,15 +367,15 @@ governments_results %>%
 <!-- 12, 17, 22, 23 which have to do with conflict, defence and security; 13 and 32 which have to do with commerce and trade; 24 and 33 which have to do with the budget, tax and spending; 29 which is to do with education and 39 which has to do with health. -->
 
 
-```{r mugov, cache = TRUE, echo = FALSE, out.width = '100%'}
-knitr::include_graphics("../../../figures/mu_gov.pdf")
+```{r mugov, cache = TRUE, echo = FALSE, out.width = '100%', fig.align="center"}
+knitr::include_graphics("../../../figures/mu_gov-slides.pdf")
 ```
 
 
 ## Analysis model - All elections
 
-```{r muelection, cache = TRUE, echo = FALSE, out.width = '100%'}
-knitr::include_graphics("../../../figures/mu_election.pdf")
+```{r muelection, cache = TRUE, echo = FALSE, out.width = '100%', fig.align="center"}
+knitr::include_graphics("../../../figures/mu_election-slides.pdf")
 ```
 
 
@@ -390,9 +389,9 @@ knitr::include_graphics("../../../figures/mu_election.pdf")
 ```{r keyeventsresultstable, echo = FALSE, results = 'asis'}
 
 key_events_results %>%
-  kable(caption = "Days that were significantly different to other days in their sitting period") %>%
+  kable() %>%
   kable_styling(font_size = 10)
-
+#CAS
 ```
 
 
@@ -421,7 +420,7 @@ knitr::include_graphics("../../../figures/mu_election-differences-menziesholt-sl
 ```
 
 
-## Whitlam stability
+## Whitlam re-election
 
 ```{r muelectionwhitlam, cache = TRUE, echo = FALSE, out.width = '100%', fig.align="center"}
 knitr::include_graphics("../../../figures/mu_election-differences-whitlam-slides.pdf")
@@ -461,15 +460,30 @@ knitr::include_graphics("../../../figures/mu_election-differences-howard-slides.
 - Propogation of uncertainty is inappropriate.
 
 
-# Future work
+# Current/future work
 
-## Future work
-- Group identity: which is more important?
--
+## Current/future work
+<!-- ### Improve data -->
+<!-- - Trying to get website data instead of needing to parse PDFs. -->
+
+### Current work
+- In-group and out-group identity: which is more important?
+- Senate/HoR: just how different are they?
+- Methods assessment: how is your cleaning impacting your results?
+- States/Commonwealth: where does policy come from?
+
+### Future
+- Open to suggestions and keen for collaboration.
 
 ## Questions?
 - rohan.alexander@anu.edu.au
 - @RohanAlexander
 - rohanalexander.com
+
+```{r hansardphoto, echo=FALSE, out.width = '75%', fig.align="center"}
+
+knitr::include_graphics("../../../figures/hansard_photo.png")
+
+```
 
 

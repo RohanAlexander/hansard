@@ -75,7 +75,7 @@ custom_stop_words <- bind_rows(stop_words, # The default list
 # Change the path as required:
 # use_this_path_to_get_csvs  <- "outputs/hansard/temp/testing"
 use_this_path_to_get_csvs <-
-  "/Volumes/Backup/senate_topic_modelling_input"
+  "/Volumes/Hansard/for_topics/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -90,7 +90,7 @@ file_names <- file_names %>% sample() # Randomise the order
 
 # use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing/test"
 use_this_path_to_save_csvs  <-
-  "/Volumes/Backup/senate_topic_modelling_prep_2"
+  "/Volumes/Hansard/for_topics/federal/hor"
 # use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)

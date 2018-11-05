@@ -31,7 +31,7 @@ multiword_expressions <- read_csv2("inputs/misc/multiwords_with_corrections.csv"
 # use_this_path_to_get_csvs  <- "/Volumes/Backup/temp"
 # use_this_path_to_get_csvs  <- "outputs/hansard/temp/testing"
 # use_this_path_to_get_csvs  <- "outputs/big_files_do_not_push/hansard_csv"
-use_this_path_to_get_csvs <- "/Volumes/Backup/senate_run_4_output"
+use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -45,7 +45,8 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # use_this_path_to_save_csvs  <- "outputs/hansard/temp/testing/test"
-use_this_path_to_save_csvs  <- "/Volumes/Backup/senate_topic_modelling_input"
+use_this_path_to_save_csvs <- "/Volumes/Hansard/for_topics/federal/hor"
+# use_this_path_to_save_csvs  <- "/Volumes/Backup/senate_topic_modelling_input"
 # use_this_path_to_save_csvs  <- "/Volumes/Backup/temp"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
