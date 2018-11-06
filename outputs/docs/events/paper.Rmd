@@ -38,8 +38,7 @@ elections <- read_csv(here::here("inputs/misc/misc_elections_data.csv"), col_typ
 governments <- read_csv(here::here("inputs/misc/change_of_pm.csv"), col_types = cols())
 keyEvents <- read_csv(here::here("inputs/misc/key_events.csv"), col_types = cols())
 significances <- read_csv(here::here("outputs/misc/significance.csv"), col_types = cols())
-top_words <- read_csv2(here::here("outputs/misc/top_words_40.csv"), col_types = cols())
-missing_days <- read_csv(here::here("outputs/misc/missing_days.csv"), col_types = cols())
+top_words <- read_csv2(here::here("outputs/results-topic_models_and_gammas/top_words_80.csv"), col_types = cols())
 hansard_sources <- read_csv(here::here("outputs/misc/hansard_sources.csv"), col_types = cols())
 
 elections_results <- read_csv(here::here("outputs/results-analysis_model/results-elections.csv"), col_types = cols()) %>% 
@@ -94,9 +93,9 @@ Following the example of the UK a daily text record called Hansard of what was s
 
 The recent digitisation of the Canadian Hansard, @BeelenEtc2017, allowed @RheaultCochran2018 to examine ideology and party polarisation in Britain and Canada. In the UK, @Duthie2016 analysed Hansard records to examine which politicians made supportive or aggressive statements toward other politicians between 1979 and 1990 and @PetersonSpirling2018 examined polarisation. And as digitisation methods improve older UK records can be analysed, for instance @Dimitruk2018 considers the effect of estate bills on prorogations in seventeenth century England. In New Zealand, @Curran2017 modelled the topics discussed between 2003 and 2016, and @Graham2016 examined unparliamentary language between 1890 and 1950. And in the US, @GentzkowShapiroTaddy2018 examined congressional speech records from 1873 to 2016 to find that partisanship has risen in the past few decades.
 
-Parts of Australian Hansard records have been analysed for various purposes. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. And @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment. 
+Parts of Australian Hansard records have been analysed for various purposes. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment. @FraussenGrahamHalpin2019 examined Australian Hansard records to assess the prominence of interest groups. The closest research to ours that we have found is @Boulous2013 who examines parliamentary debate in Australia for the period 1946 to 2012.
 
-The Australian Federal Parliament makes daily Hansard records available online as PDFs and these are considered the official release. Additionally, XML records are available in some cases.[^XMLfootnote] We provide an example of a Hansard PDF page in Appendix \@ref(examplehansardpage). There are 14,551 days of publicly available Hansard records across both chambers of the Australian Federal Parliament. Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
+The Australian Federal Parliament makes daily Hansard records available online as PDFs and these are considered the official release. Additionally, XML records are available in some cases.[^XMLfootnote] We provide an example of a Hansard PDF page in Appendix \@ref(examplehansardpage). There are 14,551 days of publicly available Hansard records across both chambers of the Australian Federal Parliament that we have PDFs for and further summary statistics for this are provided in Appendix \@ref(hansardsummarystatistics). Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
 
 [^XMLfootnote]: Tim Sherratt makes these XML records available as a single download and also presents them in a website (http://historichansard.net/) that can be used to explore Commonwealth Hansard records from 1901 to 1980. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website.
 
@@ -328,8 +327,8 @@ Table \@ref(tab:topwords) lists the top five words associated with each of the f
 ```{r topwords, echo = FALSE, results = 'asis'}
 
 top_words %>% 
-  kable(booktabs = T, caption = "Top words associated with each topic") %>%
-  kable_styling(font_size = 10)
+  kable(booktabs = T, longtable = TRUE, caption = "Top words associated with each topic") %>%
+  kable_styling(font_size = 8, latex_options = c("repeat_header"))
 
 ```
 
@@ -460,63 +459,121 @@ Watching our politicians at work can sometimes be a little disheartening. It can
 # Hansard details
 
 
-
 ## Example Hansard page {#examplehansardpage}
 
-```{r asdf, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '90%'}
+```{r asdf, echo=FALSE, fig.cap="Example Hansard page -- 6 February 1902", out.width = '65%', fig.align='center'}
 knitr::include_graphics("../../figures/example_hansard_page.png")
 ```
 
 
-
 \newpage
 
-## Summary statistics
 
-```{r countsbyyear, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '90%'}
+## Summary statistics {#hansardsummarystatistics}
+
+The number of sitting days in a year varies considerably. The highest in the House of Representatives was 122 days in 1904, followed by 113 days in 1901 and 1920. The year with the most sitting days in the Senate was 1902 with 93 days, followed by 1989 with 92 days, and 1986 with 86 days (Figure \@ref(fig:countsbyyear)).
+
+```{r countsbyyear, echo=FALSE, fig.cap="Number of sitting days, by year", out.width = '100%'}
 knitr::include_graphics("../../figures/counts_by_year.pdf")
 ```
 
+Until the 1950s the House of Representatives tended to have more sitting days than the Senate. It was then similar, before the Senate had more days in the 1980s and 1990s. Since the 2000s the House of Representatives again has tended to have more sitting days than the Senate.
+
+These counts of the number of sitting days are based on available PDFs. For this reason the counts may be slightly different to other counts. An example of one known issue of this type is detailed in the next section.
+
 
 \newpage
+
 
 ## Compared with parliamentary website {#knownhansardissues}
-Comparing the sitting days to the dates that we have suggests some issues with the dataset (Table \@ref(tab:missingdays)).)
+The parliamentary website provides a summary table of the number of sitting days in each year by chamber.[^parliamentarywebsitelink] Comparing the numbers provided in that table with number of days that we have provides an indication of how complete our dataset is.
 
-```{r missingdays, echo = FALSE, results = 'asis'}
+[^parliamentarywebsitelink]: As at 5 November, the website was available at: https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear. 
 
-missing_days %>% 
-  kable(booktabs = T, caption = "Missing days") %>%
-  kable_styling(font_size = 12) %>% 
-  kableExtra::kable_styling(latex_options = "hold_position")
+In general the number of sitting days on the parliamentary website summary table is similar to the number of PDFs that we have although it does identify a few particularly concerning years (Figure \@ref(fig:differencesbyyear)).
 
+```{r differencesbyyear, echo=FALSE, fig.cap="Example Hansard page - 6 February 1902", out.width = '100%'}
+knitr::include_graphics("../../figures/differences_by_year.pdf")
 ```
 
-Positive means we are missing some, negative means we have too many.
-Source: https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear 
+When the difference is positive, it means that in that year we have fewer PDFs than the parliamentary website claims. For instance, 5 could mean that the parliamentary website claimed there were 100 days, but we only had PDFs for 95 days. Similarly, when the difference is negative then we have more PDFs than the parliamentary website claims there were sitting days.
 
+The two major years of concern are 1992 in the House of Representatives where we have 15 days more than the parliamentary website claims there were, and 1988 in the Senate where we have eight days fewer.
+
+The Parliament website is missing the Hansard PDFs for the following dates in the Senate: 
+1988-12-21, 1988-12-20, 1988-12-19, 1988-12-16, 1988-12-15, 1988-12-14, 1988-12-13, 1988-12-12, 2000-10-12, 2000-06-19, 2004-08-09, .
+
+There are two unaccounted for differences in 2006, one unaccounted for difference in 2001.
+
+
+The Parliament website is missing the Hansard PDFs for the following dates in the House of Representatives: 
+1985-08-23,
+1992-09-10,
+1996-12-13,
+2002-05-14,
+2000-10-12, and
+2000-06-29.
+
+There is one unaccounted for differences in 1920, 1921, 1935, 1942, 1948, 1951, 1991, 2003, 2004, and there are two unaccounted for in 1985 and four unaccounted for in 2012
 
 
 \newpage
 
-## Example Hansard PDf to text record workflow {#hansardworkflow}
-Here we provide psuedo-code for the workflow from PDF to text. The scripts are primarily based on: the \texttt{PDFtools} package of @Ooms2018pdftools; the \texttt{tidyverse} package of @Wickham2017; the \texttt{tm} package of @FeinererHornik2018; the \texttt{lubridate} package of @GrolemundWickham2011; and the \texttt{stringi} package of @Gagolewski2018. The functions of those packages are supported by: the \texttt{furrr} package of @VaughanDancho2018; and the \texttt{tictoc} package of @Izrailev2014. The \texttt{hunspell} package of @Ooms2017 is also used to help find spelling issues and the \texttt{tidytext} R package of @SilgeRobinson2016 and @Benoit2018 for compounding multiword expressions.
+
+## Example Hansard PDF to text record workflow {#hansardworkflow}
+The exact scripts that we use are too long to provide here but are available on request. Instead here we provide shorterned scripts for the workflow to convert the PDFs to usable text datasets that may be a useful starting point for other researchers. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
+
+The first step is scrape the websites for the PDFs.
+
+```{r scrapingexample, echo=TRUE, eval = FALSE}
+library(purrr)
+library(tidyverse)
+
+# Create lists of URLs to scrape and file names to save the PDF as
+data_to_scrape <- read_csv("csv_of_address_to_visit_and_save_names.csv")
+# Pull out the two pieces
+address_to_visit <- data_to_scrape$URL
+save_name <- data_to_scrape$file_name
+# Add a containing folder to the save_names
+save_name <- paste0("pdfs/", save_name)
+# Create that containing folder if necessary
+dir.create("pdfs") 
+
+# The function that will visit address_to_visit and save to save_name file
+visit_address_and_save_PDF <-
+  function(name_of_address_to_visit,
+           name_of_where_to_save) {
+    # Do the actual downloading of the PDF
+    download.file(name_of_address_to_visit, name_of_where_to_save)
+    # Helpful so that you know progress when running it on all the records
+    print(paste("Done with", name_of_where_to_save, "at", Sys.time()))  
+    # Space out your requests so you don't overwhelm the website
+    Sys.sleep(sample(15:30, 1)) 
+  }
+
+# Make the function more resistent to issues
+safe_visit_address_and_save_PDF <- safely(visit_address_and_save_PDF)
+
+# Walk through the lists and get the PDFs
+walk2(address_to_visit, save_name, ~ safe_visit_address_and_save_PDF(.x, .y))
+```
+
+
+The next step is... 
+
+UP TO HERE
 
 **[TBD].**
 
 
-
-
 \newpage
+
 
 ## Stopwords over time {#stopwordsgraph}
 **[TBD].** Insert graph of stop words over time. 
 
 
-
-
 \newpage
-
 
 
 # Topic modelling example and details
@@ -570,7 +627,25 @@ This conditional distribution assigns topics depending on how often a term has b
 
 ## Selection of number of topics {#selecttopicnumber}
 
-**[TBD]**
+The choice of the number of topics to use in a topic model has a substantial affect on the results of the model. For instance, in our topic model, choosing a smaller number of topics, such as 10 or 20 results in a model that is not all that useful because the topics are so broad.
+
+There are a variety of diagnostic measures that can guide the selection of the topics, but there is rarely an obvious best choice and we found it useful to try a few quite different measures before settling on 80 topics. Useful diagnostic measures that we considered include the held-out likelihood, the lower bound, residuals, and semantic coherence (Figures \@ref(fig:topicsdiagnostics)).[^Silgefootnote]
+
+[^Silgefootnote]: The code for creating the figures in this section is based on @Silge2018.
+
+```{r topicsdiagnostics, cache = TRUE, echo = FALSE, fig.cap = "Model diagnostics", out.width = '100%'}
+knitr::include_graphics("../../figures/diagnostics_for_k.pdf")
+```
+
+**[Discuss each of these...]**
+
+Additionally, the tradeoff between exclusitivity and semantic coherence...  (Figure \@ref(fig:topicsexclusivityvscoherence))
+
+```{r topicsexclusivityvscoherence, cache = TRUE, echo = FALSE, fig.cap = "Exclusitivity compared with semantic coherence", out.width = '100%'}
+knitr::include_graphics("../../figures/exclusivity_vs_coherence.pdf")
+```
+
+**[Discuss this one too...]**
 
 
 

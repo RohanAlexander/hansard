@@ -3,7 +3,7 @@
 # Purpose: Create topics, for the words used in each day of Hansard
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 17 October 2018
+# Last updated: 5 November 2018
 # Prerequisites:
 # Issues:
 
@@ -34,9 +34,12 @@ summary(hansard)
 rm(tm_corpus)
 
 
-
 # NEED TO COME BACK AND ADD METADATA
+# For now just get the filename
+file_names <- list.files(path = "/Volumes/Hansard/for_topics/federal/hor") %>% 
+  str_replace(".csv", "")
 # # Load the metadata
+
 # election_dates <-
 #   read_csv("inputs/misc/misc_elections_data.csv", col_types = cols())
 # hansard_dates <-
@@ -128,11 +131,13 @@ many_models <-
       vocab = hansard_stm$vocab,
       K = .,
       data = hansard_stm$meta,
-      max.em.its = 75,
+      # max.em.its = 75,
       init.type = "Spectral",
       verbose = TRUE
     )
   ))
+
+Sys.time()
 
 head(many_models)
 
@@ -164,104 +169,142 @@ k_result %>% transmute(
   `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")
 ) %>%
   gather(Metric, Value, -K) %>%
-  ggplot(aes(K, Value, color = Metric)) +
-  geom_line(size = 1.5,
-            alpha = 0.7,
-            show.legend = FALSE) +
+  ggplot(aes(K, Value)) +
+  geom_point(show.legend = FALSE) +
   facet_wrap(~ Metric, scales = "free_y") +
-  labs(x = "K (number of topics)",
-       y = NULL,
-       title = "Model diagnostics by number of topics")
-# subtitle = "These diagnostics indicate that a good number of topics would be around 60")
+  labs(x = "Number of topics",
+       y = NULL) +
+  theme_minimal()
+
+ggsave(
+  "outputs/figures/diagnostics_for_k.pdf",
+  height = 6,
+  width = 8,
+  units = "in"
+)
 
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
   # filter(K %in% c(20, 60, 100)) %>%
   unnest() %>%
   mutate(K = as.factor(K)) %>%
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
-  geom_point(size = 2, alpha = 0.7) +
+  ggplot(aes(semantic_coherence, exclusivity)) +
+  geom_point(show.legend = FALSE) +
   facet_wrap(vars(K)) +
   labs(
     x = "Semantic coherence",
-    y = "Exclusivity",
-    title = "Comparing exclusivity and semantic coherence",
-    subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity"
-  )
+    y = "Exclusivity"
+  ) + 
+  theme_minimal()
+ggsave(
+  "outputs/figures/exclusivity_vs_coherence.pdf",
+  height = 6,
+  width = 8,
+  units = "in"
+)
+
 
 # Save the bits and pieces that are important for later
 topic_model_20 <- k_result %>%
   filter(K == 20) %>%
   pull(topic_model) %>%
   .[[1]]
-save(topic_model_20, file = "outputs/topic_models_and_gammas/topic_model_20.RData")
+save(topic_model_20, file = "outputs/results-topic_models_and_gammas/topic_model_20.RData")
 tidy(topic_model_20,
      matrix = "gamma",
-     document_names = hansard_stm$meta$docid_field) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_20.csv")
+     # document_names = hansard_stm$meta$docid_field) %>%
+     document_names = file_names) %>%
+  mutate(str_split(document))
+# HERE
+  write_csv("outputs/results-topic_models_and_gammas/gammas_model_20.csv")
 tidy(topic_model_20,
      matrix = "beta",
      document_names = hansard_stm$meta$docid_field) %>%
-  write_csv("outputs/topic_models_and_gammas/betas_model_20.csv")
-read_csv("outputs/topic_models_and_gammas/betas_model_20.csv") %>%
+  write_csv("outputs/results-topic_models_and_gammas/betas_model_20.csv")
+read_csv("outputs/results-topic_models_and_gammas/betas_model_20.csv") %>%
   arrange(beta) %>%
   group_by(topic) %>%
-  top_n(5, beta) %>%
+  top_n(10, beta) %>%
   arrange(-beta) %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
   unnest() %>%
-  write_delim(path = "outputs/misc/top_words_20.csv", delim = ";")
+  write_delim(path = "outputs/results-topic_models_and_gammas/top_words_20.csv", delim = ";")
 
 topic_model_40 <- k_result %>%
   filter(K == 40) %>%
   pull(topic_model) %>%
   .[[1]]
-save(topic_model_40, file = "outputs/topic_models_and_gammas/topic_model_40.RData")
+save(topic_model_40, file = "outputs/results-topic_models_and_gammas/topic_model_40.RData")
 tidy(topic_model_40,
      matrix = "gamma",
      document_names = hansard_stm$meta$docid_field) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_40.csv")
+  write_csv("outputs/results-topic_models_and_gammas/gammas_model_40.csv")
 tidy(topic_model_40,
      matrix = "beta",
      document_names = hansard_stm$meta$docid_field) %>%
-  write_csv("outputs/topic_models_and_gammas/betas_model_40.csv")
-read_csv("outputs/topic_models_and_gammas/betas_model_40.csv") %>%
+  write_csv("outputs/results-topic_models_and_gammas/betas_model_40.csv")
+read_csv("outputs/results-topic_models_and_gammas/betas_model_40.csv") %>%
   arrange(beta) %>%
   group_by(topic) %>%
-  top_n(5, beta) %>%
+  top_n(10, beta) %>%
   arrange(-beta) %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
   unnest() %>%
-  write_delim(path = "outputs/misc/top_words_40.csv", delim = ";")
+  write_delim(path = "outputs/results-topic_models_and_gammas/top_words_40.csv", delim = ";")
 
 topic_model_60 <- k_result %>%
   filter(K == 60) %>%
   pull(topic_model) %>%
   .[[1]]
-save(topic_model_60, file = "outputs/topic_models_and_gammas/topic_model_60.RData")
+save(topic_model_60, file = "outputs/results-topic_models_and_gammas/topic_model_60.RData")
 tidy(topic_model_60,
      matrix = "gamma",
      document_names = hansard_stm$meta$docid_field) %>%
-  write_csv("outputs/topic_models_and_gammas/gammas_model_60.csv")
+  write_csv("outputs/results-topic_models_and_gammas/gammas_model_60.csv")
 tidy(topic_model_60,
      matrix = "beta",
      document_names = hansard_stm$meta$docid_field) %>%
-  write_csv("outputs/topic_models_and_gammas/betas_model_60.csv")
-read_csv("outputs/topic_models_and_gammas/betas_model_60.csv") %>%
+  write_csv("outputs/results-topic_models_and_gammas/betas_model_60.csv")
+read_csv("outputs/results-topic_models_and_gammas/betas_model_60.csv") %>%
   arrange(beta) %>%
   group_by(topic) %>%
-  top_n(5, beta) %>%
+  top_n(10, beta) %>%
   arrange(-beta) %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>%
   unnest() %>%
-  write_delim(path = "outputs/misc/top_words_60.csv", delim = ";")
+  write_delim(path = "outputs/results-topic_models_and_gammas/top_words_60.csv", delim = ";")
 
+topic_model_80 <- k_result %>%
+  filter(K == 80) %>%
+  pull(topic_model) %>%
+  .[[1]]
+save(topic_model_80, file = "outputs/results-topic_models_and_gammas/topic_model_80.RData")
+tidy(topic_model_80,
+     matrix = "gamma",
+     document_names = hansard_stm$meta$docid_field) %>%
+  write_csv("outputs/results-topic_models_and_gammas/gammas_model_80.csv")
+tidy(topic_model_80,
+     matrix = "beta",
+     document_names = hansard_stm$meta$docid_field) %>%
+  write_csv("outputs/results-topic_models_and_gammas/betas_model_80.csv")
+read_csv("outputs/results-topic_models_and_gammas/betas_model_80.csv") %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest() %>%
+  write_delim(path = "outputs/results-topic_models_and_gammas/top_words_80.csv", delim = ";")
+
+rm(topic_model_20, topic_model_40, topic_model_60, topic_model_80)
 
 
 

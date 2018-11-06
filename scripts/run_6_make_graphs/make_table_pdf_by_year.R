@@ -101,4 +101,3 @@ ggsave(
   units = "in"
 )
 
-# 10 September 1992 is missing a PDF
