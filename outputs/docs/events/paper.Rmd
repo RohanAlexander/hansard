@@ -516,6 +516,10 @@ The Parliament website is missing the Hansard PDFs for the following dates in th
 
 There is one unaccounted for differences in 1920, 1921, 1935, 1942, 1948, 1951, 1991, 2003, 2004, and there are two unaccounted for in 1985 and four unaccounted for in 2012
 
+In the Senate, the PDF for 10 August 1917 may be the wrong one? It says it is for 10 Jan 1918 on the cover sheet, but there's not even an entry for 10 Jan 1918...??? Very odd....
+
+Senate Hansard - 1918-12-18 has the wrong PDF so does 1917-08-01.
+
 
 \newpage
 
