@@ -39,6 +39,10 @@ governments <- read_csv(here::here("inputs/misc/change_of_pm.csv"), col_types = 
 keyEvents <- read_csv(here::here("inputs/misc/key_events.csv"), col_types = cols())
 significances <- read_csv(here::here("outputs/misc/significance.csv"), col_types = cols())
 top_words <- read_csv2(here::here("outputs/results-topic_models_and_gammas/top_words_80.csv"), col_types = cols())
+
+top_words <- top_words %>% 
+  rename(Topic = topic, Terms = terms)
+
 hansard_sources <- read_csv(here::here("outputs/misc/hansard_sources.csv"), col_types = cols())
 
 elections_results <- read_csv(here::here("outputs/results-analysis_model/results-elections.csv"), col_types = cols()) %>% 
@@ -111,44 +115,18 @@ The goal of our modelling strategy is twofold. Firstly, we want to use topic mod
 
 We first use the Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as reduced dimension inputs that can be analysed within another model. We then formulate a Bayesian hierarchical Dirichlet model to assess changes in the topic distributions in relation to events of interest. 
 
-In the following section, we briefly describe the topic modelling approach, which is to use the CTM, which is a natural extension of the Latent Dirichlet Allocation (LDA) model [@Blei2003latent], before discussing the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. More detail on the topic modelling is available for readers that may be less familiar with it in Appendix \@ref(hansardworkflow) 
+In the following section, we briefly describe the topic modelling approach, which is to use the CTM, which is a natural extension of the Latent Dirichlet Allocation (LDA) model [@Blei2003latent], before discussing the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. More detail on the topic modelling is available for readers that may be less familiar with it in Appendix \@ref(LDAexample).
 
 <!-- The models that we use in this paper are the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage, and Bayesian hierarchical Dirichlet analysis model. In a similar way to @MuellerRauh2018, we use topics as an input to another model, in our case to analyse the effect of various events.  -->
 
 <!-- The basis of the STM is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section we provide a brief overview of both the LDA model and the STM. We consider the outputs of the topic model as reduced dimension inputs that can be analysed within another model. We then discuss the Bayesian hierarchical Dirichlet analysis model that we use for this purpose. -->
 
 ## Latent Dirichlet Allocation
-Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. One way to get consistent estimates of the topics discussed in Hansard is to use the LDA method of @Blei2003latent.
+Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. 
 
-The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method. In this sense, this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult. 
+Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 does this by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. In exchange for some reduction in the reasonableness of the categorisation, the LDA method of @Blei2003latent is able to provide consistent categorisation of the topics discussed in Hansard for large text collections.
 
-As applied to Hansard, LDA considers each statement to be a result of a process where a politician first chooses the topics they want to speak about. After choosing the topics, the politician then chooses appropriate words to use for each of those topics. Statistically, LDA considers each document as having been generated by some probability distribution over topics. Similarly, each topic is considered a probability distribution over terms. To choose the terms used in each document, terms are picked from each topic in the appropriate proportion. Figures \@ref(fig:topicsoverdocuments) and \@ref(fig:topicsoverterms) in Appendix \@ref(LDAexample) illustrate an example with five topics, two documents, and ten terms.
-
-Following @BleiLafferty2009, @blei2012 and @GriffithsSteyvers2004, the process by which a document is generated is more formally considered to be:
-
-1. There are $1, 2, \dots, k, \dots, K$ topics and the vocabulary consists of $1, 2, \dots, V$ terms. For each topic, decide the terms that the topic uses by randomly drawing distributions over the terms. The distribution over the terms for the $k$th topic is $\beta_k$. Typically a topic would be a small number of terms and so the Dirichlet distribution with hyper-parameter $\boldsymbol{\eta}$ is used: $\beta_k \sim \mbox{Dirichlet}(\boldsymbol{\eta})$, where $\boldsymbol{\eta} = (\eta_1, \eta_2, \dots, \eta_{K})$.[^Dirichletfootnote] In practice, a symmetric Dirichlet distribution is usually used, where all elements of $\boldsymbol{\eta}$ are equal. 
-2. Decide the topics that each document will cover by randomly drawing distributions over the $K$ topics for each of the $1, 2, \dots, d, \dots, D$ documents. The topic distributions for the $d$th document are $\theta_d$, and $\theta_{d,k}$ is the topic distribution for topic $k$ in document $d$. Again, the Dirichlet distribution with the hyper-parameter $0<\alpha<1$ is used here because usually a document would only cover a handful of topics: $\theta_d \sim \mbox{Dirichlet}(\boldsymbol{\alpha})$. Again, strictly $\boldsymbol{\alpha}$ is vector of length $K$ of hyper-parameters and they are usually equal.
-3. If there are $1, 2, \dots, n, \dots, N$ terms in the $d$th document, then to choose the $n$th term, $w_{d, n}$:
-    a. Randomly choose a topic for that term $n$, in that document $d$, $z_{d,n}$, from the multinomial distribution over topics in that document, $z_{d,n} \sim \mbox{Multinomial}(\theta_d)$.
-    b. Randomly choose a term from the relevant multinomial distribution over the terms for that topic, $w_{d,n} \sim \mbox{Multinomial}(\beta_{z_{d,n}})$.
-
-[^Dirichletfootnote]: The Dirichlet distribution is a variation of the beta distribution that is commonly used as a prior for categorical and multinomial variables. If there are just two categories, then the Dirichlet and the beta distributions are the same. In the special case of a symmetric Dirichlet distribution, where all elements of $\eta=1$, it is equivalent to a uniform distribution. If $\eta<1$, then the distribution is sparse and concentrated on a smaller number of the values, and this number decreases as $\eta$ decreases. A hyper-parameter is a parameter of a prior distribution.
-
-Given this set-up, the joint distribution for the variables is (@blei2012, p.6):
-$$p(\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}, w_{1:D, 1:N}) = \prod^{K}_{i=1}p(\beta_i) \prod^{D}_{d=1}p(\theta_d) \left(\prod^N_{n=1}p(z_{d,n}|\theta_d)p\left(w_{d,n}|\beta_{1:K},z_{d,n}\right) \right).$$
-
-Based on this document generation process the analysis problem, discussed next, is to compute a posterior over $\beta_{1:K}$ and $\theta_{1:D}$, given $w_{1:D, 1:N}$. This is intractable directly, but can be approximated (@GriffithsSteyvers2004 and @blei2012).
-
-After the documents are created, they are all that we have to analyse. The term usage in each document, $w_{1:D, 1:N}$, is observed, but the topics are hidden, or 'latent'. We do not know the topics of each document, nor how terms defined the topics. That is, we do not know the probability distributions of Figures \@ref(fig:topicsoverdocuments) or \@ref(fig:topicsoverterms). In a sense we are trying to reverse the document generation process -- we have the terms and we would like to discover the topics.
-
-If the earlier process around how the documents were generated is assumed and we observe the terms in each document, then we can obtain estimates of the topics (@SteyversGriffiths2006). The outcomes of the LDA process are probability distributions and these define the topics. Each term will be given a probability of being a member of a particular topic, and each document will be given a probability of being about a particular topic. That is, we are trying to calculate the posterior distribution of the topics given the terms observed in each document (@blei2012, p. 7):
-$$p(\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N} | w_{1:D, 1:N}) = \frac{p\left(\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}, w_{1:D, 1:N}\right)}{p(w_{1:D, 1:N})}.$$
-
-<!-- The initial practical step when implementing LDA given a collection of documents is to remove 'stop words'. These are words that are common, but that don't typically help to define topics. There is a common list of stop words such as: "a"; "an"; and "and". However the exact list used depends on research of focus. In the case of Australian Hansard, these are words such as: "australia"; "australian"; and "bill". Punctuation and capitalisation is also typically removed. The documents then need to then be transformed into a document-term-matrix. This is essentially a table with a column of the number of times each term appears in each document. -->
-
-<!-- After the dataset is ready, the R \texttt{topicmodels} package of @Grun2011 can be used to implement LDA and approximate the posterior.  -->
-
-Gibbs sampling or the variational expectation-maximization algorithm can be used to approximate the posterior. A summary of these approaches is provided in Appendix \@ref(LDAposteriorestimation). The choice of the number of topics, *k*, drives the results and must be specified *a priori*. If there is a strong reason for a particular number, then this can be used. Otherwise, one way to choose an appropriate number is to use cross validation.
+The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method. In this sense, this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult. More detail on how LDA works is available in Appendix \@ref(LDAexample).
 
 One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter [@blei2012]. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation. This is the Correlated Topic Model, described in the next section.
 
@@ -194,7 +172,7 @@ Figure \@ref(fig:exampletopics) illustrates a CTM output based on a five per cen
 <!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
 
 
-The CTM output of interest is the proportion of each topic appearing in each document, that is, the $\theta_d$. The aim of this stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with 40 topics for each of the roughly 14,551 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
+The CTM output of interest is the proportion of each topic appearing in each document, that is, the $\theta_d$. The aim of this stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with 80 topics for each of the roughly 14,551 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
 
 One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of Hansard, the government or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
 
@@ -320,9 +298,9 @@ Firstly, we describe the results of the CTM approach, which defined 40 unique to
 
 We applied the CTM approach discussed in Section 3.2 on the processed Hansard text database outlined in Section 2. The main output of interest are the types of topics identified by the model, and the prevalence of each topic on of each day of parliamentary discussion. 
 
-The remainder of the results refer to a topic model that had 40 distinct topics defined. The choice of 40 topics was made as a trade-off between semantic coherence and exclusivity with 40 topics performing better on both measures than 20. Measures such as residuals and held-out likelihood suggest a larger number of topics would be more appropriate. See Appendix \@ref(selecttopicnumber) for these diagnostics.
+The remainder of the results refer to a topic model that had 80 distinct topics defined. The choice of 80 topics was made as a trade-off between the standard diagnostic tests that suggested a larger number of topics would be more appropriate, and the need for the topics to be tractable for our analysis model and understandable for us. The diagnostic tests are detailed in Appendix \@ref(selecttopicnumber).
 
-Table \@ref(tab:topwords) lists the top five words associated with each of the forty topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Note that some topics seem to somewhat overlap with their content: for example, topics 12, 17, 22 and 23 all relate to war and conflict. 
+Table \@ref(tab:topwords) lists the top ten words associated with each of the 80 topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Note that some topics seem to somewhat overlap with their content: for example, topics 12, 17, 22 and 23 all relate to war and conflict. **[UPDATE THAT.]** 
 
 ```{r topwords, echo = FALSE, results = 'asis'}
 
@@ -341,7 +319,6 @@ There are several outputs of interest from this modelling stage. For example, th
 ```{r wartopicsgraph, cache = TRUE, echo = FALSE, fig.cap = "Model estimates of topic prevalance by sitting period for those related to war and conflict", out.width = '100%'}
 knitr::include_graphics("../../figures/war_stack.pdf")
 ```
-
 
 One of the main goals of the analysis model is to see which political events are associated with changes in the prevalence of topics over time. Political events are those related to a change of government or an election. As Australia has a parliamentary system, it is possible for the government to change without an election. We define a government based on who is the prime minister, and do not distinguish between terms or cabinet composition as is sometimes done. If a person was prime minister more than once then these are considered separately. 
 
@@ -563,7 +540,141 @@ walk2(address_to_visit, save_name, ~ safe_visit_address_and_save_PDF(.x, .y))
 ```
 
 
-The next step is... 
+The next step is remove the front matter from the PDFs. 
+
+```{r frontmatterexample, echo=TRUE, eval = FALSE}
+library(furrr) # May need the devtools version devtools::install_github("DavisVaughan/furrr")
+library(lubridate)
+library(pdftools)
+library(stringi)
+library(tidyverse)
+library(tictoc)
+library(tm)
+# Set up furrr to use multiple processors
+plan(multiprocess)
+
+# Create the lists of PDFs to read and file names to save text as
+use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
+use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/hor"
+
+# Get list of Hansard PDF filenames
+file_names <-
+  list.files(
+    path = use_this_path_to_get_pdfs,
+    pattern = "*.pdf",
+    recursive = TRUE,
+    full.names = TRUE
+  )
+file_names <- file_names %>% sample() # Randomise the order
+# Modify the savenames
+save_names <- file_names %>%
+  str_replace(use_this_path_to_get_pdfs, "") %>%
+  str_replace(".pdf", ".csv")
+save_names <- paste0(use_this_path_to_save_csv_files, save_names)
+
+
+#### Create the function that will be applied to the files ####
+get_text_from_PDFs <-
+  function(name_of_input_PDF_file,
+           name_of_output_csv_file) {
+    pdf_document <- pdf_text(name_of_input_PDF_file)
+    # Convert to tibble so that tidyverse can be used
+    pdf_document_tibble <- tibble(text = pdf_document)
+    rm(pdf_document)
+    # Each row is now a page of the PDF
+    # Adding a column of the row numbers allows you to keep track of the page numbers
+    pdf_document_tibble$pageNumbers <- 1:nrow(pdf_document_tibble)
+    # Separate each line (of each page) into own row
+    pdf_document_tibble <-
+      separate_rows(pdf_document_tibble, text, sep = "\\n")
+
+    # Identify page headers and footers and remove them
+    pdf_document_tibble <- pdf_document_tibble %>%
+      group_by(pageNumbers) %>%
+      mutate(lineNumber = 1:n()) %>% # This gives you a line numbering for each page
+      mutate(lastLine = n()) %>% # This tells you the number of the last line in each page
+      ungroup()
+    
+    ## Identify front matter and remove it
+    # Primarily identify the start of talking based on the first occurence of 'Mr SPEAKER'. 
+    # It seems pretty common, but there are some misses (e.g. 1991-01-22). 
+    # Use various backups
+    pdf_document_tibble <- pdf_document_tibble %>%
+      mutate(
+        firstSpeakerRow = str_detect(text, "SPEAKER"),
+        firstPresidentRow = str_detect(text, "PRESIDENT"),
+        firstJointHouseRow = str_detect(text, "JOINT HOUSE"),
+        firstTookTheChairRow = str_detect(text, "took the chair"),
+        firstTheChairAtRow = str_detect(text, "the chair at")
+      )
+    pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA
+    pdf_document_tibble$firstPresidentRow[pdf_document_tibble$firstPresidentRow == FALSE] <- NA
+    pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == FALSE] <- NA
+    pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == FALSE] <- NA
+    pdf_document_tibble$firstTheChairAtRow[pdf_document_tibble$firstTheChairAtRow == FALSE] <- NA
+    
+    # Get the row and corresponding page and then filter to only pages from that page
+    row_of_first_SPEAKER <-
+      pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == TRUE] %>% which() %>% first()
+    row_of_first_PRESIDENT <-
+      pdf_document_tibble$firstPresidentRow[pdf_document_tibble$firstPresidentRow == TRUE] %>% which() %>% first()
+    row_of_first_JOINTHOUSE <-
+      pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == TRUE] %>% which() %>% first()
+    row_of_first_TookTheChair <-
+      pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == TRUE] %>% which() %>% first()
+    row_of_first_TheChairAt <-
+      pdf_document_tibble$firstTheChairAtRow[pdf_document_tibble$firstTheChairAtRow == TRUE] %>% which() %>% first()
+    
+    first_page_of_interest_SPEAKER <-
+      pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer()
+    first_page_of_interest_PRESIDENT <-
+      pdf_document_tibble[row_of_first_PRESIDENT, "pageNumbers"] %>% as.integer()
+    first_page_of_interest_JOINTHOUSE <-
+      pdf_document_tibble[row_of_first_JOINTHOUSE, "pageNumbers"] %>% as.integer()
+    first_page_of_interest_TookTheChair <-
+      pdf_document_tibble[row_of_first_TookTheChair, "pageNumbers"] %>% as.integer()
+    first_page_of_interest_TheChairAt <-
+      pdf_document_tibble[row_of_first_TheChairAt, "pageNumbers"] %>% as.integer()
+    
+    first_page_of_interest_JOINTHOUSE <-
+      (first_page_of_interest_JOINTHOUSE + 1)  %>% as.integer()
+    
+    filter_from_here <-
+      case_when(
+        !is.na(first_page_of_interest_TookTheChair) ~ first_page_of_interest_TookTheChair,
+        !is.na(first_page_of_interest_TheChairAt) ~ first_page_of_interest_TheChairAt,
+        !is.na(first_page_of_interest_SPEAKER) ~ first_page_of_interest_SPEAKER,
+        !is.na(first_page_of_interest_PRESIDENT) ~ first_page_of_interest_PRESIDENT,
+        TRUE ~ first_page_of_interest_JOINTHOUSE
+      )
+
+    pdf_document_tibble <- pdf_document_tibble %>%
+      filter(pageNumbers >= filter_from_here) %>%
+      select(-firstSpeakerRow,
+             -firstPresidentRow,
+             -firstJointHouseRow,
+             -firstTookTheChairRow,
+             -firstTheChairAtRow)
+    
+    # Save file
+    write_csv(pdf_document_tibble, name_of_output_csv_file)
+    # Helpful to know where you're up to
+    print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
+  }
+
+
+#### Walk through the lists and parse the PDFs ####
+# Avoid errors
+safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
+
+tic("Furrr walk2 stringr")
+future_walk2(file_names,
+             save_names,
+             ~ safely_get_text_from_PDFs(.x, .y),
+             .progress = TRUE)
+toc()
+
+```
 
 UP TO HERE
 
@@ -574,15 +685,18 @@ UP TO HERE
 
 
 ## Stopwords over time {#stopwordsgraph}
-**[TBD].** Insert graph of stop words over time. 
+Insert the graph of stop words over time. 
 
 
 \newpage
 
 
-# Topic modelling example and details
-## Examples {#LDAexample}
-For instance, if there were five topics and two documents, then the first document may be comprised mostly of the first few topics; the other document may be mostly about the final few topics (Figure \@ref(fig:topicsoverdocuments)).
+# Topic modelling example and details {#LDAexample}
+
+## Overview and example
+As applied to Hansard, LDA considers each statement to be a result of a process where a politician first chooses the topics they want to speak about. After choosing the topics, the politician then chooses appropriate words to use for each of those topics. Statistically, LDA considers each document as having been generated by some probability distribution over topics. Similarly, each topic is considered a probability distribution over terms. To choose the terms used in each document, terms are picked from each topic in the appropriate proportion. 
+
+As an example, Figures \@ref(fig:topicsoverdocuments) and \@ref(fig:topicsoverterms) illustrate a smaller application with five topics, two documents, and ten terms. In this case, the first document may be comprised mostly of the first few topics; the other document may be mostly about the final few topics (Figure \@ref(fig:topicsoverdocuments)).
 
 ```{r topicsoverdocuments, cache = TRUE, echo=FALSE, fig.cap = "Probability distributions over topics for two documents", fig.height = 4}
 
@@ -599,9 +713,7 @@ tibble(
 
 ```
 
-
 For instance, if there were ten terms, then one topic could be defined by giving more weight to terms related to immigration; and some other topic may give more weight to terms related to the economy (Figure \@ref(fig:topicsoverterms)).
-
 
 ```{r topicsoverterms, cache = TRUE, echo=FALSE, fig.cap = "Probability distributions over terms", fig.height = 4}
 tibble(
@@ -617,6 +729,37 @@ tibble(
 
 ```
 
+\newpage
+
+## Document generation process
+
+Following @BleiLafferty2009, @blei2012 and @GriffithsSteyvers2004, the process by which a document is generated is more formally considered to be:
+
+1. There are $1, 2, \dots, k, \dots, K$ topics and the vocabulary consists of $1, 2, \dots, V$ terms. For each topic, decide the terms that the topic uses by randomly drawing distributions over the terms. The distribution over the terms for the $k$th topic is $\beta_k$. Typically a topic would be a small number of terms and so the Dirichlet distribution with hyper-parameter $\boldsymbol{\eta}$ is used: $\beta_k \sim \mbox{Dirichlet}(\boldsymbol{\eta})$, where $\boldsymbol{\eta} = (\eta_1, \eta_2, \dots, \eta_{K})$.[^Dirichletfootnote] In practice, a symmetric Dirichlet distribution is usually used, where all elements of $\boldsymbol{\eta}$ are equal. 
+2. Decide the topics that each document will cover by randomly drawing distributions over the $K$ topics for each of the $1, 2, \dots, d, \dots, D$ documents. The topic distributions for the $d$th document are $\theta_d$, and $\theta_{d,k}$ is the topic distribution for topic $k$ in document $d$. Again, the Dirichlet distribution with the hyper-parameter $0<\alpha<1$ is used here because usually a document would only cover a handful of topics: $\theta_d \sim \mbox{Dirichlet}(\boldsymbol{\alpha})$. Again, strictly $\boldsymbol{\alpha}$ is vector of length $K$ of hyper-parameters and they are usually equal.
+3. If there are $1, 2, \dots, n, \dots, N$ terms in the $d$th document, then to choose the $n$th term, $w_{d, n}$:
+    a. Randomly choose a topic for that term $n$, in that document $d$, $z_{d,n}$, from the multinomial distribution over topics in that document, $z_{d,n} \sim \mbox{Multinomial}(\theta_d)$.
+    b. Randomly choose a term from the relevant multinomial distribution over the terms for that topic, $w_{d,n} \sim \mbox{Multinomial}(\beta_{z_{d,n}})$.
+
+[^Dirichletfootnote]: The Dirichlet distribution is a variation of the beta distribution that is commonly used as a prior for categorical and multinomial variables. If there are just two categories, then the Dirichlet and the beta distributions are the same. In the special case of a symmetric Dirichlet distribution, where all elements of $\eta=1$, it is equivalent to a uniform distribution. If $\eta<1$, then the distribution is sparse and concentrated on a smaller number of the values, and this number decreases as $\eta$ decreases. A hyper-parameter is a parameter of a prior distribution.
+
+Given this set-up, the joint distribution for the variables is (@blei2012, p.6):
+$$p(\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}, w_{1:D, 1:N}) = \prod^{K}_{i=1}p(\beta_i) \prod^{D}_{d=1}p(\theta_d) \left(\prod^N_{n=1}p(z_{d,n}|\theta_d)p\left(w_{d,n}|\beta_{1:K},z_{d,n}\right) \right).$$
+
+Based on this document generation process the analysis problem, discussed next, is to compute a posterior over $\beta_{1:K}$ and $\theta_{1:D}$, given $w_{1:D, 1:N}$. This is intractable directly, but can be approximated (@GriffithsSteyvers2004 and @blei2012).
+
+After the documents are created, they are all that we have to analyse. The term usage in each document, $w_{1:D, 1:N}$, is observed, but the topics are hidden, or 'latent'. We do not know the topics of each document, nor how terms defined the topics. That is, we do not know the probability distributions of Figures \@ref(fig:topicsoverdocuments) or \@ref(fig:topicsoverterms). In a sense we are trying to reverse the document generation process -- we have the terms and we would like to discover the topics.
+
+If the earlier process around how the documents were generated is assumed and we observe the terms in each document, then we can obtain estimates of the topics (@SteyversGriffiths2006). The outcomes of the LDA process are probability distributions and these define the topics. Each term will be given a probability of being a member of a particular topic, and each document will be given a probability of being about a particular topic. That is, we are trying to calculate the posterior distribution of the topics given the terms observed in each document (@blei2012, p. 7):
+$$p(\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N} | w_{1:D, 1:N}) = \frac{p\left(\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}, w_{1:D, 1:N}\right)}{p(w_{1:D, 1:N})}.$$
+
+<!-- The initial practical step when implementing LDA given a collection of documents is to remove 'stop words'. These are words that are common, but that don't typically help to define topics. There is a common list of stop words such as: "a"; "an"; and "and". However the exact list used depends on research of focus. In the case of Australian Hansard, these are words such as: "australia"; "australian"; and "bill". Punctuation and capitalisation is also typically removed. The documents then need to then be transformed into a document-term-matrix. This is essentially a table with a column of the number of times each term appears in each document. -->
+
+<!-- After the dataset is ready, the R \texttt{topicmodels} package of @Grun2011 can be used to implement LDA and approximate the posterior.  -->
+
+Gibbs sampling or the variational expectation-maximization algorithm can be used to approximate the posterior. A summary of these approaches is provided next. 
+
+\newpage
 
 ## Posterior estimation {#LDAposteriorestimation}
 Following @SteyversGriffiths2006 and @Darling2011, the Gibbs sampling process attempts to find a topic for a particular term in a particular document, given the topics of all other terms for all other documents. Broadly, it does this by first assigning every term in every document to a random topic, specified by Dirichlet priors with $\alpha = \frac{50}{K}$ and $\eta = 0.1$  (@SteyversGriffiths2006 recommends $\eta = 0.01$), where $\alpha$ refers to the distribution over topics and $\eta$ refers to the distribution over terms (@Grun2011, p. 7). It then selects a particular term in a particular document and assigns it to a new topic based on the conditional distribution where the topics for all other terms in all documents are taken as given (@Grun2011, p. 6):
@@ -624,6 +767,8 @@ $$p(z_{d, n}=k | w_{1:D, 1:N}, z'_{d, n}) \propto \frac{\lambda'_{n\rightarrow k
 where $z'_{d, n}$ refers to all other topic assignments; $\lambda'_{n\rightarrow k}$ is a count of how many other times that term has been assigned to topic $k$; $\lambda'_{.\rightarrow k}$ is a count of how many other times that any term has been assigned to topic $k$; $\lambda'^{(d)}_{n\rightarrow k}$ is a count of how many other times that term has been assigned to topic $k$ in that particular document; and $\lambda'^{(d)}_{-i}$ is a count of how many other times that term has been assigned in that document. Once $z_{d,n}$ has been estimated, then estimates for the distribution of words into topics and topics into documents can be backed out.
 
 This conditional distribution assigns topics depending on how often a term has been assigned to that topic previously, and how common the topic is in that document (@SteyversGriffiths2006). The initial random allocation of topics means that the results of early passes through the corpus of document are poor, but given enough time the algorithm converges to an appropriate estimate.
+
+The choice of the number of topics, *k*, drives the results and must be specified *a priori*. If there is a strong reason for a particular number, then this can be used. Otherwise, one way to choose an appropriate number is to use cross validation. More detail on this process is provided in the next section.
 
 
 
