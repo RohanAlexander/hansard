@@ -3,44 +3,56 @@
 library(lubridate)
 library(tidyverse)
 
-td_gamma <- read_csv("outputs/results-topic_models_and_gammas/gammas_model_60.csv")
+td_gamma <- read_csv("outputs/results-topic_models_and_gammas/gammas_model_80.csv")
 dates <- read_csv("outputs/results-topic_models_and_gammas/dates.csv")
 
 head(td_gamma)
 
+td_gamma <- td_gamma %>% 
+  separate(document, into = c("chamber", "date"), sep = "-", extra = "merge")
+
+td_gamma$chamber[td_gamma$chamber == "hor"] <- "House of Representatives"
+td_gamma$chamber[td_gamma$chamber == "senate"] <- "Senate"
+
+
+td_gamma$date <- ymd(td_gamma$date)
+
 # td_gamma$document %>% unique() %>% length()
 
-td_gamma$date <- rep(dates$dates, 60)
+# td_gamma$date <- rep(dates$dates, 60)
 
-set.seed(12345)
-td_gamma <- td_gamma %>% 
-  sample_frac(0.05) # reduce to 5 per cent of the dataset so that it doesn't take an age to load
+# set.seed(12345)
+# td_gamma <- td_gamma %>% 
+#   sample_frac(0.05) # reduce to 5 per cent of the dataset so that it doesn't take an age to load
 
+
+# For paper
 td_gamma_reduced <- td_gamma %>% 
-  filter(topic %in% c(17))
+  filter(topic %in% c(4, 26, 28, 30, 66))
 
 ggplot(data = td_gamma, aes(x = date, y = gamma, color = as.factor(topic))) +
-  geom_point(color = "grey", alpha = 0.5) +
-  geom_point(data = td_gamma_reduced) +
-  theme_classic() +
+  geom_point(color = "grey", alpha = 0.5, size = 0.5) +
+  geom_point(data = td_gamma_reduced, size = 0.5) +
+  theme_minimal() +
   labs(x = "Date",
        y = "Gamma") +
-  theme(legend.position="none") +
-  scale_colour_viridis_d()
+  facet_wrap(vars(chamber), nrow = 2) +
+  # theme(legend.position="none") +
+  scale_colour_viridis_d(name = "Topics")
 
 ggsave(
     "outputs/figures/topics_example.pdf",
-     height = 6,
-     width = 8,
+     height = 8,
+     width = 6,
      units = "in"
   )
 
 
-
+# For slides
 td_gamma_reduced <- td_gamma %>% 
-  filter(topic %in% c(6, 24, 44)) 
+  filter(topic %in% c(4, 26, 28, 30, 66))
 
-ggplot(data = td_gamma, aes(x = document, y = gamma, color = as.factor(topic))) +
+ggplot(data = td_gamma, aes(x = date, y = gamma, color = as.factor(topic))) +
   geom_point(color = "grey", alpha = 0.5) +
   geom_point(data = td_gamma_reduced, size = 4) +
   theme_classic() +
