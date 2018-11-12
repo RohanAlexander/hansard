@@ -5,7 +5,7 @@
 # 3. find outliers within each period
 # 4. look at varinace over time
 
-#load("mcmc.array_40_2.Rda")
+#load("mcmc.array_80.Rda")
 
 # 1. different governments ------------------------------------------------
 
@@ -36,14 +36,17 @@ mu_gov_sig_all <- tibble(government = 1:ngovernments, sig = num_sig>0)
 
 mu_gov_sig_all <- mu_gov_sig_all %>% cbind(original_number =
   dr %>% group_by(governmentChangeDate) %>%
-    summarise(one_obs = n()==20) %>%
+    summarise(one_obs = n()==80) %>%
     filter(one_obs ==FALSE) %>%
     dplyr::select(governmentChangeDate) %>% pull()
 )
 
 # let's see who was different
 
+
 mu_gov_sig_all %>% filter(sig==TRUE) %>% dplyr::select(original_number) %>% pull()
+
+
 
 # fisher, bruce, page, menzies1, menzies2,  holt, whitlam, fraser, hawke, keating, howard, rudd1, gillard
 
@@ -54,7 +57,7 @@ for(i in 1:ngovernments){
   test_alpha <- mu_res_2 %>% filter(government==i) %>% dplyr::select(median) %>% pull()
   props <- rdirichlet(1000, exp(test_alpha))
   mean_props <- apply(props, 2, mean)
-  prop_gov <- rbind(prop_gov, tibble(government = i, topic = 1:40, prop = mean_props))
+  prop_gov <- rbind(prop_gov, tibble(government = i, topic = 1:80, prop = mean_props))
 }
 
 
@@ -96,6 +99,12 @@ mu_election_sig_all %>% filter(sig==TRUE) %>% dplyr::select(election) %>% pull()
 
 # 1949 (menzies 2); 1972 (whitlam); 1983 (hawke); 1996 (howard); 2001 (howard); 2004; 2007 (rudd); 2010 (gillard); 2013 (abbot)
 
+write_csv(tibble(sig_gov = mu_gov_sig_all %>% filter(sig==TRUE) %>% dplyr::select(original_number) %>% pull()), 
+          path = "significant_gov.csv")
+
+write_csv(tibble(sig_election = mu_election_sig_all %>% filter(sig==TRUE) %>% dplyr::select(election) %>% pull()),
+          path = "significant_election.csv")
+
 
 prop_election <- c()
 
@@ -104,7 +113,7 @@ for(i in 1:nelections){
   test_alpha <- mu_res %>% filter(election==i) %>% dplyr::select(median) %>% pull()
   props <- rdirichlet(1000, exp(test_alpha))
   mean_props <- apply(props, 2, mean)
-  prop_election <- rbind(prop_election, tibble(election = i, topic = 1:40, prop = mean_props))
+  prop_election <- rbind(prop_election, tibble(election = i, topic = 1:80, prop = mean_props))
 }
 
 

@@ -8,7 +8,7 @@ source("getsplines.R")
 
 # read in and join data
 d1 <- read_csv("dates_of_gov_and_election.csv")
-d2 <- read_csv("gammas_model_40.csv")
+d2 <- read_csv("../../outputs/results-topic_models_and_gammas/gammas_model_80-reps-only.csv")
 
 #d_old <- read_csv("gammas_model_prevalence_years_k_20.csv")
 #dates_index <- tibble(document = 1:length(unique(d_old$document)), date = unique(d_old$document))
@@ -20,14 +20,14 @@ d <- d2 %>% #left_join(dates_index) %>%
 # reduced dataset
 dr <- d #%>% filter(electionCounter>41)
 one_gov <- dr %>% group_by(governmentChangeDate) %>% 
-  summarise(one_obs = n()==20) %>% 
+  summarise(one_obs = n()==80) %>% 
   filter(one_obs==TRUE) %>% 
   select(governmentChangeDate) %>% pull()
 
 ## THERES NO GOV 23
 
 one_elec <- dr %>% group_by(electionCounter) %>% 
-  summarise(one_obs = n()==20) %>% 
+  summarise(one_obs = n()==80) %>% 
   filter(one_obs==TRUE) %>% 
   select(electionCounter) %>% pull()
 
@@ -41,13 +41,22 @@ dr_wide <- dr %>%
 dr_wide <- dr_wide %>% mutate(day_diff = document - lag(document))
 
 k <- 1
+n <- 0
 dr_wide$group <- NA
 for(i in 1:nrow(dr_wide)){
   if(is.na(dr_wide$day_diff[i])|dr_wide$day_diff[i]<7){
-    k <- k
+    if(n < 20){
+      k <- k
+      n <- n+1 
+    }
+    else{
+      k <- k+1
+      n <- 1
+    }
   }
   else{
     k <- k+1
+    n <- 1
   }
   dr_wide$group[i] <- k
 }
@@ -67,7 +76,7 @@ dr_train <- dr_long
 dr_train <- dr_train %>% group_by(electionCounter) %>%  mutate(days_since_start = group - min(group))
 
 
-ntopics <- 40
+ntopics <- 80
 
 y.stp <- array(NA, c(max(dr_train$group), max(dr_train$day_number), ntopics))
 
