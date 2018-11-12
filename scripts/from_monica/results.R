@@ -182,10 +182,11 @@ dr_long %>% filter(topic ==1) %>%
 
 musp_res %>% 
   left_join(dr_long %>% rename(sitting=group) %>% mutate(topic = as.numeric(topic))) %>% 
-  mutate(sig = gamma>2.9*upper) %>% 
-  #filter(year(document)==2001, month(document)==9, topic==17) %>% 
-  filter(sig==TRUE, upper>0.15&gamma>0.3, lower>0.000000001) %>%
-  dplyr::select(document) %>% 
+  mutate(sig = gamma>3*upper) %>% 
+  dplyr::select(-day_diff) %>% 
+  #filter(year(document)==2002, month(document)==10, day(document) ==14) %>% 
+  filter((upper>0.1&gamma>0.3&lower>0.000001&sig==TRUE)|(year(document)==2002&month(document)==10&day(document) ==14)|(year(document)==2001&month(document)==9&day(document) ==17)) %>%
+  dplyr::select(document)  %>% unique() %>% 
   write_csv(path = "results/outliers.csv")
 
 ## WAR PLOT
@@ -199,7 +200,7 @@ musp_res %>%
               dplyr::select(sitting, document)) %>% 
   group_by(sitting) %>% 
   mutate(med_norm = median/sum(median)) %>% 
-  filter(topic %in% c(12, 17, 22, 23)) %>% 
+  filter(topic %in% c(26, 28, 30, 66)) %>% 
   ggplot(aes(document, med_norm, fill = factor(topic))) + 
   geom_bar(stat = "identity", width = 100) + 
   scale_fill_viridis_d(name = "Topic") + 
@@ -215,7 +216,7 @@ musp_res %>%
               dplyr::select(sitting, document)) %>% 
   group_by(sitting) %>% 
   mutate(med_norm = median/sum(median)) %>% 
-  filter(topic %in% c(12, 17, 22, 23)) %>% 
+  filter(topic %in% c(26, 28, 30, 66)) %>% 
   ggplot(aes(document, med_norm, fill = factor(topic))) + 
   geom_bar(stat = "identity", width = 100) + 
   scale_fill_viridis_d(name = "Topic") + 
