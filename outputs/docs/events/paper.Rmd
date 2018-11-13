@@ -14,7 +14,7 @@ author:
   affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "We systematically analyse how discussion in the Australian Federal Parliament changes in response to elections and changed governments. We first create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2017 based on available public records. To reduce the dimensionality of this dataset we use a correlated topic model, and then analyse the effect of various events using a Bayesian hierarchical Dirichlet model. We find that: changes in government tend to be associated with topic changes even when the party in power does not change; and elections that do not result in a change in government are rarely associated with topic changes. The residuals of our model suggest that economic events, such as financial crises, have less significant effects than other events such as terrorist attacks although this is partly due to the construction of our model. The effect of events is much more pronounced in the second half of our sample, and especially in the past two decades. This has implications for how we think about the longer-term trajectory of government policymaking as the media and political cycles becomes increasingly focused on short-term events."
+abstract: "We systematically analyse how discussion in the Australian Federal Parliament changes in response to elections and changed governments. We first create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2017 based on available public records. To reduce the dimensionality of this dataset we use a correlated topic model, and then analyse the effect of various events using a Bayesian hierarchical Dirichlet model. We find that: changes in government tend to be associated with topic changes even when the party in power does not change; and elections that do not result in a change in government are rarely associated with topic changes. The effect of events is much more pronounced in the second half of our sample, and especially in the past two decades. This has implications for how we think about the longer-term trajectory of government policymaking as the media and political cycles becomes increasingly focused on short-term events."
 keywords: "text-as-data, Australian political history, unsupervised machine learning, Bayesian hierarchical Dirichlet model"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
@@ -64,7 +64,7 @@ Government policy is partly driven by parliamentary discussion. Conversely, that
 
 In this paper we examine text records of what was said in the Australian Federal Parliament. We create a dataset based on all sitting days from 1901 through to 2017. We have records for 7,869 days in the House of Representatives and 6,682 days in the Senate. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lower-case; remove names, numbers, and punctuation; join commonly co-located words; and remove stop words.
 
-We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in government and elections. The residuals of our model allow us to explore the effect of other significant events such as an economic recession or terrorism.
+We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in government and elections. After taking into consideration these effects, we can then explore the effect of other significant events such as an economic recession or terrorism.
 
 We find that: firstly changes in government tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the government was returned yet there was a significant change in topics. Finally, economic events, such as financial crises, have less significant effects than other events such as terrorism.
 
@@ -109,74 +109,39 @@ The percentage of stop-words in each record is reasonably consistent over time. 
 
 # Model
 
-The goal of our modelling strategy is twofold. Firstly, we want to use topic modelling [@Blei2003latent] to summarise the Hansard text into meaningful topics that reduce the dimensionality of the text data and capture the main themes discussed in parliament over time. Secondly, we want to relate the resulting topic distributions to temporal trends, changes, and events, such as a change in government, elections, and other external events. There are the two stages in our analytical process.
+The goal of our modelling strategy is twofold. Firstly, we want to use topic modelling [@Blei2003latent] to summarise the Hansard text into meaningful topics that reduce the dimensionality of the text data and capture the main themes discussed in parliament over time. Secondly, we want to relate the resulting topic distributions to temporal trends, changes, and events, such as a change in government, elections, and other external events. 
 
-We first use the Correlated Topic Model (CTM) of @BleiLafferty2007 to obtain estimated topic distributions over time. We consider these topic distributions as reduced dimension inputs that can be analysed within another model. The approach that we use to analyse these is to formulate a Bayesian hierarchical Dirichlet model to assess changes in the topic distributions in relation to events of interest. 
+We first use a Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as inputs that can be analysed within another model. Thus, the second modeling step involves using a Bayesian hierarchical Dirichlet model to analyse changes in the topic distributions (obtained from the first step) in relation to events of interest. 
 
-In the following section, we briefly describe the topic modelling approach, which is to use the CTM, which is a natural extension of the Latent Dirichlet Allocation (LDA) model of @Blei2003latent, before discussing the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. Background detail on topic modelling is available in Appendix \@ref(LDAexample).
+In the following section, we briefly describe the topic modelling approach, before discussing the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. Background detail on topic modelling is available in Appendix \@ref(LDAexample).
 
-<!-- The models that we use in this paper are the Structural Topic Model (STM) as implemented by the \texttt{stm} R package of @RobertsStewartAiroldiRPackage, and Bayesian hierarchical Dirichlet analysis model. In a similar way to @MuellerRauh2018, we use topics as an input to another model, in our case to analyse the effect of various events.  -->
-
-<!-- The basis of the STM is the Latent Dirichlet Allocation (LDA) model of @Blei2003latent. In this section we provide a brief overview of both the LDA model and the STM. We consider the outputs of the topic model as reduced dimension inputs that can be analysed within another model. We then discuss the Bayesian hierarchical Dirichlet analysis model that we use for this purpose. -->
-
-## Latent Dirichlet Allocation
+## Overview of topic modeling
 Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. 
 
-Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addresses this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. In exchange for some reduction in the reasonableness of the categorisation, the LDA method of @Blei2003latent is able to provide consistent categorisation of the topics discussed in Hansard for large text collections.
+Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addresses this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. 
+
+In order to effectively categorise topics over the whole period covering Hansard, we chose to use topic modeling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent.
 
 The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method, and it is in this sense that this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult. More detail on how topic modelling works is available in Appendix \@ref(LDAexample).
 
-One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter [@blei2012]. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation. This is the Correlated Topic Model, described in the next section.
+<!-- One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter [@blei2012]. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. -->
 
+One notable limitation of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. However, in reality topics are often related.  For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. 
 
-## Correlated Topic Model  {#correlatedtopicmodelsection}
-As mentioned in the previous section, one of the limitations of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. Correlation between topics is neither modelled nor accounted for by LDA, but in reality often topics are related. For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. The goal of the CTM [@BleiLafferty2007] is to account for this correlation between topics, in order to produce more realistic and stable topic distributions over time. The models are very similar, and the key difference is the underlying distributions that are drawn from.
-
-As with LDA, the process assumed to generate the documents is the key aspect as this will be reversed to estimate the topics. The document generation process of @Blei2003latent, discussed in Appendix \@ref(LDAdocgenprocess), is just slightly modified. Specifically, rather than assuming that the distribution of topics in a document, $\theta_d$, are a draw from a Dirichlet distribution, as in Step 2 of the LDA document generation process detailed in Appendix \@ref(LDAdocgenprocess), CTM assumes:
-$$\theta_d \sim \mbox{Logistic Normal}(\mu, \Sigma).$$
-That is, the main difference of CTM over LDA is that it replaces the assumption of the Dirichlet distribution with a more flexible logistic multivariate Normal distribution. This distribution can incorporate a covariance structure across the topics. The remainder of the steps of the document generating process are pretty much the same as LDA. 
-
-However, the replacement of the Dirichlet distribution with the logistic multivariate Normal distribution adds a level of computational complexity to CTM. The posterior distributions of the parameters of interest ($\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}$) can no longer be obtained using standard simulation techniques such as Gibbs Sampling. @BleiLafferty2007 develop a fast variational inference procedure for estimating the CTM. CTM itself has also been extended by @RobertsStewartAiroldi2016 as part of their work on Structural Topic Models. The main difference is to add a covariate to $\mu$ which allows consideration of additional information.
-
-
-<!-- The distinguishing aspect of the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 is that it considers more than just a document's content when constructing topics. For instance, we generally have some information about the author and the date that a document was created. In the case of Hansard, we know who was speaking and the date they spoke. The STM allows this additional information to affect the construction of topics, though influencing either topical prevalence or topical content. That said, the assumption that there is some document generation process is the same as the LDA method, it is just that this process now includes metadata. -->
-
-<!-- The STM is set-up to include metadata to do with prevalence and content. Prevalence relates to the topic proportions in each document. For instance, we expect that topics related to the reasons for Federation, such as tariffs and trade, should be more prevalent in those earlier years than later. Similarly, we may expect topics to do with terrorism to be more prevalent in recent years. The prevalence meta-data for the $d$th document are in $X_d$, which has one column for each covariate. For instance, if there were 10 documents and each had a date and an author, then $X$ would be $10\times 2$. Content relates to the words that make up each topic. For instance, there are changes in the use of language over the period for which we have data, and it would be better for these to not be responsible for defining different topics rather than being part of the same topic. STM only allows for one covariate related to content changes, for example, documents could be grouped by year.  -->
-
-<!-- As with LDA, the process assumed to generate the documents is the key aspect as this will be reversed to estimate the topics. The document generation process of @Blei2003latent discussed earlier, is slightly modified by @RobertsStewartAiroldi2016 for the STM: -->
-
-<!-- 1. As with LDA, the topic distributions, that is, the proportion of a document dedicated to a topic, for the $d$th document are $\theta_d$, and $\theta$ is a vector with length $D$. In contrast to LDA, this is a drawn from a logistic-normal distribution, parameterised such that the mean of that distribution, $\mu$, is affected by a vector of document covariates, $X_d$ (following @RobertsStewartTingley2018, p.3): -->
-<!-- $$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)$$ -->
-
-<!-- 2. To decide the distribution over terms for each topic, $\beta_{d,k}$, start with some baseline distribution over the terms, $m$. Topic-$k$-specific deviations from this are controlled by $\kappa_k^{(t)}$, deviations due to the document meta-data are controlled by $\kappa_{y_d}^{(c)}$, and the interaction between these two deviations is controlled by  $\kappa_{y_d,k}^{(i)}$: -->
-<!-- $$\beta_{d,k}\propto \mbox{exp}\left(m+\kappa^{(t)}_{k} + \kappa_{y_d}^{(c)} + \kappa_{y_{d}k}^{(i)}\right) $$ -->
-
-<!-- 3. Then if there are $n$ terms in the $d$th document, then to choose the $n$th term, $w_{d,n}$: -->
-<!--     a. Randomly choose a topic for that term from the document-specific multinomial distribution over topics. -->
-<!--     b. Randomly choose a term from the topic-specific multinomial distribution over terms. -->
-
-<!-- We primarily implement the STM on the daily-level parliamentary text data described earlier using the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. We consider both topic prevalence and content to be functions of time. The choice of the number of topics to use in the model is a situation-specific compromise. We use a standard diagnostic approach to decide on 80 **[UPDATE]** topics. More detail on this selection process is available in Appendix \@ref(selecttopicnumber). -->
-
-Figure \@ref(fig:exampletopics) illustrates a CTM output based on a sample from the Australian House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time.
-
-```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with five topics highlighted", out.width = '100%'}
-knitr::include_graphics("../../figures/topics_example.png")
-```
-
+As such, we chose to use a Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain topic distributions. CTM is a slight extension to LDA which allows for correlations between topics. More details about CTM can be found in Appendix \@ref(LDAexample).
 
 ## Analysis model  {#analysismodelexplanation}
 
-<!-- **[Actually, maybe this whole paragraph not needed?]** There are many ways to consider the effect of events. One is to summarise the topic proportions by each event and then run multinomial tests for whether the groups are different, although this does not take full advantage of the frequency of our data. Another is to consider a variant of multinomial logistic regression, but then events would be constrained to have an effect in certain ways. An autoregressive moving average (ARMA) model could be used to test for structural breaks, but **[something]**. Or splines could be fit with specific knot placements and then cross validation used to compare the RSS with a more general splines model, but **[something]**.  -->
-
-
-The CTM output of interest is the proportion of each topic appearing in each document, that is, the $\theta_d$. The aim of this stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with many topics for each of the roughly 14,551 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
+The CTM output of interest is the proportion of each topic appearing in each document. The aim of this stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with many topics for each of the roughly 14,551 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
 
 One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of Hansard, the government or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
 
-More specifically, consider a matrix of covariates. $X_d$, where each column relates to a different covariate or metadata aspect, and each row refers to a document. Then a cell has the value of each covariate for a particular document. Similar to the CTM, the STM assumes the topics within a document $\theta_d$ are a draw from a logistic Normal distribution with mean $\mu$. However, the STM framework assumes that the mean parameter is a linear function of covariates $X_d$:
-$$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma).$$
+<!-- More specifically, consider a matrix of covariates. $X_d$, where each column relates to a different covariate or metadata aspect, and each row refers to a document. Then a cell has the value of each covariate for a particular document. Similar to the CTM, the STM assumes the topics within a document $\theta_d$ are a draw from a logistic Normal distribution with mean $\mu$. However, the STM framework assumes that the mean parameter is a linear function of covariates $X_d$: -->
+<!-- $$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma).$$ -->
 
-Using the STM framework with covariates could theoretically allow the relationships between topics and certain types of events to be assessed. For instance, one covariate could be the government, $g$, that was in power during the time corresponding to document, $d$. However, the STM covariate framework has several limitations in terms of our goal to assess the relationship between topics and events:
+<!-- Using the STM framework with covariates could theoretically allow the relationships between topics and certain types of events to be assessed. For instance, one covariate could be the government, $g$, that was in power during the time corresponding to document, $d$.  -->
+
+However, the STM covariate framework has several limitations in terms of our goal to assess the relationship between topics and events:
 
 1. There is no way of specifying more complicated auto-correlated functional forms of the effects of events over time. For example, we believe that the effect of an election would peak at the time of the election, then gradually decay as a function of days since election. In the STM framework, it is possible to specify a constant or linear effect of elections over time, or a spline relationship over elections, but it is not possible to restrict the effect of a specific election over time to be monotonically decreasing. 
 2. There is no way to implement partial pooling across groups of similar documents. The STM framework assumes that  documents are independently and identically distributed, conditional on the model covariates. However, it could be expected that topic distributions within a particular government, for example, may be more- or less-likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period. 
@@ -184,7 +149,7 @@ Using the STM framework with covariates could theoretically allow the relationsh
 
 To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in governments and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods over the period 1901 to 2017 inclusive. **[UPDATE.]**
+Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 822 sitting periods over the period 1901 to 2017 inclusive.
 
 The topic proportions on day $d$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
 $$
@@ -231,49 +196,6 @@ $$
 
 We run the model in JAGS using the \texttt{rjags} package of @Plummer2018. 
 
-<!-- __[An illustration of the validity of our analysis model using simulated data is in Appendix \@ref(modeldetailsandsimulation).] __ -->
-
-
-
-
-<!-- RA STUFF: -->
-
-<!-- The full model is: -->
-
-<!-- \begin{align} -->
-<!-- \gamma_{stp} &\sim \mbox{Dirichlet}(\mu_{stp}) (\#eq:distributionforgammas) \\ -->
-<!-- \log \mu_{stp} &= \alpha_{sp} + \delta_{stp} (\#eq:meanforgammas) \\ -->
-<!-- \alpha_{s1} &= 0 (\#eq:zeroconstraint)\\ -->
-<!-- \alpha_{sp} &\sim \mbox{Normal}\left(\eta_{g[s]}, \sigma^2_g\right) \mbox{ for } p>1 (\#eq:alphasp) \\ -->
-<!-- \delta_{s,t,p} &\sim \mbox{Normal}\left(\delta_{s,t-1,p}, \sigma^2_{\delta}\right) (\#eq:deltasp) \\ -->
-<!-- \sigma^2_{\delta} &\sim \mbox{Uniform}(0, 40). (\#eq:randomwalkvariance) -->
-<!-- \end{align} -->
-
-<!-- **[Does the variance parameter used in Equation 4 need to be specified too?]** -->
-
-<!-- Equation \@ref(eq:distributionforgammas) describes the proportion of each day within a sitting period given to a particular topic. This is considered as a draw from a Dirichlet distribution parameterised by $\mu_{stp}$. In a sense, $\mu_{stp}$ will be mean topic distributions over whatever time period is of interest. -->
-
-<!-- Equation \@ref(eq:meanforgammas) describes that distribution parameter, $\mu_{stp}$, as the sum of $\alpha_{sp}$, which are sitting period specific topic distributions and mean the model is linear in time for each topic and sitting period, and $\delta_{stp}$, which is a simple time series that allows for a little variation within a sitting period. These are themselves parameters. The primary aim of the modelling task is to find an appropriate and meaningful functional form for $\mu$. -->
-
-<!-- Equation \@ref(eq:zeroconstraint) constrains the first intercept to zero for identification purposes. Equation \@ref(eq:alphasp) shows how we consider $\alpha_{sp}$ as a draw from a Normal distribution with a mean that depends on **[SOMETHING]** and a variance that depends on **[SOMETHING ELSE]**. Similarly, Equation \@ref(eq:deltasp) show how we model $\delta_{stp}$  as a draw from a Normal distribution with a mean that depends on the preceding $\delta$ and some variance which is drawn from the Uniform distribution in Equation \@ref(eq:randomwalkvariance), that is, a random walk around each intercept. -->
-
-<!-- **[Probably need to add: 1) where does each covariate come into it and how do they interact; 2) how does correlation work; 3) what are the random effects and fixed effects?]** -->
-
-
-
-<!-- We currently consider events in two ways. The first is graphically, grouping each of the daily topic proportions by the events and isolating the topics. This illustrates the differences between the topics. The second is by including incrementing variables in the prevalence metadata This groups each day by events and we can then conduct significance tests. Unfortunately both of these do not consider short-term effects. -->
-
-
-<!-- **[Use tf-idf between them as illustrative instead? Use that other measure of difference?]** -->
-
-
-<!-- We consider events in two ways. The first is in the change in the word usage before and after events and the second is in changes in the topics. -->
-
-<!-- Differences in word usage can be evaluated using the term frequency-inverse document frequency (tf-idf) measure. It will be higher for words that are rarely used across all documents, but commonly used in a document. For instance, in Australian parliamentary text records 'the' is commonly used in many documents and so the fact that it is used in any particular document is not usual. However, 'aboriginal' is less common across, and so if it was especially prevalent in a particular document that may distinguish that document. -->
-
-<!-- When we consider events using tf-idf, we gather terms from more than one day. We define groups of days that are roughly analogous to sitting periods. If there is more than a week between a day then we define a new group, otherwise the day is in the existing group. We use various measures **(Text2vec R package has some? or some other package)** to define a baseline measure of how different each group is, and then test for whether groups separated by our events are significantly different to this baseline. -->
-
-
 
 # Results
 
@@ -293,6 +215,14 @@ top_words %>%
   kable_styling(font_size = 8, latex_options = c("repeat_header"))
 
 ```
+
+Figure \@ref(fig:exampletopics) illustrates the CTM output based on a sample from the Australian House of Representatives between 1901 and 2017. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time. The highlighted topics are those related to war and conflict. 
+
+```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with five topics highlighted", out.width = '100%'}
+knitr::include_graphics("../../figures/topics_example.png")
+```
+
+
 
 ## Analysis model
 
@@ -779,6 +709,33 @@ knitr::include_graphics("../../figures/exclusivity_vs_coherence.pdf")
 ```
 
 
+## Correlated Topic Model  {#correlatedtopicmodelsection}
+One of the limitations of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. In reality often topics are related. For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. The goal of the CTM [@BleiLafferty2007] is to account for this correlation between topics, in order to produce more realistic and stable topic distributions over time. The models are very similar, and the key difference is the underlying distributions that are drawn from.
+
+As with LDA, the process assumed to generate the documents is the key aspect as this will be reversed to estimate the topics. The document generation process of @Blei2003latent, discussed in Appendix \@ref(LDAdocgenprocess), is just slightly modified. Specifically, rather than assuming that the distribution of topics in a document, $\theta_d$, are a draw from a Dirichlet distribution, as in Step 2 of the LDA document generation process detailed in Appendix \@ref(LDAdocgenprocess), CTM assumes:
+$$\theta_d \sim \mbox{Logistic Normal}(\mu, \Sigma).$$
+That is, the main difference of CTM over LDA is that it replaces the assumption of the Dirichlet distribution with a more flexible logistic multivariate Normal distribution. This distribution can incorporate a covariance structure across the topics. The remainder of the steps of the document generating process are pretty much the same as LDA. 
+
+However, the replacement of the Dirichlet distribution with the logistic multivariate Normal distribution adds a level of computational complexity to CTM. The posterior distributions of the parameters of interest ($\beta_{1:K}, \theta_{1:D}, z_{1:D, 1:N}$) can no longer be obtained using standard simulation techniques such as Gibbs Sampling. @BleiLafferty2007 develop a fast variational inference procedure for estimating the CTM. CTM itself has also been extended by @RobertsStewartAiroldi2016 as part of their work on Structural Topic Models. The main difference is to add a covariate to $\mu$ which allows consideration of additional information.
+
+
+<!-- The distinguishing aspect of the Structural Topic Model (STM) of @RobertsStewartAiroldi2016 is that it considers more than just a document's content when constructing topics. For instance, we generally have some information about the author and the date that a document was created. In the case of Hansard, we know who was speaking and the date they spoke. The STM allows this additional information to affect the construction of topics, though influencing either topical prevalence or topical content. That said, the assumption that there is some document generation process is the same as the LDA method, it is just that this process now includes metadata. -->
+
+<!-- The STM is set-up to include metadata to do with prevalence and content. Prevalence relates to the topic proportions in each document. For instance, we expect that topics related to the reasons for Federation, such as tariffs and trade, should be more prevalent in those earlier years than later. Similarly, we may expect topics to do with terrorism to be more prevalent in recent years. The prevalence meta-data for the $d$th document are in $X_d$, which has one column for each covariate. For instance, if there were 10 documents and each had a date and an author, then $X$ would be $10\times 2$. Content relates to the words that make up each topic. For instance, there are changes in the use of language over the period for which we have data, and it would be better for these to not be responsible for defining different topics rather than being part of the same topic. STM only allows for one covariate related to content changes, for example, documents could be grouped by year.  -->
+
+<!-- As with LDA, the process assumed to generate the documents is the key aspect as this will be reversed to estimate the topics. The document generation process of @Blei2003latent discussed earlier, is slightly modified by @RobertsStewartAiroldi2016 for the STM: -->
+
+<!-- 1. As with LDA, the topic distributions, that is, the proportion of a document dedicated to a topic, for the $d$th document are $\theta_d$, and $\theta$ is a vector with length $D$. In contrast to LDA, this is a drawn from a logistic-normal distribution, parameterised such that the mean of that distribution, $\mu$, is affected by a vector of document covariates, $X_d$ (following @RobertsStewartTingley2018, p.3): -->
+<!-- $$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)$$ -->
+
+<!-- 2. To decide the distribution over terms for each topic, $\beta_{d,k}$, start with some baseline distribution over the terms, $m$. Topic-$k$-specific deviations from this are controlled by $\kappa_k^{(t)}$, deviations due to the document meta-data are controlled by $\kappa_{y_d}^{(c)}$, and the interaction between these two deviations is controlled by  $\kappa_{y_d,k}^{(i)}$: -->
+<!-- $$\beta_{d,k}\propto \mbox{exp}\left(m+\kappa^{(t)}_{k} + \kappa_{y_d}^{(c)} + \kappa_{y_{d}k}^{(i)}\right) $$ -->
+
+<!-- 3. Then if there are $n$ terms in the $d$th document, then to choose the $n$th term, $w_{d,n}$: -->
+<!--     a. Randomly choose a topic for that term from the document-specific multinomial distribution over topics. -->
+<!--     b. Randomly choose a term from the topic-specific multinomial distribution over terms. -->
+
+<!-- We primarily implement the STM on the daily-level parliamentary text data described earlier using the \texttt{stm} R package of @RobertsStewartAiroldiRPackage. We consider both topic prevalence and content to be functions of time. The choice of the number of topics to use in the model is a situation-specific compromise. We use a standard diagnostic approach to decide on 80 **[UPDATE]** topics. More detail on this selection process is available in Appendix \@ref(selecttopicnumber). -->
 
 
 <!-- \newpage -->
