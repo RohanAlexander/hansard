@@ -21,7 +21,7 @@ geometry: margin=1in
 fontfamily: mathpazo
 fontsize: 12pt
 toc: FALSE
-# spacing: double
+spacing: double
 bibliography: ../bibliography.bib
 biblio-style: apsr
 endnote: no
@@ -67,6 +67,11 @@ key_events_results <-
   read_csv(here::here("outputs/results-analysis_model/results-outliers.csv"), col_types = cols()) %>%
     select(-Expected)
 
+key_events_results_cols <-
+  read_csv(here::here("outputs/results-analysis_model/results-outliers_in_columns.csv"), col_types = cols())
+  
+names(key_events_results_cols) <- c("Dates", "", "", "", "", "", "", "")
+
 ```
 
 
@@ -77,11 +82,11 @@ In this paper we examine text records of what was said in the Australian Federal
 
 We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in government and elections. After taking into consideration these effects, we can then explore the effect of other significant events such as an economic recession or terrorism.
 
-We find that: firstly changes in government tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the government was returned yet there was a significant change in topics. Finally, economic events, such as financial crises, have less significant effects than other events such as terrorism.
+We find that: firstly, changes in government tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the government was returned yet there was a significant change in topics. Finally, economic events, such as financial crises, have less significant effects than other events such as terrorism.
 
-As our dataset covers 117 years we are able to see how the effect of events changes over time. We find that the events that we are interested in are rarely significant in the first half of our dataset. With a small number of exceptions, even changes of government where the party in power also changed were not associated with overly large changes in parliamentary discussion. If governments try to more thoroughly distinguish themselves from their predecessor then longer-term policy may be more difficult to enact. Similarly, there is the danger that larger-scale signature-accomplishments of a government may be neglected by their successor for solely political reasons.
+As our dataset covers 117 years we are able to see how the effect of events changes over time. We find that the events that we are interested in are rarely significant in the first half of our dataset. With a small number of exceptions, even changes of government where the party in power also changed were not associated with overly large changes in parliamentary discussion. If governments try to more thoroughly distinguish themselves from their predecessor, then longer-term policy may be more difficult to enact. Similarly, there is the danger that larger-scale signature-accomplishments of a government may be neglected by their successor for solely political reasons.
 
-Our work contributes to a growing modern quantitative social sciences literature that considers text as an input to statistical methods, rather than requiring separate analysis. This literature sits across and draws from various historically-separate disciplines including applied statistics, economics, and political science. We contribute to this literature in terms of both data and methods. From a data perspective we bring to bear an essentially-complete record of what was said in the Australian Federal Parliament on a daily basis, and we make our dataset available to other researchers via the R package \texttt{hansardr}. From a methods perspective, our analysis model has several advantages over existing methods. These include: allowing the events to have more-complicated auto-correlated functional forms; implementing pooling across groups of similar documents; and identifying outlying topic distributions without the need to pre-specify the event of interest. As the digitisation of historical sources continues and computational power becomes cheaper, we expect interest in this quantitative social sciences approach to text to only increase and we expect the data and methods in our paper will be extended by other researchers in a variety of ways.
+Our work contributes to a growing modern quantitative social sciences literature that considers text as an input to statistical methods, rather than requiring separate analysis. This literature sits across and draws from various historically-separate disciplines including applied statistics, economics, and political science. We contribute to this literature in terms of both data and methods. From a data perspective we bring to bear an essentially-complete record of what was said in the Australian Federal Parliament on a daily basis, and we make our dataset available to other researchers via the R package \texttt{hansardr}. From a methods perspective, our analysis model has several advantages over existing methods. These include: allowing the events to have more-complicated auto-correlated functional forms; implementing pooling across groups of similar documents; and identifying outlying topic distributions without the need to pre-specify the event of interest. As the digitisation of historical sources continues and computational power becomes cheaper, we expect interest in a quantitative approach to text to only increase and the data and methods in our paper will be extended in a variety of ways.
 
 
 
@@ -112,7 +117,7 @@ The Australian Federal Parliament makes daily Hansard records available online a
 
 [^XMLfootnote]: Tim Sherratt makes these XML records available as a single download and also presents them in a website -- http://historichansard.net/ -- that can be used to explore Commonwealth Hansard records from 1901 to 1980. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website.
 
-We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R, @R2018, to convert the PDFs into daily text records. An example of the workflow and some pseudo-code are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
+We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R, @R2018, to convert the PDFs into daily text records. An example of the workflow and some example scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
 
 The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time. Details of this check are provided in Appendix \@ref(stopwordsgraph). We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new zealand to new_zealand. Then the sentences are de-constructed and each word considered individually.
 
@@ -122,16 +127,16 @@ The percentage of stop-words in each record is reasonably consistent over time. 
 
 The goal of our modelling strategy is twofold. Firstly, we want to use topic modelling [@Blei2003latent] to summarise the Hansard text into meaningful topics that reduce the dimensionality of the text data and capture the main themes discussed in parliament over time. Secondly, we want to relate the resulting topic distributions to temporal trends, changes, and events, such as a change in government, elections, and other external events. 
 
-We first use a Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as inputs that can be analysed within another model. Thus, the second modeling step involves using a Bayesian hierarchical Dirichlet model to analyse changes in the topic distributions (obtained from the first step) in relation to events of interest. 
+We first use a Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as inputs that can be analysed within another model. Thus, the second modelling step involves using a Bayesian hierarchical Dirichlet model to analyse changes in the topic distributions (obtained from the first step) in relation to events of interest. 
 
 In the following section, we briefly describe the topic modelling approach, before discussing the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. Background detail on topic modelling is available in Appendix \@ref(LDAexample).
 
-## Overview of topic modeling
+## Overview of topic modelling
 Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. 
 
 Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addresses this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. 
 
-In order to effectively categorise topics over the whole period covering Hansard, we chose to use topic modeling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent.
+In order to effectively categorise topics over the whole period covering Hansard, we chose to use topic modelling , a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent.
 
 The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method, and it is in this sense that this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult. More detail on how topic modelling works is available in Appendix \@ref(LDAexample).
 
@@ -285,18 +290,18 @@ knitr::include_graphics("../../figures/mu_election.pdf")
 
 ### Additional results
 
-Once government and election effects have been taken into consideration, some days stand out compared with others in their sitting period. We do not explicitly include them in the model because of over-fitting and effect-type concerns, but we are interested to see if these can be explained by events that occured on or before that sitting day. For instance, we may expect that events of a historical magnitude, such as the 9/11 attacks would be the focus of an entire day's discussion, or that the sitting day when the Apology to the Stolen Generation was delivered, or some particular legislation introduced, would be different to others in that sitting period.
+Once government and election effects have been taken into consideration, some days stand out compared with others in their sitting period. We do not explicitly include them in the model because of over-fitting and effect-type concerns, but we are interested to see if these can be explained by events that occurred on or before that sitting day. For instance, we may expect that events of a historical magnitude, such as the 9/11 attacks would be the focus of an entire day's discussion, or that the sitting day when the Apology to the Stolen Generation was delivered, or some particular legislation introduced, would be different to others in that sitting period.
 
 To do this we estimate sitting-period level-effects (essentially a mean for each topic by sitting period). The difference between this mean distribution and a particular day's topic distribution defines a measure that can be thought of as essentially a residual which allows us to identify outlying days. This approach means that the model generates dates that are interesting without us having to specify interesting dates. More specifically, we define a day to be 'outlying' or 'different-to-expected' if the topic distribution on that particular day is more than three standard deviations different to the mean topic distribution for the relevant sitting period. Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week.
 
+
 ```{r keyeventsresultstable, echo = FALSE, results = 'asis'}
 
-key_events_results %>%
+key_events_results_cols %>%
   kable(booktabs = T, caption = "Days that were significantly different to other days in their sitting period") %>%
   kable_styling(font_size = 10) 
 
 ```
-
 
 <!-- Finally, Figure \@ref(fig:sigmaelection) illustrates the estimated standard deviation of topic distributions, around the mean election effect, over time. In general, the estimates of standard deviation are increasing over time, suggesting that discussed topics are more variable in more recent election periods compared to historical periods.  -->
 
@@ -312,7 +317,7 @@ Of the 36 governments over this period, we find that 20 of them are significantl
 
 The Second Menzies Government, starting in 1949, is the next government that is significantly different to a predecessor. The rest of the governments that are different are concentrated in the second half of our sample, with three of them being in the past twenty years. Similarly, of the 45 general elections that have been held we find that 14 of them define periods that were significantly different to their immediate predecessor. 1974, 1980, 1990, 1998, 2004, and 2007 stand out as elections where the government did not change, but the model suggests there was considerable change in the topics discussed in parliament.
 
-The Second Menzies Government was associated with a variety of changes compared with the preceding Chifley Government. The Chifley Government had governed through the end of World War II and the difficult economic times that followed. There was also a large increase in the number of seats in the House of Representatives at the 1949 election. Many new politicians entered parliament and this changed representation may also have been partly to do with the changed distribution of discussion topics. The sixteen-year length of the Second Menzies Government, and better economic conditions over this time make it understandable why parliamentary discussion would have been different. There were six elections within the Second Menzies Government. Three toward the middle of that government were associated with significant changes in the topics discussed. 
+The Second Menzies Government was associated with a variety of changes compared with the preceding Chifley Government. The Chifley Government had governed through the end of World War II and the difficult economic times that followed. There was also a large increase in the number of seats in the House of Representatives at the 1949 election. Many new politicians entered parliament, and this changed representation may also have been partly to do with the changed distribution of discussion topics. The sixteen-year length of the Second Menzies Government, and better economic conditions over this time make it understandable why parliamentary discussion would have been different. There were six elections within the Second Menzies Government. Three toward the middle of that government were associated with significant changes in the topics discussed. 
 
 The Menzies Government was succeeded by the Holt Government in January 1966. This is an example where there was a change in government without an election, as the next election only happened in November 1966. We find that the Holt Government is different to the Menzies Government. In Figures \@ref(fig:muelectionall) we compare the topics during the final term of the Menzies Government with the topics of the Holt Government.
 
@@ -324,9 +329,9 @@ The Whitlam government is especially interesting as we find a difference in the 
 
 The Howard Government is also interesting because of the significant differences between elections. For instance, each of the election periods is associated with fairly substantial differences compared with the preceding election periods, and all are actually significantly different at the 95 per cent level. Figure \@ref(fig:muelectionall) compares the topics that are significant in the different Howard terms.
 
-To a certain extent the change after the November 2001 election is expected because of the 9/11 terrorist attacks that had only occurred two months earlier, the Bali Bombings that occurred in October 2002, and the dramatic increase in the discussion related to terrorism and conflict over these years. However the change in 1998 and 2004 is more unexpected. Although the Howard Government is the second-longest serving government and commonly thought of as a period of stability because the senior ministers were consistent as well, it might be that it is better to think of the Howard Government as a combination of three or four different periods and that the Howard Government reinvented itself over this period.
+To a certain extent the change after the November 2001 election is expected because of the 9/11 terrorist attacks that had only occurred two months earlier, the Bali Bombings that occurred in October 2002, and the dramatic increase in the discussion related to terrorism and conflict over these years. However, the change in 1998 and 2004 is more unexpected. Although the Howard Government is the second-longest serving government and commonly thought of as a period of stability because the senior ministers were consistent as well, it might be that it is better to think of the Howard Government as a combination of three or four different periods and that the Howard Government reinvented itself over this period.
 
-One advantage of our analysis model, compared with using the STM approach is that we can create a measure that is equivalent to testing for outliers in a model where the underlying variables were not latent. The results of this reduction in supervision are promising, but suggest the specifics of our process may need further refinement. For instance, our approach appropriately identifies the sitting day that first follows 11 September 2001 and 12 October 2002, which were the dates of the 9/11 Attacks and Bali Bombings respectively. It also appropriately identifies some of other key events in Australian history, such as X and Y. There are many dates that we would have expected to be identified that were not, and similarly some of the dates that were identified are surprising. When we dig into this we find that some of them, such as X and Y, are associated with significant legislation. Further work is needed to improve this approach. For instance, our approach may not be appropriately considering step-changes.
+One advantage of our analysis model compared with using the STM approach is that we can create a measure that is equivalent to testing for outliers in a model where the underlying variables were not latent. The results of this reduction in supervision are promising, but suggest the specifics of our process may need further refinement. For instance, our approach appropriately identifies the sitting day that first follows 11 September 2001 and 12 October 2002, which were the dates of the 9/11 Attacks and Bali Bombings respectively. But there are many dates that we would have expected to be identified that were not, and similarly some of the dates that were identified are surprising. When we dig into this we find that some of them, such as 4 February 2009, are associated with significant legislation. However the over-weighting of dates in the first half of our sample in Table \@ref(tab:keyeventsresultstable) highlights further work is needed to improve this approach. For instance, our approach may not be appropriately considering step-changes or it may be that our identification of sitting periods is not appropriate for the entire period.
 
 
 
@@ -339,11 +344,11 @@ Using text as data allows larger-scale analysis that would not be viable using l
 
 In terms of the analysis model which relates the topic distributions with events, there are several limitations to the model. Firstly, we are assuming that the effect of a particular government is constant across the whole period. In addition, we assume that the effect of elections is monotonically decreasing across days since election. Future work could consider different functional forms on both of these effects, and in particular try to allow for elections to have a 'lead-up' effect.
 
-The way that we identify unusual periods could also be improved. We defined sitting periods in a constant fashion across the whole dataset time frame, but how long the stretches are that parliament sits for has changed over time. In addition, more work needs to be done on how to identify outlying events. For instance, the extent to which an important event that occurs outside a sitting period can be identified has a great deal of uncertainty. And if an event happens in the middle of an sitting period, it may have a large effect on the overall mean, such that specific days are not identified as significantly outlying.
+The way that we identify unusual periods could also be improved. We defined sitting periods in a constant fashion across the whole dataset time frame, but how long the stretches are that parliament sits for has changed over time. In addition, more work needs to be done on how to identify outlying events. For instance, the extent to which an important event that occurs outside a sitting period can be identified has a great deal of uncertainty. And if an event happens in the middle of a sitting period, it may have a large effect on the overall mean, such that specific days are not identified as significantly outlying.
 
-Finally, the current modelling and analysis set-up is a two-stage process: we take the output of a topic model, and use this as the input to a second model. However, this approach does not appropriately propagate uncertainty in topic distribution estimation. Future methodological work could consider how to combine these two modelling steps by extending the STM approach into a more flexible framework. 
+Finally, the current modelling and analysis set-up is a two-stage process: we take the output of a topic model, and use this as the input to a second model. However, this approach does not appropriately propagate the uncertainty of the topic distribution estimation stage. Future methodological work could consider how to combine these two modelling steps, for instance by extending the STM approach into a more flexible framework. 
 
-Watching our politicians at work can sometimes be a little disheartening. It can be hard to believe that not only are those in charge shouting insults that would not be tolerated in a schoolyard, but that we voted to put them there. Nonetheless, our work suggests that reasonable debate of important topics does occur in parliament. It is easy to look back and think that we live in uniquely tumultuous times, but our analysis suggests events have always driven debate and that periods of stability may be the exception. However, we do find that since the 1980s differences between government and election periods are greater than they used to be. It is, of course, reasonable that a government should act on the mandate they receive, but it takes a long time to get policy right, and we may find progress being held back if the media and political cycles become too focused on short-term events.
+Watching our politicians at work can sometimes be a little disheartening. It can be hard to believe that not only are those in charge shouting insults that would not be tolerated in a schoolyard, but that we voted to put them there. Nonetheless, our work suggests that important topics are discussed in parliament. It is easy to look back and think that we live in uniquely tumultuous times, but our analysis suggests events have always driven debate and that periods of stability may be the exception. However, we do find that since the 1980s differences between government and election periods seem to be more pronounced than they used to be. It is, of course, reasonable that a government should act on the mandate they receive, but it takes a long time to get policy right, and we may find progress being held back if the media and political cycles become too focused on short-term events.
 
 
 
@@ -426,132 +431,134 @@ Senate Hansard - 1918-12-18 has the wrong PDF so does 1917-08-01.
 
 
 ## Example Hansard PDF to text record workflow {#hansardworkflow}
-The exact scripts that we use are too long to provide here but are available on request. Instead here we provide shorterned pseudo-code that summarises the workflow to convert the PDFs to usable text datasets and may be a useful starting point for other researchers. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
+The exact scripts that we use are too long to provide here but are available on request. Instead here we provide example scripts that summarises the workflow to convert the PDFs to usable text datasets and may be a useful starting point for other researchers. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
 
-The first step is scrape the websites for the PDFs.
+**[Insert the example scripts.]**
 
-```{r scrapingexample, echo=TRUE, eval = FALSE}
-visit_address_and_save_PDF <-
-  function(name_of_address_to_visit,
-           name_of_where_to_save) {
-    # Do the actual downloading of the PDF
-    download.file(name_of_address_to_visit, name_of_where_to_save)
-    # Helpful so that you know progress when running it on all the records
-    print(paste("Done with", name_of_where_to_save, "at", Sys.time()))  
-    # Space out your requests so you don't overwhelm the website
-    Sys.sleep(sample(15:30, 1)) 
-  }
-```
+<!-- The first step is to scrape the websites for the PDFs. -->
+
+<!-- ```{r scrapingexample, echo=TRUE, eval = FALSE} -->
+<!-- visit_address_and_save_PDF <- -->
+<!--   function(name_of_address_to_visit, -->
+<!--            name_of_where_to_save) { -->
+<!--     # Do the actual downloading of the PDF -->
+<!--     download.file(name_of_address_to_visit, name_of_where_to_save) -->
+<!--     # Helpful so that you know progress when running it on all the records -->
+<!--     print(paste("Done with", name_of_where_to_save, "at", Sys.time()))   -->
+<!--     # Space out your requests so you don't overwhelm the website -->
+<!--     Sys.sleep(sample(15:30, 1))  -->
+<!--   } -->
+<!-- ``` -->
 
 
-The next step is remove the front matter from the PDFs. 
+<!-- The next step is to remove the front matter from the PDFs.  -->
 
-```{r frontmatterexample, echo=TRUE, eval = FALSE}
+<!-- ```{r frontmatterexample, echo=TRUE, eval = FALSE} -->
 
-get_text_from_PDFs <-
-  function(name_of_input_PDF_file,
-           name_of_output_csv_file) {
-    pdf_document <- pdf_text(name_of_input_PDF_file)
-    # Convert to tibble so that tidyverse can be used
-    pdf_document_tibble <- tibble(text = pdf_document)
-    rm(pdf_document)
-    # Each row is now a page of the PDF
-    # Adding a column of the row numbers allows you to keep track of the page numbers
-    pdf_document_tibble$pageNumbers <- 1:nrow(pdf_document_tibble)
-    # Separate each line (of each page) into own row
-    pdf_document_tibble <-
-      separate_rows(pdf_document_tibble, text, sep = "\\n")
-    # Identify page headers and footers and remove them
-    pdf_document_tibble <- pdf_document_tibble %>%
-      group_by(pageNumbers) %>%
-      mutate(lineNumber = 1:n()) %>% # This gives you a line numbering for each page
-      mutate(lastLine = n()) %>% # This tells you the number of the last line in each page
-      ungroup()
-    ## Identify front matter and remove it
-    pdf_document_tibble <- pdf_document_tibble %>%
-      mutate(
-        firstSpeakerRow = str_detect(text, "SPEAKER")
-      )
-    pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA
-    # Get the row and corresponding page and then filter to only pages from that page
-    row_of_first_SPEAKER <-
-      pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == TRUE] %>% which() %>% first()
-    first_page_of_interest_SPEAKER <-
-      pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer()
-    filter_from_here <-
-      case_when(
-        !is.na(first_page_of_interest_SPEAKER) ~ first_page_of_interest_SPEAKER
-      )
-    pdf_document_tibble <- pdf_document_tibble %>%
-      filter(pageNumbers >= filter_from_here) %>%
-      select(-firstSpeakerRow)
-    # Save file
-    write_csv(pdf_document_tibble, name_of_output_csv_file)
-    # Helpful to know where you're up to
-    print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
-  }
+<!-- get_text_from_PDFs <- -->
+<!--   function(name_of_input_PDF_file, -->
+<!--            name_of_output_csv_file) { -->
+<!--     pdf_document <- pdf_text(name_of_input_PDF_file) -->
+<!--     # Convert to tibble so that tidyverse can be used -->
+<!--     pdf_document_tibble <- tibble(text = pdf_document) -->
+<!--     rm(pdf_document) -->
+<!--     # Each row is now a page of the PDF -->
+<!--     # Adding a column of the row numbers allows you to keep track of the page numbers -->
+<!--     pdf_document_tibble$pageNumbers <- 1:nrow(pdf_document_tibble) -->
+<!--     # Separate each line (of each page) into own row -->
+<!--     pdf_document_tibble <- -->
+<!--       separate_rows(pdf_document_tibble, text, sep = "\\n") -->
+<!--     # Identify page headers and footers and remove them -->
+<!--     pdf_document_tibble <- pdf_document_tibble %>% -->
+<!--       group_by(pageNumbers) %>% -->
+<!--       mutate(lineNumber = 1:n()) %>% # This gives you a line numbering for each page -->
+<!--       mutate(lastLine = n()) %>% # This tells you the number of the last line in each page -->
+<!--       ungroup() -->
+<!--     ## Identify front matter and remove it -->
+<!--     pdf_document_tibble <- pdf_document_tibble %>% -->
+<!--       mutate( -->
+<!--         firstSpeakerRow = str_detect(text, "SPEAKER") -->
+<!--       ) -->
+<!--     pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA -->
+<!--     # Get the row and corresponding page and then filter to only pages from that page -->
+<!--     row_of_first_SPEAKER <- -->
+<!--       pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == TRUE] %>% which() %>% first() -->
+<!--     first_page_of_interest_SPEAKER <- -->
+<!--       pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer() -->
+<!--     filter_from_here <- -->
+<!--       case_when( -->
+<!--         !is.na(first_page_of_interest_SPEAKER) ~ first_page_of_interest_SPEAKER -->
+<!--       ) -->
+<!--     pdf_document_tibble <- pdf_document_tibble %>% -->
+<!--       filter(pageNumbers >= filter_from_here) %>% -->
+<!--       select(-firstSpeakerRow) -->
+<!--     # Save file -->
+<!--     write_csv(pdf_document_tibble, name_of_output_csv_file) -->
+<!--     # Helpful to know where you're up to -->
+<!--     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time())) -->
+<!--   } -->
 
-```
+<!-- ``` -->
 
-Then the rows need to be combined:
-```{r combinerows, echo=TRUE, eval = FALSE}
-split_columns <-
-  function(name_of_input_csv_file,
-           name_of_output_csv_file) {
-    # Read in the csv, based on the filename list
-    csv_with_rows_to_combine <-
-      read_csv(name_of_input_csv_file,
-               trim_ws = FALSE,
-               col_types = cols())
-    # Remove any extra whitespace i.e. two or more spaces and spaces at either end. 
-    # Yes, I know that I turned this off in the read_csv, but it's better to be 
-    #explicit because the whitespace is useful sometimes.
-    csv_with_rows_to_combine$text <-
-      str_squish(csv_with_rows_to_combine$text)
-    # Put everything onto one line, which allows us to rejoin words that have been 
-    #split across two lines e.g. Mon- ica
-    csv_with_rows_to_combine <- csv_with_rows_to_combine %>%
-      mutate(text = str_replace_all(text, "-$", "MONICA"))
-    full_days_hansard <- csv_with_rows_to_combine %>%
-      select(-pageNumbers) %>%
-      summarise(text = paste(text, collapse = " ")) %>%
-      mutate(text = str_replace_all(text, "MONICA ", "")) %>%
-      mutate(text = str_replace_all(text, "[:space:]-(?=[:alpha:])", " - "))
-    rm(csv_with_rows_to_combine)
-    write_csv(full_days_hansard, name_of_output_csv_file)
-    print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
-  }
-```
+<!-- Then the rows need to be combined: -->
+<!-- ```{r combinerows, echo=TRUE, eval = FALSE} -->
+<!-- split_columns <- -->
+<!--   function(name_of_input_csv_file, -->
+<!--            name_of_output_csv_file) { -->
+<!--     # Read in the csv, based on the filename list -->
+<!--     csv_with_rows_to_combine <- -->
+<!--       read_csv(name_of_input_csv_file, -->
+<!--                trim_ws = FALSE, -->
+<!--                col_types = cols()) -->
+<!--     # Remove any extra whitespace i.e. two or more spaces and spaces at either end.  -->
+<!--     # Yes, I know that I turned this off in the read_csv, but it's better to be  -->
+<!--     #explicit because the whitespace is useful sometimes. -->
+<!--     csv_with_rows_to_combine$text <- -->
+<!--       str_squish(csv_with_rows_to_combine$text) -->
+<!--     # Put everything onto one line, which allows us to rejoin words that have been  -->
+<!--     #split across two lines e.g. Mon- ica -->
+<!--     csv_with_rows_to_combine <- csv_with_rows_to_combine %>% -->
+<!--       mutate(text = str_replace_all(text, "-$", "MONICA")) -->
+<!--     full_days_hansard <- csv_with_rows_to_combine %>% -->
+<!--       select(-pageNumbers) %>% -->
+<!--       summarise(text = paste(text, collapse = " ")) %>% -->
+<!--       mutate(text = str_replace_all(text, "MONICA ", "")) %>% -->
+<!--       mutate(text = str_replace_all(text, "[:space:]-(?=[:alpha:])", " - ")) -->
+<!--     rm(csv_with_rows_to_combine) -->
+<!--     write_csv(full_days_hansard, name_of_output_csv_file) -->
+<!--     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time())) -->
+<!--   } -->
+<!-- ``` -->
 
-Finally, we can fix the spelling:
-```{r fixspelling, echo=TRUE, eval = FALSE}
-fix_spelling <-
-  function(name_of_input_csv_file,
-           name_of_output_csv_file) {
-    csv_to_clean <-
-      read_csv(name_of_input_csv_file,
-               trim_ws = FALSE,
-               col_types = cols())
-    #Fix the spelling
-    csv_to_clean$text <-
-      stri_replace_all_regex(
-        csv_to_clean$text,
-        "\\b" %s+% fix_wrong_spellings$original %s+% "\\b",
-        fix_wrong_spellings$corrected,
-        vectorize_all = FALSE
-      )
-    # Save file
-    write_csv(csv_to_clean, name_of_output_csv_file)
-    print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
-  }
-```
+<!-- Finally, we can fix the spelling: -->
+<!-- ```{r fixspelling, echo=TRUE, eval = FALSE} -->
+<!-- fix_spelling <- -->
+<!--   function(name_of_input_csv_file, -->
+<!--            name_of_output_csv_file) { -->
+<!--     csv_to_clean <- -->
+<!--       read_csv(name_of_input_csv_file, -->
+<!--                trim_ws = FALSE, -->
+<!--                col_types = cols()) -->
+<!--     #Fix the spelling -->
+<!--     csv_to_clean$text <- -->
+<!--       stri_replace_all_regex( -->
+<!--         csv_to_clean$text, -->
+<!--         "\\b" %s+% fix_wrong_spellings$original %s+% "\\b", -->
+<!--         fix_wrong_spellings$corrected, -->
+<!--         vectorize_all = FALSE -->
+<!--       ) -->
+<!--     # Save file -->
+<!--     write_csv(csv_to_clean, name_of_output_csv_file) -->
+<!--     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time())) -->
+<!--   } -->
+<!-- ``` -->
 
 
 \newpage
 
 
 ## Stopwords over time {#stopwordsgraph}
-Insert the graph of stop words over time. 
+**[Insert the graph of stop words over time.]**
 
 
 \newpage
@@ -644,9 +651,9 @@ The choice of the number of topics, *k*, drives the results and must be specifie
 
 ## Selection of number of topics {#selecttopicnumber}
 
-The choice of the number of topics to use in a topic model has a substantial affect on the results of the model. For instance, in our topic model, choosing a smaller number of topics, such as 10 or 20 results in a model that is not all that useful because the topics are so broad.
+The choice of the number of topics to use in a topic model has a substantial effect on the results of the model. For instance, in our topic model, choosing a smaller number of topics, such as 10 or 20 results in a model that is not all that useful because the topics are so broad.
 
-There are a variety of diagnostic measures that can guide the selection of the topics, but there is rarely an obvious best choice, especially at a more fine level such as choosing betweeen 60 and 65 topics. We found it useful to try a few quite different measures before settling on 80 topics. This provided a balance between being granular enough to be informative--anything less than 40 topics tended to be too broad-- yet still being tractable for our analysis model in a reasonable amount of time. In addition to looking at the topics and how they changed over time, diagnostic measures that we considered include the held-out likelihood, the lower bound, residuals, exclusivity. and semantic coherence (Figures \@ref(fig:topicsdiagnostics)).[^Silgefootnote] 
+There are a variety of diagnostic measures that can guide the selection of the topics, but there is rarely an obvious best choice, especially at a finer level such as choosing between 60 and 65 topics. We found it useful to try a few quite different measures before settling on 80 topics. This provided a balance between being granular enough to be informative--anything less than 40 topics tended to be too broad-- yet still being tractable for our analysis model in a reasonable amount of time. In addition to looking at the topics and how they changed over time, diagnostic measures that we considered include the held-out likelihood, the lower bound, residuals, exclusivity. and semantic coherence (Figures \@ref(fig:topicsdiagnostics)).[^Silgefootnote] 
 
 [^Silgefootnote]: The code for creating the figures in this section is based on @Silge2018.
 
@@ -654,7 +661,7 @@ There are a variety of diagnostic measures that can guide the selection of the t
 knitr::include_graphics("../../figures/diagnostics_for_k.pdf")
 ```
 
-@RobertsStewartAiroldiRPackage provides more detail about the diagnostic tests that we use, but we briefly discuss each here. Exclusivity is a measure of how specific words are to particular topics. It looks at the proportion that a word makes up of a particular topic compared with the proportion that word makes up of the other topics. As the number of topics increases we usually expect exclusivity to increase because the topics become more particular. Higher values are better. The held out likelihood as described by @Wallach2009 takes a test/training approach to estimate the probability of held-out documents given the training documents. Higher values are better. The lower bound gives some indication of whether the model may have multiple modes and hence the end result be sensitive to the starting position (@Roberts2016navigating). Residuals analysis (@Taddy2012) compares the theoretical distribution of the variance with the eactual distribution. It is a test for overdispersion of the variance, and if it is found then this can suggest that more topics would be appropriate. Semantic coherence is the tradeoff for having topics that are more specific and the subsequent risk that the topics become meaningless. @Mimno2011 define a measure of coherence that is based on ratios of single words compared with pairs of words. The idea is that words that should occur in the one document should be more likely to be in a particular topic than ones that do not occur together. For instance, a topic that has 'wine' and 'cheese' as highly rated words would score better on their measure than another that contained 'cheese' and 'mining'. Lower values are better. @RobertsStewartAiroldiRPackage recommend examining the tradeoff between exclusitivity and semantic coherence. This suggests that the magnitude of improvement reduces from about 80 topics (Figure \@ref(fig:topicsexclusivityvscoherence)).
+@RobertsStewartAiroldiRPackage provides more detail about the diagnostic tests that we use, but we briefly discuss each here. Exclusivity is a measure of how specific words are to particular topics. It looks at the proportion that a word makes up of a particular topic compared with the proportion that word makes up of the other topics. As the number of topics increases we usually expect exclusivity to increase because the topics become more particular. Higher values are better. The held-out likelihood as described by @Wallach2009 takes a test/training approach to estimate the probability of held-out documents given the training documents. Higher values are better. The lower bound gives some indication of whether the model may have multiple modes and hence the end result be sensitive to the starting position (@Roberts2016navigating). Residuals analysis (@Taddy2012) compares the theoretical distribution of the variance with the actual distribution. It is a test for overdispersion of the variance, and if it is found then this can suggest that more topics would be appropriate. Semantic coherence is the trade-off for having topics that are more specific and the subsequent risk that the topics become meaningless. @Mimno2011 define a measure of coherence that is based on ratios of single words compared with pairs of words. The idea is that words that should occur in the one document should be more likely to be in a particular topic than ones that do not occur together. For instance, a topic that has 'wine' and 'cheese' as highly rated words would score better on their measure than another that contained 'cheese' and 'mining'. Lower values are better. @RobertsStewartAiroldiRPackage recommend examining the trade-off between exclusivity and semantic coherence. This suggests that the magnitude of improvement reduces from about 80 topics (Figure \@ref(fig:topicsexclusivityvscoherence)).
 
 ```{r topicsexclusivityvscoherence, cache = TRUE, echo = FALSE, fig.cap = "Exclusitivity compared with semantic coherence", out.width = '100%'}
 knitr::include_graphics("../../figures/exclusivity_vs_coherence.pdf")
