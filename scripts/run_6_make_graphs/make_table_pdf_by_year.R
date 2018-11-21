@@ -92,7 +92,8 @@ counts_by_year %>%
     geom_label_repel(aes(label = label_the_year)) + 
     facet_wrap(vars(Chamber), nrow = 2) +
     theme_classic() +
-    scale_fill_viridis_d()
+    scale_fill_viridis_d() + 
+    theme(text = element_text(size=12))
 
 ggsave(
   "outputs/figures/differences_by_year.pdf",

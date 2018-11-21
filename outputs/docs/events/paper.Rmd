@@ -25,6 +25,23 @@ spacing: double
 bibliography: ../bibliography.bib
 biblio-style: apsr
 endnote: no
+
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage[table]{xcolor}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}
+- \usepackage{threeparttablex}
+- \usepackage[normalem]{ulem}
+- \usepackage{makecell}
+
 ---
 
 ```{r setup, include=FALSE}
@@ -138,9 +155,9 @@ Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addressed this
 
 In order to effectively categorise the topics of the entire Hansard, we chose to use topic modelling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent.
 
-The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method, and it is in this sense that this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult. A
+The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method, and it is in this sense that this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult.
 
-An overview and simplified example of how topic modelling works is available in Appendix \@ref(LDAoverviewandexample). The underlying document generation process is discussed in Appendix \@ref(LDAdocgenprocess), and Appendix \@ref(LDAposteriorestimation) explains how this is reversed to generate topics. Finally, the choice of the number of topics has a large effect on the composition of the topics, and some diagnostics for selecting the appropriate number are discussed in Appendix \@ref(selecttopicnumber).
+An overview, and an example, of how topic modelling works is available in Appendix \@ref(LDAoverviewandexample). The underlying document generation process is discussed in Appendix \@ref(LDAdocgenprocess), and then Appendix \@ref(LDAposteriorestimation) explains how this is reversed to generate topics. Finally, Appendix \@ref(selecttopicnumber) contains a discussion of how the number of topics was chosen.
 
 <!-- One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter [@blei2012]. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. -->
 
@@ -231,8 +248,9 @@ Table \@ref(tab:topwords) lists the top ten words associated with each of the 80
 ```{r topwords, echo = FALSE, results = 'asis'}
 
 top_words %>% 
-  kable(booktabs = T, longtable = TRUE, caption = "Top words associated with each topic") %>%
-  kable_styling(font_size = 8, latex_options = c("repeat_header"))
+  kable("latex", booktabs = T, longtable = TRUE, caption = "Top words associated with each topic") %>%
+  kable_styling(font_size = 8, latex_options = c("repeat_header")) %>% 
+  footnote(general = "We display only the top ten words for each topic, but the topics are defined by probability distributions over all words.")
 
 ```
 
@@ -267,16 +285,24 @@ We summarise our results in terms of governments in Table \@ref(tab:governmentsr
 
 governments_results %>%
   kable(booktabs = T, caption = "Governments that were significantly different to their predecessor") %>%
-  kable_styling(font_size = 10)
+  kable_styling(font_size = 10) %>% 
+  footnote(
+    general = "The significance of a government is determined by whether at least one topic was significantly different during this government, compared with the previous one.", 
+    footnote_as_chunk = T, 
+    threeparttable = TRUE)
+
 
 ```
 
 ```{r electionsresults, echo = FALSE, results = 'asis'}
 
 elections_results %>%
-  kable(booktabs = T, caption = "Elections that were significantly different to the one before") %>%
+  kable(booktabs = T, caption = "Election-periods that were significantly different to the one before") %>%
   kable_styling(font_size = 10) %>% 
-  footnote(general = "Here is a general comments of the table. ")
+   footnote(
+    general = "The significance of a government is determined by whether at least one topic was significantly different during the period between this election and the next, compared with the previous one.", 
+    footnote_as_chunk = T, 
+    threeparttable = TRUE)
 
 ```
 
@@ -303,7 +329,12 @@ To do this we estimate sitting-period level-effects (essentially a mean for each
 
 key_events_results_cols %>%
   kable(booktabs = T, caption = "Days that were significantly different to other days in their sitting period") %>%
-  kable_styling(font_size = 10) 
+  kable_styling(font_size = 10) %>% 
+  footnote(
+    general = "These days were significantly different to others in their sitting period after taking election and government effects into consideration.", 
+    footnote_as_chunk = T, 
+    threeparttable = TRUE)
+
 
 ```
 
@@ -397,7 +428,7 @@ These counts of the number of sitting days are based on available PDFs. For this
 \newpage
 
 
-## Compared with parliamentary website {#knownhansardissues}
+## Annual counts of sitting days, compared with parliamentary website {#knownhansardissues}
 The parliamentary website provides a summary table of the number of sitting days in each year by chamber.[^parliamentarywebsitelink] Comparing the numbers provided in that table with number of days that we have provides an indication of how complete our dataset is.
 
 [^parliamentarywebsitelink]: As at 5 November, the website was available at: https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear. 
@@ -410,27 +441,34 @@ knitr::include_graphics("../../figures/differences_by_year.pdf")
 
 When the difference is positive, it means that in that year we have fewer PDFs than the parliamentary website claims. For instance, 5 could mean that the parliamentary website claimed there were 100 days, but we only had PDFs for 95 days. Similarly, when the difference is negative then we have more PDFs than the parliamentary website claims there were sitting days.
 
-The two major years of concern are 1992 in the House of Representatives where we have 15 days more than the parliamentary website claims there were, and 1988 in the Senate where we have eight days fewer.
+The two major years of concern are 1992 in the House of Representatives where we have 15 days more than the parliamentary website claims there were, and 1988 in the Senate where we have eight days fewer. We examined the physical copy of the Hansard kept in the NSW State Library and this suggests that the summary table on the parliamentary website may be wrong.
 
 The Parliament website is missing the Hansard PDFs for the following dates in the Senate: 
-1988-12-21, 1988-12-20, 1988-12-19, 1988-12-16, 1988-12-15, 1988-12-14, 1988-12-13, 1988-12-12, 2000-10-12, 2000-06-19, 2004-08-09.
+1988-12-21, 
+1988-12-20, 
+1988-12-19, 
+1988-12-16, 
+1988-12-15, 
+1988-12-14, 
+1988-12-13, 
+1988-12-12, 
+2000-10-12, 
+2000-06-19, and
+2004-08-09.
 
 There are two unaccounted for differences in 2006, one unaccounted for difference in 2001.
-
 
 The Parliament website is missing the Hansard PDFs for the following dates in the House of Representatives: 
 1985-08-23,
 1992-09-10,
 1996-12-13,
-2002-05-14,
-2000-10-12, and
-2000-06-29.
+2000-10-12,
+2000-06-29, and 
+2002-05-14.
 
 There is one unaccounted for difference in 1920, 1921, 1935, 1942, 1948, 1951, 1991, 2003, 2004, and there are two unaccounted for in 1985 and four unaccounted for in 2012.
 
-In the Senate, the PDF for 10 August 1917 may be the wrong one. It says it is for 10 January 1918 on the cover sheet, but there's not an entry for 10 January 1918.
-
-Senate Hansard - 1918-12-18 has the wrong PDF so does 1917-08-01.
+In terms of other issues, in the Senate, the PDF for 10 August 1917 may be the wrong one. It says that it is for 10 January 1918 on the cover sheet, but there's no an entry for 10 January 1918. Similarly for 1918-12-18 and 1917-08-01.
 
 
 \newpage
