@@ -1,9 +1,9 @@
 # !diagnostics off
 #### Preamble ####
-# Purpose: This file takes Australian Hansard CSV files that are all in one column and one row and applies a brutal, replacement-based, custom-dictionary, spell-checker.
+# Purpose: This file takes Australian Hansard CSV files and attemps to split them into different lines for each speech.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 11 October 2018
+# Last updated: 23 November 2018
 # Prerequisites: You need to have done all the other parsing steps. For testing purposes there should be some in the /outputs/hansard folder.
 # To do:
 
@@ -20,12 +20,6 @@ library(tm)
 # update.packages()
 # Set up furrr
 plan(multiprocess)
-# Get the spell checker
-fix_wrong_spellings <-
-  read_csv2("inputs/misc/misspelt_words_with_corrections.csv") %>%
-  mutate(numberOfCharacters = nchar(original)) %>%
-  arrange(desc(numberOfCharacters)) %>%
-  select(-numberOfCharacters)
 
 
 #### Create lists of CSVs to read ####

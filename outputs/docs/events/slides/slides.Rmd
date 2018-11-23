@@ -3,9 +3,9 @@ title: The Effect of Events on Discussion in the Australian Federal Parliament (
 subtitle: 
 author:
 - Monica Alexander, University of Toronto\newline
-- Rohan Alexander, Australian National University
-date: 25 October 2018
-institute: Presentation at the Research School of Economics, Australian National University, Canberra, Australia.
+- \textbf{Rohan Alexander, Australian National University}
+date: 22 November 2018
+institute: Presentation at the University of Toronto Political Behaviour Group, Toronto, Canada.
 output: binb::metropolis
 # output: ioslides_presentation
 fontsize: 12pt
@@ -23,21 +23,33 @@ elections <- read_csv(here::here("inputs/misc/misc_elections_data.csv"), col_typ
 governments <- read_csv(here::here("inputs/misc/change_of_pm.csv"), col_types = cols())
 keyEvents <- read_csv(here::here("inputs/misc/key_events.csv"), col_types = cols())
 significances <- read_csv(here::here("outputs/misc/significance.csv"), col_types = cols())
-top_words <- read_csv2(here::here("outputs/misc/top_words_40.csv"), col_types = cols())
-missing_days <- read_csv(here::here("outputs/misc/missing_days.csv"), col_types = cols())
+top_words <- read_csv2(here::here("outputs/results-topic_models_and_gammas/top_words_80.csv"), col_types = cols())
+missing_days <- read_csv(here::here("outputs/misc/missing_dates.csv"), col_types = cols())
 hansard_sources <- read_csv(here::here("outputs/misc/hansard_sources.csv"), col_types = cols())
 
-elections_results <- read_csv(here::here("outputs/results-analysis_model/results-elections.csv"), col_types = cols()) %>% 
-  # filter(Significant %in% c("Yes", "No"))
-  filter(Significant %in% c("Yes"))
+elections_results <-
+  read_csv(here::here("outputs/results-analysis_model/results-elections.csv"), col_types = cols()) %>%
+    filter(Significant %in% c("Yes")) %>%
+    select(-Significant)
 
-governments_results <- read_csv(here::here("outputs/results-analysis_model/results-governments.csv"), col_types = cols()) %>% 
-  filter(Significant %in% c("Yes")) %>% 
-  # filter(Significant %in% c("Yes", "No")) %>% 
-  select(-Party, -`Died in Office`)
+
+governments_results <-
+  read_csv(here::here("outputs/results-analysis_model/results-governments.csv"), col_types = cols()) %>%
+    filter(Significant %in% c("Yes")) %>%
+    select(-Party,-`Died in Office`,-Significant)
 
 key_events_results <- read_csv(here::here("outputs/results-analysis_model/results-outliers.csv"), col_types = cols())
 #breka
+
+key_events_results_cols <-
+  read_csv(here::here("outputs/results-analysis_model/results-outliers_in_columns.csv"), col_types = cols())
+  
+names(key_events_results_cols) <- c("Dates", "", "", "", "", "", "", "")
+
+key_events_results_cols <- key_events_results_cols[7:8]
+
+names(key_events_results_cols) <- c("Dates", "")
+  
 ```
 
 # Summary
@@ -56,7 +68,6 @@ Test
 
 - Changes in government tend be associated with topic changes even when the party in power does not change.
 - Elections that do not result in a change in government are rarely associated with topic changes.
-- Economic events, such as financial crises, have less significant effects than other events such as terrorist attacks.
 - The effect of events is much more pronounced in the second half of our sample, and especially in the past two decades.
 
 
@@ -65,8 +76,8 @@ Test
 
 ## Hansard
 - A daily text record called Hansard of what was said in the Australian Federal Parliament has been made available since it was established in 1901. It's not vertatim, but it's pretty close.
-- Hansard records have been used in other counties but not really at scale in Australia (although others, such as Patrick Leslie, also use them).
-- Daily PDFs are available Hansard records available online as PDFs and these are considered the official release. 
+- Hansard records have been used in other counties but not really at scale in Australia.
+- Daily PDFs are available online and these are considered the official release. 
 - There are 14,551 days of publicly available Hansard records across both chambers of the Australian Federal Parliament.
 
 ## Example PDF page
@@ -154,46 +165,16 @@ tibble(
 ```
 
 
-## Latent Dirichlet Allocation - Data generation process
-
-1. There are $K$ topics and the vocabulary consists of $V$ terms. For each topic, decide the terms by randomly drawing distributions over the terms. The distribution over the terms for the $k$th topic is $\beta_k$. Use the Dirichlet distribution with hyper-parameter $\boldsymbol{\eta}$: $\beta_k \sim \mbox{Dirichlet}(\boldsymbol{\eta})$, where $\boldsymbol{\eta} = (\eta_1, \eta_2, \dots, \eta_{K})$.
-
-## Latent Dirichlet Allocation - Data generation process (cont.)
-
-2. Decide the topics that each document will cover by randomly drawing distributions over the $K$ topics for each of the $D$ documents. The topic distributions for the $d$th document are $\theta_d$, and $\theta_{d,k}$ is the topic distribution for topic $k$ in document $d$. Again, the Dirichlet distribution with the hyper-parameter $0<\alpha<1$ is used here because usually a document would only cover a handful of topics: $\theta_d \sim \mbox{Dirichlet}(\boldsymbol{\alpha})$.
-
-## Latent Dirichlet Allocation - Data generation process (cont.)
-3. If there are $N$ terms in the $d$th document, then to choose the $n$th term, $w_{d, n}$:
-    a. Randomly choose a topic for that term $n$, in that document $d$, $z_{d,n}$, from the multinomial distribution over topics in that document, $z_{d,n} \sim \mbox{Multinomial}(\theta_d)$.
-    b. Randomly choose a term from the relevant multinomial distribution over the terms for that topic, $w_{d,n} \sim \mbox{Multinomial}(\beta_{z_{d,n}})$.
-
-## Latent Dirichlet Allocation - Data generation process (cont.)
-Given this set-up, we have a joint distribution for the variables and the analysis problem, discussed next, is to compute a posterior over $\beta_{1:K}$ and $\theta_{1:D}$, given $w_{1:D, 1:N}$. This is intractable directly, but can be approximated.
-
-
-## Latent Dirichlet Allocation - Analysis problem
-- After the documents are created, they are all that we have to analyse. The term usage in each document, $w_{1:D, 1:N}$, is observed, but the topics are hidden, or 'latent'. 
-- We do not know the topics of each document, nor how terms defined the topics. In a sense we are trying to reverse the document generation process.
-- If the earlier process around how the documents were generated is assumed and we observe the terms in each document, then we can obtain estimates of the topics. 
-
-## Latent Dirichlet Allocation - Analysis problem (cont.)
-- The outcomes of the LDA process are probability distributions and these define the topics. Each term will be given a probability of being a member of a particular topic, and each document will be given a probability of being about a particular topic. 
-- That is, we are trying to calculate the posterior distribution of the topics given the terms observed in each document.
-- The choice of the number of topics, *k*, drives the results and must be specified *a priori*. 
-
-<!-- If there is a strong reason for a particular number, then this can be used. Otherwise, one way to choose an appropriate number is to use cross validation. -->
-
-<!-- One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation. This is the Correlated Topic Model, described in the next section. -->
 
 ## Correlated Topic Model
-Modification of LDA - rather than assuming that the distribution of topics in a document, $\theta_d$, are a draw from a Dirichlet distribution, as in step 2 in LDA above, CTM assumes
+Modification of LDA - rather than assuming that the distribution of topics in a document, $\theta_d$, are a draw from a Dirichlet distribution, as in LDA, CTM assumes
 $$\theta_d \sim \mbox{Logistic Normal}(\mu, \Sigma)$$
 Essentially it swaps the Dirichlet for the Logistic Multivariate Normal. This sounds easy, but it's hard to implement.
 
 ## Correlated Topic Model - Example output
 
 ```{r exampletopics, echo=FALSE, out.width = '100%'}
-knitr::include_graphics("../../../figures/topics_example-slides.png")
+knitr::include_graphics("../../../figures/topics_example_slides_update.png")
 ```
 
 
@@ -201,7 +182,7 @@ knitr::include_graphics("../../../figures/topics_example-slides.png")
 ## Structural Topic Model
 The Structural Topic Model approach then adds a covariate to $\mu$ which allows consideration of additional information. 
 $$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma)$$
-Again, sounds easy, but hard to implement, and they have a very nice solutions algorithm.
+Again, sounds easy, but hard to implement, and they have a very nice algorithm.
 
 
 
@@ -307,7 +288,7 @@ We run the model in JAGS using the \texttt{rjags} package.
 
 <!-- Table \@ref(tab:topwords) lists the top five words associated with each of the forty topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Note that some topics seem to somewhat overlap with their content: for example, topics 12, 17, 22 and 23 all relate to war and conflict.  -->
 
-We choose 40 topics because it is the minimum needed to have meaningful results.
+We choose 80 topics because it is the minimum needed to have meaningful results.
 
 ```{r topwords, echo = FALSE, results = 'asis'}
 # library(tidyverse)
@@ -342,11 +323,23 @@ knitr::include_graphics("../../../figures/war_stack-slides.pdf")
 ```{r electionsresults, echo = FALSE, results = 'asis'}
 
 elections_results %>%
-  select(-Significant) %>% 
+  filter(Number %in% c(9, 10, 19, 21, 22, 23, 28, 30, 32, 33)) %>% 
   kable() %>%
   kable_styling(font_size = 10)
 
 ```
+
+## Analysis model - Significantly different elections (cont.)
+
+```{r electionsresultscont, echo = FALSE, results = 'asis'}
+
+elections_results %>%
+  filter(Number %in% c(34, 35, 36, 38, 39, 40, 41, 42, 43, 44)) %>% 
+  kable() %>%
+  kable_styling(font_size = 10)
+
+```
+
 
 
 ## Analysis model - Significantly different governments
@@ -354,12 +347,24 @@ elections_results %>%
 ```{r governmentsresults, echo = FALSE, results = 'asis'}
 
 governments_results %>%
-  select(-Significant) %>% 
+  filter(Number %in% c(6, 9, 10, 12, 14, 15, 16, 20, 21, 22)) %>% 
   kable() %>%
   kable_styling(font_size = 10)
 
 ```
 
+
+
+## Analysis model - Significantly different governments (cont.)
+
+```{r governmentsresultscont, echo = FALSE, results = 'asis'}
+
+governments_results %>%
+  filter(Number %in% c(24, 25, 26, 27, 28, 29, 30, 31, 32, 34)) %>% 
+  kable() %>%
+  kable_styling(font_size = 10)
+
+```
 
 ## Analysis model - All governments
 
@@ -388,10 +393,10 @@ knitr::include_graphics("../../../figures/mu_election-slides.pdf")
 
 ```{r keyeventsresultstable, echo = FALSE, results = 'asis'}
 
-key_events_results %>%
+key_events_results_cols %>%
   kable() %>%
   kable_styling(font_size = 10)
-#CAS
+
 ```
 
 
@@ -487,3 +492,40 @@ knitr::include_graphics("../../../figures/hansard_photo.png")
 ```
 
 
+
+
+
+
+
+# Supplementary
+
+## Latent Dirichlet Allocation - Data generation process
+
+1. There are $K$ topics and the vocabulary consists of $V$ terms. For each topic, decide the terms by randomly drawing distributions over the terms. The distribution over the terms for the $k$th topic is $\beta_k$. Use the Dirichlet distribution with hyper-parameter $\boldsymbol{\eta}$: $\beta_k \sim \mbox{Dirichlet}(\boldsymbol{\eta})$, where $\boldsymbol{\eta} = (\eta_1, \eta_2, \dots, \eta_{K})$.
+
+## Latent Dirichlet Allocation - Data generation process (cont.)
+
+2. Decide the topics that each document will cover by randomly drawing distributions over the $K$ topics for each of the $D$ documents. The topic distributions for the $d$th document are $\theta_d$, and $\theta_{d,k}$ is the topic distribution for topic $k$ in document $d$. Again, the Dirichlet distribution with the hyper-parameter $0<\alpha<1$ is used here because usually a document would only cover a handful of topics: $\theta_d \sim \mbox{Dirichlet}(\boldsymbol{\alpha})$.
+
+## Latent Dirichlet Allocation - Data generation process (cont.)
+3. If there are $N$ terms in the $d$th document, then to choose the $n$th term, $w_{d, n}$:
+    a. Randomly choose a topic for that term $n$, in that document $d$, $z_{d,n}$, from the multinomial distribution over topics in that document, $z_{d,n} \sim \mbox{Multinomial}(\theta_d)$.
+    b. Randomly choose a term from the relevant multinomial distribution over the terms for that topic, $w_{d,n} \sim \mbox{Multinomial}(\beta_{z_{d,n}})$.
+
+## Latent Dirichlet Allocation - Data generation process (cont.)
+Given this set-up, we have a joint distribution for the variables and the analysis problem, discussed next, is to compute a posterior over $\beta_{1:K}$ and $\theta_{1:D}$, given $w_{1:D, 1:N}$. This is intractable directly, but can be approximated.
+
+
+## Latent Dirichlet Allocation - Analysis problem
+- After the documents are created, they are all that we have to analyse. The term usage in each document, $w_{1:D, 1:N}$, is observed, but the topics are hidden, or 'latent'. 
+- We do not know the topics of each document, nor how terms defined the topics. In a sense we are trying to reverse the document generation process.
+- If the earlier process around how the documents were generated is assumed and we observe the terms in each document, then we can obtain estimates of the topics. 
+
+## Latent Dirichlet Allocation - Analysis problem (cont.)
+- The outcomes of the LDA process are probability distributions and these define the topics. Each term will be given a probability of being a member of a particular topic, and each document will be given a probability of being about a particular topic. 
+- That is, we are trying to calculate the posterior distribution of the topics given the terms observed in each document.
+- The choice of the number of topics, *k*, drives the results and must be specified *a priori*. 
+
+<!-- If there is a strong reason for a particular number, then this can be used. Otherwise, one way to choose an appropriate number is to use cross validation. -->
+
+<!-- One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation. This is the Correlated Topic Model, described in the next section. -->

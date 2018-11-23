@@ -70,7 +70,7 @@ mu_gov %>%
   ggplot(aes(x = government, y = median)) +
   geom_point() +
   geom_errorbar(aes(ymin = lower, ymax = upper)) +
-  facet_wrap(vars(topic), nrow = 4, ncol = 3) +
+  facet_wrap(vars(topic), nrow = 2, ncol = 3) +
   theme_minimal()
 
 ggsave(
@@ -84,11 +84,11 @@ ggsave(
 
 mu_gov %>% 
   # filter(!government %in% c(19, 32)) %>%
-  filter(topic %in% c(12, 13, 17, 22, 23, 24, 29, 30, 32, 33, 35, 39)) %>% 
+  filter(topic %in% c(4, 26, 28, 30, 66)) %>% 
   ggplot(aes(x = government, y = median)) +
   geom_point() +
   geom_errorbar(aes(ymin = lower, ymax = upper)) +
-  facet_wrap(vars(topic), nrow = 3, ncol = 4) +
+  facet_wrap(vars(topic), nrow = 2, ncol = 3) +
   theme_minimal() +
   theme(text = element_text(size = 20)) +
   theme(
