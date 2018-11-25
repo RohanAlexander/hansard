@@ -27,7 +27,7 @@ plan(multiprocess)
 use_this_path_to_get_csvs  <- "outputs/hansard/temp"
 # use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
-# Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
+# Get list of Hansard csvs
 file_names <-
   list.files(
     path = use_this_path_to_get_csvs,
@@ -38,32 +38,30 @@ file_names <-
 
 file_names <- file_names %>% sample() # Randomise the order
 
-use_this_path_to_save_csvs  <- "outputs/hansard/temp"
+use_this_path_to_save_csvs  <- "outputs/hansard/tempp"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
 
 #### Create the function that will be applied to the files ####
-fix_spelling <-
+split_lines <-
   function(name_of_input_csv_file,
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
     # name_of_input_csv_file <- "/Volumes/Backup/temp/1971-10-05.csv" # uncomment for testing
+    # name_of_input_csv_file <- "outputs/hansard/temp/1915-07-07.csv" # uncomment for testing
     
     csv_to_clean <-
       read_csv(name_of_input_csv_file,
                trim_ws = FALSE,
                col_types = cols())
     
-    #Fix the spelling
-    csv_to_clean$text <-
-      stri_replace_all_regex(
-        csv_to_clean$text,
-        "\\b" %s+% fix_wrong_spellings$original %s+% "\\b",
-        fix_wrong_spellings$corrected,
-        vectorize_all = FALSE
-      )
+    csv_to_clean <- separate_rows(csv_to_clean, text, sep = "METHESTART- (?=Mr [:upper:]{2,})", convert = FALSE)
+    
+    # write_csv(csv_to_clean, "test.csv")
+    
+    
     
     # Save file
     write_csv(csv_to_clean, name_of_output_csv_file)

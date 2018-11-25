@@ -93,6 +93,7 @@ get_text_from_PDFs <-
       str_replace_all(pdf_document_tibble$text, "’", "'")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "•", "-") # Some hyphens are being read in as big dots
+    
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
     
@@ -112,40 +113,6 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "~", "-")
     
-    # Fix some other issues that just make everything a bit easier
-    pdf_document_tibble$text <-
-      str_replace_all(
-        pdf_document_tibble$text,
-        "M[:space:]?r[:punct:]+[:space:]|Mr[:space:]*[:punct:]+",
-        "Mr "
-      )
-    # str_detect("Mr . THOMAS ", "M[:space:]?r[:punct:]+[:space:]|Mr[:space:]*[:punct:]+")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text,
-                      "M[:space:]?r[:space:]*[:punct:]*[:space:]",
-                      "Mr ")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "DE-ANNE", "DEANNE")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "- BRITIS H", "BRITISH")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "McDONALD", "MCDONALD")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "thatAn", "that An")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "(?<=\\S)Sir", " Sir")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "S i r", "Sir")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "EDWARDBRADDON", "EDWARD BRADDON")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text,
-                      "WILLIAMM c MILLAN",
-                      "WILLIAM MCMILLAN")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "Mc(?=[:upper:]+)", "MC")
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "(?<=\\S)Mr", " Mr")
     
     # Fix related to the Speaker taking the chair
     pdf_document_tibble$text <-

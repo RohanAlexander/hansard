@@ -220,7 +220,7 @@ split_columns <-
       select(text, pageNumbers)
     
     # Check whether at the start of a row
-    all_one_column$text <- paste0("METHESTART- ", all_one_column$text)
+    
     
     write_csv(all_one_column, name_of_output_csv_file)
     
