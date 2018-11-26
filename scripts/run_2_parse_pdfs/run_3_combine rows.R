@@ -60,17 +60,19 @@ split_columns <-
     csv_with_rows_to_combine$text <-
       str_squish(csv_with_rows_to_combine$text)
     
-    # Put everything onto one line, which allows us to rejoin words that have been split across two lines e.g. Mon- ica
-    csv_with_rows_to_combine <- csv_with_rows_to_combine %>%
-      mutate(text = str_replace_all(text, "-$", "MONICA"))
+    # # Put everything onto one line, which allows us to rejoin words that have been split across two lines e.g. Mon- ica
+    # csv_with_rows_to_combine <- csv_with_rows_to_combine %>%
+    #   mutate(text = str_replace_all(text, "-$", "MONICA"))
+    # 
+    full_days_hansard <- csv_with_rows_to_combine
     
-    full_days_hansard <- csv_with_rows_to_combine %>%
-      select(-pageNumbers) %>%
-      summarise(text = paste(text, collapse = " ")) %>%
-      mutate(text = str_replace_all(text, "MONICA ", "")) %>%
-      mutate(text = str_replace_all(text, "[:space:]-(?=[:alpha:])", " - "))
-    
-    rm(csv_with_rows_to_combine)
+    # full_days_hansard <- csv_with_rows_to_combine %>%
+    #   select(-pageNumbers) %>%
+    #   summarise(text = paste(text, collapse = " ")) %>%
+    #   mutate(text = str_replace_all(text, "MONICA ", "")) %>%
+    #   mutate(text = str_replace_all(text, "[:space:]-(?=[:alpha:])", " - "))
+    # 
+    # rm(csv_with_rows_to_combine)
     
     write_csv(full_days_hansard, name_of_output_csv_file)
     

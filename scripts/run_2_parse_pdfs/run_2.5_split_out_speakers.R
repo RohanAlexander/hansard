@@ -21,6 +21,14 @@ library(tm)
 # Set up furrr
 plan(multiprocess)
 
+# Get the name fixer
+fix_wrong_names <-
+  read_csv2("inputs/misc/wrong_names_with_corrections.csv") %>%
+  mutate(numberOfCharacters = nchar(original)) %>%
+  arrange(desc(numberOfCharacters)) %>%
+  select(-numberOfCharacters)
+
+
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
@@ -51,7 +59,7 @@ split_columns <-
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
     # name_of_input_csv_file <-
-    #   "outputs/hansard/temp/1971-10-05.csv" # uncomment for testing
+    #   "outputs/hansard/temp/1901-06-27.csv" # uncomment for testing
     csv_with_rows_to_combine <-
       read_csv(name_of_input_csv_file,
                trim_ws = FALSE,
@@ -93,84 +101,41 @@ split_columns <-
       str_replace_all(full_days_hansard$text, 
                       "(?<=\\S)Sir", 
                       " Sir") # Again, if there is not a space to the left of Sir then put one there
-    # Finally, some special cases
+   
     full_days_hansard$text <-
       str_replace_all(full_days_hansard$text,
-                      "WILLIAMM c MILLAN",
-                      "WILLIAM MCMILLAN")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "FitzPATRICK",
-                      "FITZPATRICK")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "Mr Reynolds-",
-                      "Mr REYNOLDS-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "Mr DEPUTY SPEAKER ( Mr Drury)-",
-                      "Mr DEPUTY SPEAKER-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "Mr Sinclair-",
-                      "Mr SINCLAIR-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "Mr BEAZLEY (Fremantle) (4.43)-",
-                      "Mr BEAZLEY-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "MTHAMER - 1",
-                      "Mr HAMMER - I")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "Mr Foster-",
-                      "Mr FOSTER-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "WHITLA M",
-                      "WHITLAM")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "^Mr James-",
-                      "Mr JAMES-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "^Mr Collard-",
-                      "Mr COLLARD-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "^Mr Cope-",
-                      "Mr COPE-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "^Mr Bryant-",
-                      "Mr BRYANT-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "^Mr Whitlam-",
-                      "Mr WHITLAM-")
-    full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "^Mr Malcolm Fraser-",
-                      "Mr MALCOLM FRASER-")
+                      "Sir WILLIAM LYNE ;",
+                      "Sir WILLIAM LYNE")   
 
+    full_days_hansard$text <-
+      str_replace_all(full_days_hansard$text,
+                      "Mi-\.",
+                      "Mr")   
 
+    #Fix the names
+    full_days_hansard$text <-
+      stri_replace_all_regex(
+        full_days_hansard$text,
+        fix_wrong_names$original,
+        fix_wrong_names$corrected,
+        vectorize_all = FALSE
+      )
     
-    
-    
+        
 
     # separate(full_days_hansard, text, into = c("Speaker", "Text"), sep = "^[(?=Mr [:upper:]{2,}) -]", fill = "right", remove = FALSE)
     full_days_hansard <- separate(
       full_days_hansard,
       text,
       into = c("Speaker", "Text"),
-      sep = "(?<=(Mr [:upper:]{2,30}[:blank:]?))-|(?<=(Mr [:upper:]{2,30}[:blank:][:upper:]{2,30}))-|(?<=(Dr [:upper:]{2,30}[:blank:]?))-|(?<=(Mr [:upper:]{2,30}[:blank:]?(\\(.{1,20})\\)))-|(?<=(Dr [:upper:]{2,30}[:blank:]?(\\(.{1,20})\\)))-|(?<=(Mr [:upper:]{2,30}[:blank:]?))\\(|(?<=(Mr [:upper:]{2,30}[:blank:][:upper:]{2,30}[:blank:]?))\\(", # The third one takes care of "Mr HAYDEN (Oxley)-", the fifth one takes care of "Mr SINCLAIR (New England", the sith one takes care of "Mr DEPUTY SPEAKER ( Mr Drury"
+      sep = "(?<=(Mr [:upper:]{1,30}[:blank:]?))-|(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-|(?<=(Dr [:upper:]{1,30}[:blank:]?))-|(?<=(Mr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-|(?<=(Dr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-|(?<=(Mr [:upper:]{1,30}[:blank:]?))\\(|(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(|(?<=(Sir [:upper:]{1,30}[:blank:]?))-|(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-|(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(|(?<=(Mr [:upper:]{1,30}[:blank:]?))(asked)|(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked|(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked|(?<=(The CHAIRMAN ))-|(?<=(An HONOURABLE MEMBER[:blank:]?))-|(?<=(Colonel [:upper:]{1,30}[:blank:]?))-|(?<=(Colonel [:upper:]{1,30}[:blank:]?))asked|(?<=(Dr [:upper:]{1,30}[:blank:]?))asked", # The third one takes care of "Mr HAYDEN (Oxley)-", the fifth one takes care of "Mr SINCLAIR (New England", the sith one takes care of "Mr DEPUTY SPEAKER ( Mr Drury"
       extra = "merge",
       fill = "left",
       remove = TRUE
     )
     
+    
+    # str_count("Mr PULLER asked the Prime Minister,", "(?<=(Mr[:blank:]?[:upper:]{2,30}[:blank:]?))(asked)")
     
     # 
     # # str_detect("WOOLSHED", "^(^[:lower:])$")
