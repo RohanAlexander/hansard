@@ -1,9 +1,9 @@
 # !diagnostics off
 #### Preamble ####
-# Purpose: This file takes Australian Hansard CSV files and combines everything onto one row. The reason for this is that some words have been split across lines e.g. Moni- ca, and so they are treated as two words, but really ought to be combined.
+# Purpose: This file takes Australian Hansard CSV files and isolates the name of the speaker into a separate column. 
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 11 October 2018
+# Last updated: 26 November 2018
 # Prerequisites: You need to have downloaded the PDFs, read them into CSVs and the removed the two column format. For testing purposes there should be some in the /outputs/hansard/ folder.
 # To do:
 
@@ -78,39 +78,52 @@ split_columns <-
         "M[:space:]?r[:punct:]+[:space:]",
         "Mr ") # Looks for "Mr. ", or "M r. " (the full stop is any punctuation) and replaces it with "Mr "
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "M[:space:]?r[:space:]*[:punct:]*[:space:]",
-                      "Mr ") # Change, "Mr. " to "Mr "
+      str_replace_all(
+        full_days_hansard$text,
+        "M[:space:]?r[:space:]?s[:punct:]?+[:space:]",
+        "Mrs ") # Looks for "Mrs. ", or "M rs. ", etc, (the full stop is any punctuation) and replaces it with "Mrs "
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text, 
-                      "S i r", 
-                      "Sir")
+      str_replace_all(
+        full_days_hansard$text,
+        "M[:space:]?r[:space:]*[:punct:]*[:space:]",
+        "Mr ") # Change, "Mr. " to "Mr "
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text, 
-                      "Mc(?=[:upper:]+)", 
-                      "MC") # Change McDONALD to MCDONALD
+      str_replace_all(
+        full_days_hansard$text, 
+        "S i r", 
+        "Sir")
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text, 
-                      "Mac(?=[:upper:]+)", 
-                      "MAC") # Change MacDONALD to MACDONALD
+      str_replace_all(
+        full_days_hansard$text, 
+        "Mc(?=[:upper:]+)", 
+        "MC") # Change McDONALD to MCDONALD
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text, 
-                      "(?<=\\S)Mr", 
-                      " Mr") # If there is not a space to the left of Mr then put one there
+      str_replace_all(
+        full_days_hansard$text, 
+        "Mac(?=[:upper:]+)", 
+        "MAC") # Change MacDONALD to MACDONALD
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text, 
-                      "(?<=\\S)Sir", 
-                      " Sir") # Again, if there is not a space to the left of Sir then put one there
+      str_replace_all(
+        full_days_hansard$text, 
+        "(?<=\\S)Mr", 
+        " Mr") # If there is not a space to the left of Mr then put one there
+    full_days_hansard$text <-
+      str_replace_all(
+        full_days_hansard$text, 
+        "(?<=\\S)Sir", 
+        " Sir") # Again, if there is not a space to the left of Sir then put one there
    
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "Sir WILLIAM LYNE ;",
-                      "Sir WILLIAM LYNE")   
-
+      str_replace_all(
+        full_days_hansard$text,
+        "D[:space:]?r[:space:]*[:punct:]",
+        "Dr") # Change, "Dr." to "Dr"
+    
     full_days_hansard$text <-
-      str_replace_all(full_days_hansard$text,
-                      "Mi-\.",
-                      "Mr")   
+      str_replace_all(
+        full_days_hansard$text,
+        "Mi-\\.",
+        "Mr")   
 
     #Fix the names
     full_days_hansard$text <-
@@ -121,14 +134,51 @@ split_columns <-
         vectorize_all = FALSE
       )
     
-        
+    on_the_regular <- paste(
+      "(?<=(Mr [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Mr [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Mr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-",
+      "(?<=(Mrs [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Mrs [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Mrs [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Mrs [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Ms [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Ms [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Ms [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Ms [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Dr [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Dr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Dr [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Dr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-",
+      "(?<=(Dr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Sir [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(Mr [:upper:]{1,30}[:blank:]?))(asked)",
+      "(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(The CHAIRMAN ))-",
+      "(?<=(An HONOURABLE MEMBER[:blank:]?))-",
+      "(?<=(GOVERNMENT SUPPORTERS[:blank:]?))-",
+      "(?<=(Colonel [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(Colonel [:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(Dr [:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(Dame [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(The [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(The [:upper:]{1,30}[:blank:]?))\\(",
+      sep = "|")
+           
 
     # separate(full_days_hansard, text, into = c("Speaker", "Text"), sep = "^[(?=Mr [:upper:]{2,}) -]", fill = "right", remove = FALSE)
     full_days_hansard <- separate(
       full_days_hansard,
       text,
       into = c("Speaker", "Text"),
-      sep = "(?<=(Mr [:upper:]{1,30}[:blank:]?))-|(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-|(?<=(Dr [:upper:]{1,30}[:blank:]?))-|(?<=(Mr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-|(?<=(Dr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-|(?<=(Mr [:upper:]{1,30}[:blank:]?))\\(|(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(|(?<=(Sir [:upper:]{1,30}[:blank:]?))-|(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-|(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(|(?<=(Mr [:upper:]{1,30}[:blank:]?))(asked)|(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked|(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked|(?<=(The CHAIRMAN ))-|(?<=(An HONOURABLE MEMBER[:blank:]?))-|(?<=(Colonel [:upper:]{1,30}[:blank:]?))-|(?<=(Colonel [:upper:]{1,30}[:blank:]?))asked|(?<=(Dr [:upper:]{1,30}[:blank:]?))asked", # The third one takes care of "Mr HAYDEN (Oxley)-", the fifth one takes care of "Mr SINCLAIR (New England", the sith one takes care of "Mr DEPUTY SPEAKER ( Mr Drury"
+      sep = on_the_regular,
       extra = "merge",
       fill = "left",
       remove = TRUE
@@ -151,6 +201,14 @@ split_columns <-
     #   remove = FALSE
     # )
     # 
+    
+    # Misc other:
+    # Motion (by Mr OHIFUBY). agreed .to-
+    # Honorable members interjecting,
+    # Sir Arthur Fadden interjecting,
+    # Sitting suspended from 5.59 to 8 p.m.
+    
+    
     
     
     # write_csv(full_days_hansard, "test.csv")
