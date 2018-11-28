@@ -124,6 +124,27 @@ split_columns <-
         full_days_hansard$text,
         "Mi-\\.",
         "Mr")   
+    
+    full_days_hansard$text <-
+      str_replace_all(
+        full_days_hansard$text,
+        "Mr SYDNEY; SMITH",
+        "Mr SYDNEY SMITH") 
+
+    full_days_hansard$text <-
+      str_replace_all(
+        full_days_hansard$text,
+        "to encourage such industries; Mr JONES",
+        "Mr JONES") 
+    
+    full_days_hansard$text <-
+      str_replace_all(
+        full_days_hansard$text,
+        "PAIRS; Mr SPEAKER",
+        "Mr SPEAKER") 
+    
+    
+    
 
     #Fix the names
     full_days_hansard$text <-
