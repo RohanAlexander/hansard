@@ -75,14 +75,14 @@ get_text_from_PDFs <-
     # name_of_input_PDF_file <- "inputs/for_testing_senate_pdf/1901-06-06.pdf" # uncomment for testing
     pdf_document <- pdf_text(name_of_input_PDF_file)
     
-    # Convert to tibble so that tidyverse can be used
+    # Convert to tibble
     pdf_document_tibble <- tibble(text = pdf_document)
     rm(pdf_document)
     
     # Each row is now a page of the PDF so adding a column of the row numbers allows you to keep track of the page numbers later on
     pdf_document_tibble$pageNumbers <- 1:nrow(pdf_document_tibble)
     
-    # Separate each line (of each page) into it's own row
+    # Separate each line (of each page) into a row
     pdf_document_tibble <-
       separate_rows(pdf_document_tibble, text, sep = "\\n")
     
@@ -93,10 +93,8 @@ get_text_from_PDFs <-
       str_replace_all(pdf_document_tibble$text, "’", "'")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "•", "-") # Some hyphens are being read in as big dots
-    
     pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an and that would affect the words analysis so needs to be fixed
-    
+      str_replace_all(pdf_document_tibble$text, "\\b- \\b", "") # Hyphens are being retained improperly e.g. Roh- an
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "—", "-") # I'm as pedantic as the next person about dash, hyphen, em dash usage, but this is not the place.
     pdf_document_tibble$text <-
@@ -105,18 +103,17 @@ get_text_from_PDFs <-
         "(?<=[:space:][:upper:])[:space:](?=[:upper:][:space:])",
         ""
       ) # This one is picking up annoying spaces e.g. R O H A N should be Rohan. The regular expression is a bit wild, but each bit in round brackets is looking either side of the space and then removing that space as appropriate - see 'Look Arounds' in the stringr cheatsheet. There's a function - kerning - in the textclean package which does a similar task, but it seems to have an error that binds it to the next word if that's capitalised. Thanks Monica and also https://stackoverflow.com/questions/31280327/remove-extra-white-space-from-between-letters-in-r-using-gsub
+    
     # These next ones are just to make search and replacements work more consistently
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "-[:space:]{2}", "- ") # A dash followed by two spaces should be changed to a dash followed by one space
     pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "\\.[:space:]*-", " -")
+      str_replace_all(pdf_document_tibble$text, "\\.[:space:]*-", " -") # If there is a full stop followed by one or more spaces and then a dash, change it to just a space then a dash. Mostly an issue with the names, e.g. 'Rohan. - Mr Speaker, the...', would be changed to 'Rohan - Mr Speaker...'
     pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "~", "-")
-    
-    
-    # Fix related to the Speaker taking the chair
-    pdf_document_tibble$text <-
-      str_replace_all(pdf_document_tibble$text, "ohair|ehair", "chair")
+      str_replace_all(pdf_document_tibble$text, "~", "-") # Change weird tilda thing to a dash  - there shouldn't be any of these in Hansard, it's a parsing error.
+  
+    # Fix issues related to the Speaker taking the chair
+    # House of Reps Hansard starts with something along the lines of 'the Speaker took the chair', so we want that sentence to be correctly parsed as far as reasonable. Senate is same, but for President.
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "SruAKEK|Sr-EAKEB|SI-KAXEE|SFJSAKEK|SPEAKBB|SI'BAKBR|SPBAKSK|SPKAKKR", "SPEAKER")
     pdf_document_tibble$text <-
@@ -138,6 +135,8 @@ get_text_from_PDFs <-
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "Mx: SI-BAKER", "MR SPEAKER")
     pdf_document_tibble$text <-
+      str_replace_all(pdf_document_tibble$text, "ohair|ehair", "chair")
+    pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "took the. chair", "took the chair")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "took tho chair", "took the chair")
@@ -147,11 +146,9 @@ get_text_from_PDFs <-
       str_replace_all(pdf_document_tibble$text, "took tiie chair", "took the chair")
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "took 'the chair|took the nhair", "took the chair")
-    
     pdf_document_tibble$text <-
       str_replace_all(pdf_document_tibble$text, "PBESIEENT|FREBIDKKT|PBUSIOTNT|PBEaroBNT", "PRESIDENT")
     
-
     ## Identify page headers and footers and remove them
     pdf_document_tibble <- pdf_document_tibble %>%
       group_by(pageNumbers) %>%
@@ -166,7 +163,6 @@ get_text_from_PDFs <-
       filter(text %>% str_trim != "FEDERATION CHAMBER") %>% # Remove the footer when it exists
       select(-lineNumber,-lastLine)
     
-    
     ## Identify front matter and remove it
     # Primarily identify the start of talking based on the first occurence of 'Mr SPEAKER'. It seems pretty common, but there are some misses (e.g. 1991-01-22). As a backup look for first occurence of "JOINT HOUSE" and then pick the next page. And look for 'took the chair' and pick that page.
     pdf_document_tibble <- pdf_document_tibble %>%
@@ -177,16 +173,11 @@ get_text_from_PDFs <-
         firstTookTheChairRow = str_detect(text, "took the chair"),
         firstTheChairAtRow = str_detect(text, "the chair at")
       )
-    pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <-
-      NA
-    pdf_document_tibble$firstPresidentRow[pdf_document_tibble$firstPresidentRow == FALSE] <-
-      NA
-    pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == FALSE] <-
-      NA
-    pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == FALSE] <-
-      NA
-    pdf_document_tibble$firstTheChairAtRow[pdf_document_tibble$firstTheChairAtRow == FALSE] <-
-      NA
+    pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA
+    pdf_document_tibble$firstPresidentRow[pdf_document_tibble$firstPresidentRow == FALSE] <- NA
+    pdf_document_tibble$firstJointHouseRow[pdf_document_tibble$firstJointHouseRow == FALSE] <- NA
+    pdf_document_tibble$firstTookTheChairRow[pdf_document_tibble$firstTookTheChairRow == FALSE] <- NA
+    pdf_document_tibble$firstTheChairAtRow[pdf_document_tibble$firstTheChairAtRow == FALSE] <- NA
     
     # Get the row and corresponding page and then filter to only pages from that page
     row_of_first_SPEAKER <-
@@ -223,7 +214,6 @@ get_text_from_PDFs <-
         TRUE ~ first_page_of_interest_JOINTHOUSE
       )
 
-
     pdf_document_tibble <- pdf_document_tibble %>%
       filter(pageNumbers >= filter_from_here) %>%
       select(-firstSpeakerRow,
@@ -246,7 +236,6 @@ get_text_from_PDFs <-
       filter_from_here
     )
     
-    
     # Save file
     write_csv(pdf_document_tibble, name_of_output_csv_file)
     
@@ -266,11 +255,9 @@ safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
 # file_names <- file_names[1:(length(file_names)/2)]
 # save_names <- save_names[1:(length(save_names)/2)]
 
-
 tic("Furrr walk2 stringr")
 future_walk2(file_names,
              save_names,
              ~ safely_get_text_from_PDFs(.x, .y),
              .progress = TRUE)
 toc()
-

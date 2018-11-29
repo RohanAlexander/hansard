@@ -1,22 +1,20 @@
 # !diagnostics off
 #### Preamble ####
-# Purpose: This file takes Australian Hansard CSV files and isolates the name of the speaker into a separate column. 
+# Purpose: This file takes Australian Hansard CSV files and isolates the name of the person speaking into a separate column.
 # Author: Rohan Alexander
 # Email: rohan.alexander@anu.edu.au
-# Last updated: 26 November 2018
-# Prerequisites: You need to have downloaded the PDFs, read them into CSVs and the removed the two column format. For testing purposes there should be some in the /outputs/hansard/ folder.
+# Last updated: 28 November 2018
+# Prerequisites: 1) Download the PDFs; 2) read them into CSVs; 3) get rid of the front matter; 4) split the columns. For testing purposes there should be some Hansard PDFs in the /outputs/hansard/ folder.
 # To do:
 
 
 #### Set up workspace ####
 # devtools::install_github("DavisVaughan/furrr")
 library(furrr)
-# library(lubridate)
-# library(pdftools)
 library(stringi)
 library(tidyverse)
 library(tictoc)
-library(tm)
+# library(tm)
 # update.packages()
 # Set up furrr
 plan(multiprocess)
@@ -27,7 +25,6 @@ fix_wrong_names <-
   mutate(numberOfCharacters = nchar(original)) %>%
   arrange(desc(numberOfCharacters)) %>%
   select(-numberOfCharacters)
-
 
 
 #### Create lists of CSVs to read ####
@@ -58,8 +55,7 @@ split_columns <-
   function(name_of_input_csv_file,
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
-    # name_of_input_csv_file <-
-    #   "outputs/hansard/temp/1901-06-27.csv" # uncomment for testing
+    # name_of_input_csv_file <- "outputs/hansard/temp/1901-07-19.csv" # uncomment for testing
     csv_with_rows_to_combine <-
       read_csv(name_of_input_csv_file,
                trim_ws = FALSE,
@@ -112,40 +108,36 @@ split_columns <-
         full_days_hansard$text, 
         "(?<=\\S)Sir", 
         " Sir") # Again, if there is not a space to the left of Sir then put one there
-   
     full_days_hansard$text <-
       str_replace_all(
         full_days_hansard$text,
         "D[:space:]?r[:space:]*[:punct:]",
         "Dr") # Change, "Dr." to "Dr"
-    
     full_days_hansard$text <-
       str_replace_all(
         full_days_hansard$text,
         "Mi-\\.",
         "Mr")   
     
+    # These are less general, but have a semi colon in the middle which was annoying the csv of the other less general ones
     full_days_hansard$text <-
       str_replace_all(
         full_days_hansard$text,
         "Mr SYDNEY; SMITH",
         "Mr SYDNEY SMITH") 
-
     full_days_hansard$text <-
       str_replace_all(
         full_days_hansard$text,
         "to encourage such industries; Mr JONES",
         "Mr JONES") 
-    
     full_days_hansard$text <-
       str_replace_all(
         full_days_hansard$text,
         "PAIRS; Mr SPEAKER",
         "Mr SPEAKER") 
     
+    # Sir GRANVILLE RYRIE;-; Sir GRENVILLE RYRIE -
     
-    
-
     #Fix the names
     full_days_hansard$text <-
       stri_replace_all_regex(
@@ -192,7 +184,6 @@ split_columns <-
       "(?<=(The [:upper:]{1,30}[:blank:]?))-",
       "(?<=(The [:upper:]{1,30}[:blank:]?))\\(",
       sep = "|")
-           
 
     # separate(full_days_hansard, text, into = c("Speaker", "Text"), sep = "^[(?=Mr [:upper:]{2,}) -]", fill = "right", remove = FALSE)
     full_days_hansard <- separate(
@@ -205,35 +196,7 @@ split_columns <-
       remove = TRUE
     )
     
-    
-    # str_count("Mr PULLER asked the Prime Minister,", "(?<=(Mr[:blank:]?[:upper:]{2,30}[:blank:]?))(asked)")
-    
-    # 
-    # # str_detect("WOOLSHED", "^(^[:lower:])$")
-    # ## titles
-    # 
-    # heh <- separate(
-    #   full_days_hansard,
-    #   Text,
-    #   into = c("Title", "Text"),
-    #   sep = "^[^a-z]*$",
-    #   extra = "merge",
-    #   fill = "left",
-    #   remove = FALSE
-    # )
-    # 
-    
-    # Misc other:
-    # Motion (by Mr OHIFUBY). agreed .to-
-    # Honorable members interjecting,
-    # Sir Arthur Fadden interjecting,
-    # Sitting suspended from 5.59 to 8 p.m.
-    
-    
-    
-    
-    # write_csv(full_days_hansard, "test.csv")
-    
+    # write_csv(full_days_hansard, "test.csv") # Just for testing
     write_csv(full_days_hansard, name_of_output_csv_file)
     
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))

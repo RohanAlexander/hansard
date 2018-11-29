@@ -44,48 +44,55 @@ header-includes:
 
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include = FALSE}
+# install.packages("here")
 library(here)
+# install.packages("kableExtra")
 library(kableExtra)
+# install.packages("knitr")
 library(knitr)
+# install.packages("tidyverse")
 library(tidyverse)
 
+knitr::opts_chunk$set(echo = TRUE)
+
+library(readr)
+
 elections <-
-  read_csv(here::here("inputs/misc/misc_elections_data.csv"), col_types = cols())
+  read_csv("../../../inputs/misc/misc_elections_data.csv", col_types = cols())
 
 governments <-
-  read_csv(here::here("inputs/misc/change_of_pm.csv"), col_types = cols())
+  read_csv("../../../inputs/misc/change_of_pm.csv", col_types = cols())
 
 keyEvents <-
-  read_csv(here::here("inputs/misc/key_events.csv"), col_types = cols())
+  read_csv("../../../inputs/misc/key_events.csv", col_types = cols())
 
 significances <-
-  read_csv(here::here("outputs/misc/significance.csv"), col_types = cols())
+  read_csv("../../../outputs/misc/significance.csv", col_types = cols())
 
 top_words <-
-  read_csv2(here::here("outputs/results-topic_models_and_gammas/top_words_80.csv"), col_types = cols()) %>% 
+  read_csv2("../../../outputs/results-topic_models_and_gammas/top_words_80.csv", col_types = cols()) %>% 
   rename(Topic = topic, Terms = terms)
 
 hansard_sources <-
-  read_csv(here::here("outputs/misc/hansard_sources.csv"), col_types = cols())
+  read_csv("../../../outputs/misc/hansard_sources.csv", col_types = cols())
 
 elections_results <-
-  read_csv(here::here("outputs/results-analysis_model/results-elections.csv"), col_types = cols()) %>%
+  read_csv("../../../outputs/results-analysis_model/results-elections.csv", col_types = cols()) %>%
     filter(Significant %in% c("Yes")) %>%
     select(-Significant)
 
 governments_results <-
-  read_csv(here::here("outputs/results-analysis_model/results-governments.csv"), col_types = cols()) %>%
+  read_csv("../../../outputs/results-analysis_model/results-governments.csv", col_types = cols()) %>%
     filter(Significant %in% c("Yes")) %>%
     select(-Party,-`Died in Office`,-Significant)
 
 key_events_results <-
-  read_csv(here::here("outputs/results-analysis_model/results-outliers.csv"), col_types = cols()) %>%
+  read_csv("../../../outputs/results-analysis_model/results-outliers.csv", col_types = cols()) %>%
     select(-Expected)
 
 key_events_results_cols <-
-  read_csv(here::here("outputs/results-analysis_model/results-outliers_in_columns.csv"), col_types = cols())
+  read_csv("../../../outputs/results-analysis_model/results-outliers_in_columns.csv", col_types = cols())
   
 names(key_events_results_cols) <- c("Dates", "", "", "", "", "", "", "")
 
@@ -182,7 +189,9 @@ However, the STM covariate framework has several limitations in terms of our goa
 
 To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2017 inclusive.
+Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2017 inclusive. Appendix \@ref(wastonywrong) contains more information about the sitting patterns over time.
+
+
 
 The topic proportions on day $d$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
 $$
@@ -283,10 +292,10 @@ We summarise our results in terms of prime ministers in Table \@ref(tab:primemin
 
 governments_results %>%
   kable(booktabs = T, caption = "Prime ministers that were significantly different to their predecessor") %>%
-  kable_styling(font_size = 10) %>% 
+  kable_styling(font_size = 10) %>%
   footnote(
-    general = "The significance of a prime minister is determined by whether at least one topic was significantly different during this prime minister, compared with the previous one.", 
-    footnote_as_chunk = T, 
+    general = "The significance of a prime minister is determined by whether at least one topic was significantly different during this prime minister, compared with the previous one.",
+    footnote_as_chunk = T,
     threeparttable = TRUE)
 
 
@@ -772,14 +781,18 @@ elections %>%
 
 \newpage
 
+# Sitting periods over time {#wastonywrong}
 
+TBD
+
+\newpage
 
 ## List of Prime Ministers {#fulllistofgovernments}
 
 
 ```{r governments, echo = FALSE, results = 'asis'}
 
-governments %>% 
+governments %>%
   kable(booktabs = T, caption = "Change in prime ministers") %>%
   kable_styling(font_size = 8)
 
