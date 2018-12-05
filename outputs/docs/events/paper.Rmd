@@ -160,7 +160,7 @@ Although more- or less-fine levels of analysis are possible, here we are primari
 
 Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addressed this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. 
 
-In order to effectively categorise the topics of the entire Hansard, we chose to use topic modelling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent.
+In order to effectively categorise the topics of the entire Hansard, we chose to use topic modelling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent. One advantage of using the Dirichlet distribution is that it formalises the idea that there is a trade-off in what is talked about in parliament given the limited time. A multinomial approach would not have this property.
 
 The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method, and it is in this sense that this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult.
 
@@ -330,6 +330,8 @@ In Appendix \@ref(resilientresults) we show that our main findings are resilient
 
 
 ### Additional results
+
+**[Add graph of example.]**
 
 Once prime minister and election effects have been taken into consideration, some days stand out compared with others in their sitting period. We do not explicitly include them in the model because of over-fitting and effect-type concerns, but we are interested to see if these can be explained by events that occurred on or before that sitting day. For instance, we may expect that events of a historical magnitude, such as the 9/11 attacks would change the discussion, or that the sitting day when, for instance, the Apology to the Stolen Generation was delivered, or some particularly prominent legislation introduced, would be different to others in that sitting period.
 

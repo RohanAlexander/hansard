@@ -16,6 +16,7 @@
 library(furrr)
 # devtools::install_github("DavisVaughan/furrr")
 library(lubridate)
+# install.packages('pdftools')
 library(pdftools)
 library(stringi)
 library(tidyverse)

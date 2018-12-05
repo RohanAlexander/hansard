@@ -15,11 +15,15 @@ file_names <-
     full.names = TRUE
   )
 
-all_data <- purrr::map_df(file_names, readr::read_csv, .id = "id")
+names(file_names) <- list.files(use_this_path) %>% 
+  str_replace(".csv", "")
+  
+all_data <- purrr::map_df(file_names, readr::read_csv, .id = "date")
 
 names(all_data)
 
-speakers <- all_data$Speaker %>% count()
-count(all_data, Speaker, sort = TRUE)
+speakers <- count(all_data, Speaker, sort = TRUE)
+
+write_csv(speakers, "speakers.csv")
 
 write_csv(all_data, "test.csv")
