@@ -1,0 +1,37 @@
+government,primeMinister,party,start,end,diedInOffice,hor,senate
+Barton,Edmund Barton,Protectionist,1901-01-01,1903-09-24,No,284,228
+Deakin 1,Alfred Deakin,Protectionist,1903-09-24,1904-04-27,No,31,23
+Watson,Chris Watson,Labour,1904-04-27,1904-08-18,No,47,18
+Reid,George Reid,Free Trade,1904-08-18,1905-07-05,No,60,37
+Deakin 2,Alfred Deakin,Protectionist,1905-07-05,1908-11-13,No,334,255
+Fisher 1,Andrew Fisher,Labour,1908-11-13,1909-06-02,No,15,14
+Deakin 3,Alfred Deakin,Commonwealth Liberal,1909-06-02,1910-04-29,No,94,67
+Fisher 2,Andrew Fisher,Labor,1910-04-29,1913-06-24,No,249,167
+Cook,Joseph Cook,Commonwealth Liberal,1913-06-24,1914-09-17,No,108,59
+Fisher 3,Andrew Fisher,Labor,1914-09-17,1915-10-27,No,90,77
+Hughes,Billy Hughes,Labor National Labor and Nationalist,1915-10-27,1923-02-09,No,489,387
+Bruce,Stanley Bruce,Nationalist (Coalition),1923-02-09,1929-10-22,No,416,308
+Scullin,James Scullin,Labor,1929-10-22,1932-01-06,No,206,154
+Lyons,Joseph Lyons,United Australia (Coalition),1932-01-06,1939-04-07,Yes,396,279
+Page,Earle Page,Country (Coalition),1939-04-07,1939-04-26,No,2,0
+Menzies 1,Robert Menzies,United Australia (Coalition),1939-04-26,1941-08-28,No,118,87
+Fadden,Arthur Fadden,Country (Coalition),1941-08-28,1941-10-07,No,8,6
+Curtin,John Curtin,Labor,1941-10-07,1945-07-05,Yes,223,153
+Forde,Frank Forde,Labor,1945-07-06,1945-07-13,No,1,1
+Chifley,Ben Chifley,Labor,1945-07-13,1949-12-19,No,357,173
+Menzies 2,Robert Menzies,Liberal (Coalition),1949-12-19,1966-01-26,No,1024,822
+Holt,Harold Holt,Liberal (Coalition),1966-01-26,1967-12-19,Yes,117,111
+McEwen,John McEwen,Country (Coalition),1967-12-19,1968-01-10,No,0,0
+Gorton,John Gorton,Liberal (Coalition),1968-01-10,1971-03-10,No,200,201
+McMahon,William McMahon,Liberal (Coalition),1971-03-10,1972-12-05,No,125,128
+Whitlam,Gough Whitlam,Labor,1972-12-05,1975-11-11,No,213,213
+Fraser,Malcolm Fraser,Liberal (Coalition),1975-11-11,1983-03-11,No,457,500
+Hawke,Bob Hawke,Labor,1983-03-11,1991-12-20,No,546,681
+Keating,Paul Keating,Labor,1991-12-20,1996-03-11,No,246,289
+Howard,John Howard,Liberal (Coalition),1996-03-11,2007-12-03,No,780,734
+Rudd 1,Kevin Rudd,Labor,2007-12-03,2010-06-24,No,172,128
+Gillard,Julia Gillard,Labor,2010-06-24,2013-06-27,No,179,154
+Rudd 2,Kevin Rudd,Labor,2013-06-27,2013-09-18,No,1,2
+Abbott,Tony Abbott,Liberal (Coalition),2013-09-18,2015-09-15,No,143,115
+Turnbull,Malcolm Turnbull,Liberal (Coalition),2015-09-15,2018-08-24,No,179,151
+Morrison,Scott Morrison,Liberal (Coalition),2018-08-24,-,-,24,24

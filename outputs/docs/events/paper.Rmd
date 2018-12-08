@@ -59,10 +59,10 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 
 elections <-
-  read_csv("../../../inputs/misc/misc_elections_data.csv", col_types = cols())
+  read_csv("../../../outputs/misc/misc_elections.csv", col_types = cols())
 
 governments <-
-  read_csv("../../../inputs/misc/change_of_pm.csv", col_types = cols())
+  read_csv("../../../outputs/misc/pm_dates.csv", col_types = cols())
 
 keyEvents <-
   read_csv("../../../inputs/misc/key_events.csv", col_types = cols())
@@ -484,10 +484,12 @@ The Parliament website is missing the Hansard PDFs for the following dates in th
 
 There is one unaccounted for difference in 1920, 1921, 1935, 1942, 1948, 1951, 1991, 2003, 2004, and there are two unaccounted for in 1985 and four unaccounted for in 2012.
 
-In terms of other issues, in the Senate, the PDF for 10 August 1917 may be the wrong one. It says that it is for 10 January 1918 on the cover sheet, but there's no an entry for 10 January 1918. Similarly for 1918-12-18 and 1917-08-01.
+In terms of other known issues, in the Senate, the PDF for the website date 10 August 1917 may be wrong. When downloaded the PDF says that it is for 10 January 1918 on the cover sheet, but there's no website entry for 10 January 1918. This is also the case for 18 December 1918 (which contains the PDF for 28 November 1918), and for 1 August 1917 (which contains the PDF for 10 August 1917).
+
 
 
 \newpage
+
 
 
 ## Example Hansard PDF to text record workflow {#hansardworkflow}
@@ -784,7 +786,7 @@ However, the replacement of the Dirichlet distribution with the logistic multiva
 
 elections %>% 
   filter(election == 1) %>% 
-  select(year, electionDate, electionWinner) %>% 
+  select(-election, -comment) %>% 
   kable("latex", booktabs = T, caption = "Elections") %>%
   kable_styling(font_size = 8)
 
@@ -806,8 +808,24 @@ TBD
 ```{r governments, echo = FALSE, results = 'asis'}
 
 governments %>%
+  rename(
+    "Government" = "government",
+    "Prime Minister" = "primeMinister",
+    "Party" = "party",
+    "Start" = "start",
+    "End" = "end",
+    "Died in Office" = "diedInOffice",
+    "HoR" = "hor",
+    "Senate" = "senate"
+    ) %>% 
   kable(booktabs = T, caption = "Change in prime ministers") %>%
-  kable_styling(font_size = 8)
+  kable_styling(font_size = 8) %>% 
+  footnote(general = "Here is a general comments of the table. ",
+           number = c("Footnote 1; ", "Footnote 2; "),
+           alphabet = c("Footnote A; ", "Footnote B; "),
+           symbol = c("Footnote Symbol 1; ", "Footnote Symbol 2")
+           )
+
 
 ```
 
