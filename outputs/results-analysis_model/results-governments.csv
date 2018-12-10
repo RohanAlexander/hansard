@@ -1,37 +1,37 @@
-Number, Government, Party, Start, End, Died in Office, Significant
-1, Barton, Protectionist,1901-01-01,1903-09-24, No, 
-2, Deakin 1, Protectionist,1903-09-24,1904-04-27, No, 
-3, Watson, Labour,1904-04-27,1904-08-18, No, 
-4, Reid, Free Trade,1904-08-18,1905-07-05, No, 
-5, Deakin 2, Protectionist,1905-07-05,1908-11-13, No, 
-6, Fisher 1, Labour,1908-11-13,1909-06-02, No, Yes
-7, Deakin 3, Commonwealth Liberal,1909-06-02,1910-04-29, No, 
-8, Fisher 2, Labor,1910-04-29,1913-06-24, No, 
-9, Cook, Commonwealth Liberal,1913-06-24,1914-09-17, No, Yes
-10, Fisher 3, Labor,1914-09-17,1915-10-27, No, Yes
-11, Hughes,Labor and Nationalist,1915-10-27,1923-02-09, No,No
-12, Bruce, Nationalist (Coalition),1923-02-09,1929-10-22, No,Yes
-13, Scullin, Labor,1929-10-22,1932-01-06, No,No
-14, Lyons, United Australia (Coalition),1932-01-06,1939-04-07, Yes,Yes
-15, Page, Country (Coalition),1939-04-07,1939-04-26, No,Yes
-16, Menzies 1, United Australia (Coalition),1939-04-26,1941-08-28, No,Yes
-17, Fadden, Country (Coalition),1941-08-28,1941-10-07, No,No
-18, Curtin, Labor,1941-10-07,1945-07-05, Yes, 
-19, Forde, Labor,1945-07-06,1945-07-13, No, No
-20, Chifley, Labor,1945-07-13,1949-12-19, No,Yes
-21, Menzies 2, Liberal (Coalition),1949-12-19,1966-01-26, No,Yes
-22, Holt, Liberal (Coalition),1966-01-26,1967-12-19, Yes,Yes
-23, McEwen, Country (Coalition),1967-12-19,1968-01-10, No,No
-24, Gorton, Liberal (Coalition),1968-01-10,1971-03-10, No,Yes
-25, McMahon, Liberal (Coalition),1971-03-10,1972-12-05, No,Yes
-26, Whitlam, Labor,1972-12-05,1975-11-11, No,Yes
-27, Fraser, Liberal (Coalition),1975-11-11,1983-03-11, No,Yes
-28, Hawke, Labor,1983-03-11,1991-12-20, No,Yes
-29, Keating, Labor,1991-12-20,1996-03-11, No,Yes
-30, Howard, Liberal (Coalition),1996-03-11,2007-12-03, No,Yes
-31, Rudd 1, Labor,2007-12-03,2010-06-24, No,Yes
-32, Gillard, Labor,2010-06-24,2013-06-27, No,Yes
-33, Rudd 2, Labor,2013-06-27,2013-09-18, No,No
-34, Abbott, Liberal (Coalition),2013-09-18,2015-09-15, No, Yes
-35, Turnbull, Liberal (Coalition),2015-09-15,2018-08-24, No, No
-36, Morrison, Liberal (Coalition),2018-08-24, -, -, No
+Number, Premiership, Party, Start, End, Died in Office, Significant, Party changed
+1, Barton, Protectionist,1901-01-01,1903-09-24, No, , Yes
+2, Deakin 1, Protectionist,1903-09-24,1904-04-27, No, , No
+3, Watson, Labour,1904-04-27,1904-08-18, No, , Yes
+4, Reid, Free Trade,1904-08-18,1905-07-05, No, , Yes
+5, Deakin 2, Protectionist,1905-07-05,1908-11-13, No, , Yes
+6, Fisher 1, Labour,1908-11-13,1909-06-02, No, Yes, Yes
+7, Deakin 3, Commonwealth Liberal,1909-06-02,1910-04-29, No, , Yes
+8, Fisher 2, Labor,1910-04-29,1913-06-24, No, , Yes
+9, Cook, Commonwealth Liberal,1913-06-24,1914-09-17, No, Yes, Yes
+10, Fisher 3, Labor,1914-09-17,1915-10-27, No, Yes, Yes
+11, Hughes,Labor and Nationalist,1915-10-27,1923-02-09, No, No, Yes
+12, Bruce, Nationalist (Coalition),1923-02-09,1929-10-22, No, Yes, Yes
+13, Scullin, Labor,1929-10-22,1932-01-06, No, No, Yes
+14, Lyons, United Australia (Coalition),1932-01-06,1939-04-07, Yes,Yes, Yes
+15, Page, Country (Coalition),1939-04-07,1939-04-26, No, Yes, Yes
+16, Menzies 1, United Australia (Coalition),1939-04-26,1941-08-28, No, Yes, Yes
+17, Fadden, Country (Coalition),1941-08-28,1941-10-07, No, No, Yes
+18, Curtin, Labor,1941-10-07,1945-07-05, Yes, , Yes
+19, Forde, Labor,1945-07-06,1945-07-13, No, No, No
+20, Chifley, Labor,1945-07-13,1949-12-19, No, Yes, No
+21, Menzies 2, Liberal (Coalition),1949-12-19,1966-01-26, No, Yes, Yes
+22, Holt, Liberal (Coalition),1966-01-26,1967-12-19, Yes,Yes, No
+23, McEwen, Country (Coalition),1967-12-19,1968-01-10, No, No, Yes
+24, Gorton, Liberal (Coalition),1968-01-10,1971-03-10, No, Yes, Yes
+25, McMahon, Liberal (Coalition),1971-03-10,1972-12-05, No, Yes, No
+26, Whitlam, Labor,1972-12-05,1975-11-11, No, Yes, Yes
+27, Fraser, Liberal (Coalition),1975-11-11,1983-03-11, No, Yes, Yes
+28, Hawke, Labor,1983-03-11,1991-12-20, No, Yes, Yes
+29, Keating, Labor,1991-12-20,1996-03-11, No, Yes, No
+30, Howard, Liberal (Coalition),1996-03-11,2007-12-03, No, Yes, Yes
+31, Rudd 1, Labor,2007-12-03,2010-06-24, No, Yes, Yes
+32, Gillard, Labor,2010-06-24,2013-06-27, No, Yes, No
+33, Rudd 2, Labor,2013-06-27,2013-09-18, No, No, No
+34, Abbott, Liberal (Coalition),2013-09-18,2015-09-15, No, Yes, Yes
+35, Turnbull, Liberal (Coalition),2015-09-15,2018-08-24, No, No, No
+36, Morrison, Liberal (Coalition),2018-08-24, -, -, No, No

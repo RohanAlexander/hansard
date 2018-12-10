@@ -102,17 +102,19 @@ names(key_events_results_cols) <- c("Dates", "", "", "", "", "", "", "")
 # Introduction
 <!-- Government policy is partly driven by parliamentary discussion. Conversely, that same discussion can indicate a government's priorities. But major events -- be they somewhat expected, such as an election, and unexpected, such as a recession or terrorist attack -- can affect the course of parliamentary discussion. For instance, think of how a new government often goes to some trouble to seem different to the one they replace, or how events such as the 9/11 attacks altered government priorities. -->
 
-Events are a well-known cause of political behaviour. But the extent of their effect is varied and changes over time. Here we focus on just two types of events: elections, and a change in prime minister. We examine the effect of these types of events on the topics that are discussed in the Australian Federal Parliament. 
+Events are a well-known cause of political behaviour. But their effect is varied, and changes over time. Here we focus on just two types of events: elections, and changes in prime minister. We examine the effect of these types of events on the topics that are discussed in the Australian Federal Parliament. 
 
 The main data source for our paper is the text record of what was said in the Australian Federal Parliament known as 'Hansard'. From this we create a dataset based on the sitting days from 1901 through to 2018. We have records for 7,934 days in the House of Representatives and 6,746 days in the Senate. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lower-case; remove names, numbers, and punctuation; join commonly co-located words; and remove stop words.
 
-We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in prime minister and elections. After taking these into consideration these effects, we can then explore other significant events.
+We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in prime minister and elections. After taking these effects into consideration, we then explore other significant events.
 
-We find that: firstly, changes in prime minister tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the prime minister did not change but there was a significant change in topics. The effects in Australia of elections and prime ministers appear to have become more pronounced since the 1980s. Finally, economic events, such as financial crises, have less significant effects than other events such as terrorism.
+We find that: firstly, changes in prime minister tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the prime minister did not change but there was a significant change in topics. Finally, economic events, such as financial crises, have less significant effects than other events such as terrorism.
 
-As our dataset covers 118 years we are able to see how the effect of events changes over time. We find that the events that we are interested in are rarely significant in the first half of our dataset. With a small number of exceptions, even changes of prime minister where the party in power also changed were not associated with overly large changes in the topics of parliamentary discussion. It may be that these days prime ministers are trying to more thoroughly distinguish themselves from their predecessor, or that the role of the government in agenda setting in the Australian Federal Parliament is changing.
+As our dataset covers 118 years we are able to see how the effect of these two types of events changes over time. In Australia the effect of elections and a change in prime minister appear to have become more pronounced since the 1980s. We find that the events that we are interested in are rarely significant in the first half of our dataset. With a small number of exceptions, even changes in prime minister where the party in power also changed were not associated with overly large changes in the topics of parliamentary discussion until the 1980s. It may be that more recent prime ministers are trying to more thoroughly distinguish themselves from their predecessor, or that the role of the government in agenda setting in the Australian Federal Parliament has changed.
 
-Our work contributes to the growing literature in quantitative social science that considers text as an input to statistical methods, rather than requiring separate analysis. This literature sits across and draws from various historically-separate disciplines including applied statistics, economics, and political science. We contribute to this literature in terms of both data and methods, as well as our key findings. From a data perspective we bring to bear an essentially-complete record of what was said in the Australian Federal Parliament on a daily basis, and we make our dataset available to other researchers via the R package \texttt{hansardr}. From a methods perspective, our analysis model has several advantages over existing methods. These include: allowing the events to have more-complicated auto-correlated functional forms; implementing pooling across groups of similar documents; and identifying outlying topic distributions without the need to pre-specify the event of interest. As the digitisation of historical sources continues and computational power becomes cheaper, we expect the popularity of quantitative approaches to text to further increase and the data and methods in our paper can be improved on in a variety of ways.
+Our work contributes to the growing literature that considers text as an input to statistical methods. This literature sits across and draws from various historically-separate disciplines including applied statistics, economics, and political science. In addition to our key findings about Australian politics, we contribute to this literature in terms of both data and methods. From a data perspective we bring to bear an essentially-complete record of what was said in the Australian Federal Parliament on a daily basis, and our dataset is available to other researchers. From a methods perspective, our analysis model has several advantages over existing methods. These include: allowing the events to have more-complicated auto-correlated functional forms; implementing pooling across groups of similar documents; and identifying outlying topic distributions without the need to pre-specify the event of interest. 
+
+<!-- As the digitisation of historical sources continues and computational power becomes cheaper, we expect the popularity of quantitative approaches to text to further increase. For instance, our dataset could be linked to others or our statistical approach could be improved.  with others, and the data and methods in our paper can be improved on in a variety of ways. -->
 
 
 
@@ -141,11 +143,11 @@ The Australian Federal Parliament makes daily Hansard records available online a
 
 [^XMLfootnote]: Tim Sherratt makes Commonwealth XML records for 1901 to 1980 available as a single download at: http://historichansard.net/. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website or the website can be scraped. We do not use the XML records or scrape the website because those records are known to be incomplete but the extent of how incomplete they are is unknown. The trade-off for a more-complete record is the errors introduced by having to parse the PDFs.
 
-We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R, @R2018, to convert the PDFs into daily text records. An example of the workflow and some example scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
+We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R [@R2018] to convert the PDFs into daily text records. An example of the workflow and some example scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate, especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
 
-The percentage of stop-words in each record is reasonably consistent over time. This suggests that there is no significant difference in the quality of the parsing over time, although manual inspection does suggest there is some improvement in quality over time. Details of this check are provided in Appendix \@ref(stopwordsgraph). We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new zealand to new_zealand. We do not stem the words because @SchofieldMimno2016 suggest that there is no significant benefit. Then the sentences are de-constructed and each word considered individually. The resulting dataset used for analysis contains counts of words by day for each of the 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
+The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This is evidence to suggest that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. We do not stem the words because @SchofieldMimno2016 suggest that there may not be any significant benefit. Then the sentences are de-constructed and each word considered individually. The resulting dataset used for analysis contains counts of words by day for each of the 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
 
-[^datasourcefootnote]: We have made our dataset available via the R package \texttt{hansardr}. R users can draw on the devtools package [@Wickham2018] to install it from: https://github.com/RohanAlexander/hansardr. Users of other languages can download the daily CSV files from the data-raw folder of that repository.
+[^datasourcefootnote]: We have made our dataset available via the R package \texttt{hansardr}. R users can use the devtools package [@Wickham2018] to install it from: https://github.com/RohanAlexander/hansardr. Users of other languages can download the daily CSV files from the data-raw folder of that repository.
 
 
 
@@ -174,7 +176,7 @@ An overview, and an example, of how topic modelling works is available in Append
 
 One notable limitation of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. However, in reality topics are often related.  For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. 
 
-As such, we chose to use a Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain topic distributions. CTM is a slight extension to LDA which allows for correlations between topics. More details about CTM can be found in Appendix \@ref(correlatedtopicmodelsection).
+As such, we use the Correlated Topic Model (CTM) of @BleiLafferty2007 to obtain topic distributions. The CTM is a modification of LDA that allows for correlations between topics. More detail about the CTM is in Appendix \@ref(correlatedtopicmodelsection).
 
 ## Analysis model  {#analysismodelexplanation}
 
@@ -248,14 +250,14 @@ We run the model in JAGS using the \texttt{rjags} package of @Plummer2018.
 
 # Results
 
-Firstly, we describe the results of the CTM approach, which defined 80 unique topics over the period 1901 to 2018. We then describe the results of the Bayesian analysis model, which identified prime ministers, elections and other events that were associated with a change in the topics discussed. 
+Firstly, we describe the results of the CTM approach, which defined 80 topics over the period 1901 to 2018. We then describe the results of the Bayesian analysis model, which identified prime ministers, elections and other events that were associated with a change in the topics discussed. 
 
 ## Topic modelling
 We applied the CTM approach discussed in Appendix \@ref(correlatedtopicmodelsection) on the processed Hansard text database outlined in Section \@ref(hansarddata). The main output of interest are the types of topics identified by the model, and the prevalence of each topic for each day of parliamentary discussion. 
 
 Our main results are based on a topic model with 80 distinct topics. With almost 15,000 days and 80 topics, the analysis model is being fit to more than a million observations. The choice of 80 topics was made as a trade-off between standard diagnostic tests that suggested a larger number of topics would be more appropriate, and the need for the analysis model to be tractable. Those diagnostic tests are detailed in Appendix \@ref(selecttopicnumber). 
 
-Table \@ref(tab:topwords) lists the top ten words associated with each of the 80 topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. There are also some topics that appear to be about procedural or day-to-day, such as Topics 7 or 9. Note that, as expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
+Table \@ref(tab:topwords) lists the top ten words associated with each of the 80 topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Similar to when topic models are run using the parliamentary text records of other countries, there are also some topics that appear to be about procedural or day-to-day matters, such as Topics 7 or 9. As expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
 
 ```{r topwords, echo = FALSE, results = 'asis'}
 
@@ -273,23 +275,32 @@ knitr::include_graphics("../../figures/topics_example.png")
 
 ```
 
+Figure \@ref(fig:threeexamples) shows the topic model output in the context of three notable periods of Australian political history. 
 
+```{r threeexamples, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, for three periods", out.width = '100%'}
+knitr::include_graphics("../../figures/topics_examples_three.pdf")
+
+```
+
+The first panel of Figure \@ref(fig:threeexamples) is the second Menzies premiership. The dashed lines show the elections. While the results here abstract from differences based on topic mix, the shape of the distribution seems to be reasonably similar. Given 80 topics, it may be difficult to see differences in the topic mix manually, and so we would like for the analysis model to be able to suggest whether the mix is changing. The second panel shows the 1983 election, and the subsequent change from Fraser to Hawke on 11 March 1983, identified by a dotted line on that date. The distribution of topics seems less bunched after the change, but it is difficult to tell how different it is. We would like the analysis model to be able to distinguish between the two if they seem different. The third panel shows the first Rudd premiership. The important aspect to note is that the period after the 2007 election and the Rudd premiership contain essentially the same Hansard dates. The analysis model needs to be able to deal with this situation.
+
+Appendix \@ref(topicmodeleconresultsdiscussion) provides another example from the topic model results in the context of economic events.
 
 ## Analysis model
 
 ### Main results
 
-We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. As discussion in Section \@ref(analysismodelexplanation), the modelling process takes the topic proportions estimated in the CTM approach, and examines the association between these topic distributions and outside events. That is, the topic model outputs are inputs for our analysis model.
+We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. As discussed in Section \@ref(analysismodelexplanation), the modelling process takes the topic proportions estimated by the CTM, and examines the association between these topic distributions and outside events. That is, the topic model outputs are inputs for our analysis model.
 
-There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by prime ministers or elections tend not to provide enough variability. For instance, examining Topics 26, 28, 30 and 66, which have to do with war and conflict illustrates Australia's involvement in World War I, World War II, the Korean War, the Vietnam War, the First Gulf War, the War in Afghanistan and the Second Gulf War (Figure \@ref(fig:wartopicsgraph)). Appendix \@ref(topicmodeleconresultsdiscussion) provides more detail about the topic model results in the context of economic events.
+There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by prime ministers or elections tend not to provide enough variability. For instance, examining Topics 4, 26, 28, 30 and 66, which have to do with war and conflict illustrates Australia's involvement in World War I, World War II, the Korean War, the Vietnam War, the First Gulf War, the War in Afghanistan and the Second Gulf War (Figure \@ref(fig:wartopicsgraph)). 
 
 ```{r wartopicsgraph, cache = TRUE, echo = FALSE, fig.cap = "Model estimates of topic prevalance by sitting period for those related to war and conflict", out.width = '100%'}
 knitr::include_graphics("../../figures/war_stack.pdf")
 ```
 
-One of the main goals of the analysis model is to see which political events are associated with changes in the prevalence of topics over time. Political events are those related to a change of prime minister or an election. Note that as Australia has a parliamentary system it is possible for the prime minister to change without an election and we do not distinguish between terms or cabinet composition although this more detailed analysis is possible. If a person was prime minister more than once then these periods are considered independently. 
+One of the main goals of the analysis model is to see which elections and changes of prime minister are associated with changes in the prevalence of topics over time. By way of background, as Australia has a parliamentary system it is possible for the prime minister to change without an election and we do not distinguish between terms or cabinet composition although this more-detailed analysis is possible. If a person was prime minister more than once then these periods are considered independently. 
 
-As detailed in Section \@ref(analysismodelexplanation), the model estimates a mean level-effect for each prime minister, $\alpha_g$ and each election, $\alpha_e$. We identify differences between neighbouring prime ministers and between neighbouring elections based on calculating 95 per cent credible intervals from posterior samples of these respective mean effects. When these do not overlap we consider that the model finds a significant difference between either the neighbouring prime ministers or elections. 
+As detailed in Section \@ref(analysismodelexplanation), the model estimates a mean level-effect for each prime minister, $\alpha_g$ and each election, $\alpha_e$. We identify differences between neighbouring prime ministers and between neighbouring elections based on calculating 95 per cent credible intervals from posterior samples of these respective mean effects. When these do not overlap we consider that the model finds a difference between either the neighbouring prime ministers or elections, as appropriate. 
 
 We summarise our results in terms of prime ministers in Table \@ref(tab:primeministersresults) and in terms of elections in Table \@ref(tab:electionsresults). These tables focus on elections and prime ministers that were different to the ones that preceded them. Complete lists of the Australian elections and prime ministers are available in Appendices \@ref(fulllistofelections) and \@ref(fulllistofgovernments).
 
@@ -299,7 +310,7 @@ governments_results %>%
   kable(booktabs = T, caption = "Prime ministers that were significantly different to their predecessor") %>%
   kable_styling(font_size = 10) %>%
   footnote(
-    general = "The significance of a prime minister is determined by whether at least one topic was significantly different during this prime minister, compared with the previous one.",
+    general = "The significance of a prime minister is determined by whether at least one topic was significantly different during this premiership, compared with the previous one.",
     footnote_as_chunk = T,
     threeparttable = TRUE)
 
@@ -312,14 +323,13 @@ elections_results %>%
   kable(booktabs = T, caption = "Election-periods that were significantly different to the one before") %>%
   kable_styling(font_size = 10) %>% 
    footnote(
-    general = "The significance of a prime minister is determined by whether at least one topic was significantly different during the period between this election and the next, compared with the previous one.", 
+    general = "The significance of an election is determined by whether at least one topic was significantly different during the period between this election and the next, compared with the period between the previous election and this one.", 
     footnote_as_chunk = T, 
     threeparttable = TRUE)
 
 ```
 
-**[For teh elections one, John says 'For the uninitiated, I think the govt party should be identified here, as well as the govt part of the predecessor--more like in Table 6.  I'm left wondering whether these significantly different govts are mostly the result of a change in party.']**
-In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate significant differences between prime ministers and elections, respectively. In the graphs, the points show the estimated value of $\alpha_g$ and $\alpha_e$, respectively, for each of the topics specified. The error bars represent 95 per cent Bayesian credible intervals. As there are 80 topics it would be overwhelming to show all of them, and so we have focused on Topics 4, 26, 28, 30 and 66 here which have to do with war and conflict. 
+In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate significant differences between prime ministers and elections, respectively. In the graphs, the points show the estimated value of $\alpha_g$ and $\alpha_e$, respectively, for each of the topics specified. The error bars represent 95 per cent Bayesian credible intervals. As there are 80 topics it would be unwieldy to show all of them, and so we have again focused on Topics 4, 26, 28, 30 and 66 here which have to do with war and conflict. 
 
 ```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "prime minister level effects on selected topics.", out.width = '100%'}
 knitr::include_graphics("../../figures/mu_gov.pdf")
@@ -335,8 +345,6 @@ In Appendix \@ref(resilientresults) we show that our main findings are resilient
 
 
 ### Additional results
-
-**[Add graph of example.]**
 
 Once prime minister and election effects have been taken into consideration, some days stand out compared with others in their sitting period. We do not explicitly include them in the model because of over-fitting and effect-type concerns, but we are interested to see if these can be explained by events that occurred on or before that sitting day. For instance, we may expect that events of a historical magnitude, such as the 9/11 attacks would change the discussion, or that the sitting day when, for instance, the Apology to the Stolen Generation was delivered, or some particularly prominent legislation introduced, would be different to others in that sitting period.
 
@@ -356,6 +364,11 @@ key_events_results_cols %>%
 
 ```
 
+
+
+<!-- **[Add graph of example.]** -->
+
+
 <!-- Finally, Figure \@ref(fig:sigmaelection) illustrates the estimated standard deviation of topic distributions, around the mean election effect, over time. In general, the estimates of standard deviation are increasing over time, suggesting that discussed topics are more variable in more recent election periods compared to historical periods.  -->
 
 <!-- ```{r sigmaelection, cache = TRUE, echo = FALSE, fig.cap = "Elections level effects on selected topics", out.width = '100%'} -->
@@ -367,7 +380,7 @@ key_events_results_cols %>%
 
 # Discussion
 
-**[Needs more.]**
+<!-- **[Needs more.]** -->
 
 Of the 36 prime ministers over this period, we find that 20 of them are significantly different to the prime minister that preceded them. However, four of these results -- the significance of the Page Premiership, the First Menzies Premiership, the Chifley Premiership and the Abbott Premiership -- are likely due to the short length of either the prime minister or the predecessor and should be ignored, leaving only 16. The earliest of these are the First Fisher Premiership, the Cook Premiership and the Third Fisher Premiership, which were different to the Second Deakin Premiership, the Second Fisher Premiership, and the Cook Premiership, respectively. To a certain extent this is likely due to changes due to World War I.
 
@@ -782,8 +795,9 @@ Although the example topics in the main paper have a military and defence theme,
 
 
 
+**[Insert the econ examples.]**
 
-**[TBD]**
+
 
 
 \newpage
@@ -808,7 +822,9 @@ elections %>%
 
 # Sitting periods over time {#wastonywrong}
 
-TBD
+
+**[Add the graph.]**
+
 
 \newpage
 
@@ -830,11 +846,12 @@ governments %>%
     ) %>% 
   kable(booktabs = T, caption = "Change in prime ministers") %>%
   kable_styling(font_size = 8) %>% 
-  footnote(general = "Here is a general comments of the table. ",
-           number = c("Footnote 1; ", "Footnote 2; "),
-           alphabet = c("Footnote A; ", "Footnote B; "),
-           symbol = c("Footnote Symbol 1; ", "Footnote Symbol 2")
+  footnote(general = "This table contains summary information for each prime minister of Australia. HoR and Senate refer to the number of days that each chamber sat for while that person was prime minister.",
+  footnote_as_chunk = T, 
+    threeparttable = TRUE
            )
+
+
 
 
 ```
@@ -865,7 +882,9 @@ governments %>%
 
 # Effect of number of topics on analysis model results {#resilientresults}
 
-**[Add Lior's idea about running the model for 60 and for 100 and then showing that the main results don't change.]**
+**[Add results for 60 and 100 topics.]**
+
+<!-- **[Add Lior's idea about running the model for 60 and for 100 and then showing that the main results don't change.]** -->
 
 
 \newpage
