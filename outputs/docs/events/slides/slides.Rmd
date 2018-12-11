@@ -1,11 +1,11 @@
 ---
-title: The Effect of Events on Discussion in the Australian Federal Parliament (1901--2017)
+title: The Effect of Elections and Prime Ministers on Discussion in the Australian Federal Parliament (1901--2018)
 subtitle: 
 author:
 - Monica Alexander, University of Toronto\newline
 - \textbf{Rohan Alexander, Australian National University}
-date: 22 November 2018
-institute: Presentation at the University of Toronto Political Behaviour Group, Toronto, Canada.
+date: 11 December 2018
+institute: Presentation at the Max Planck Institute for Demographic Research, Rostock, Germany.
 output: binb::metropolis
 # output: ioslides_presentation
 fontsize: 12pt
@@ -56,19 +56,16 @@ names(key_events_results_cols) <- c("Dates", "")
 
 ## Approach
 
-- Create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2017 based on available public records. 
+- Create a dataset of what was said in the Australian Federal Parliament from 1901 through to 2018 based on available public records. 
 - Use a correlated topic model to reduce dimemsionality.
 - Analyse the effect of various events using a Bayesian hierarchical Dirichlet model. 
 
-<div class="notes">
-Test
-</div>
 
 ## Findings
 
-- Changes in government tend be associated with topic changes even when the party in power does not change.
-- Elections that do not result in a change in government are rarely associated with topic changes.
-- The effect of events is much more pronounced in the second half of our sample, and especially in the past two decades.
+- Changing the prime minister tends be associated with topic changes even when the party in power does not change.
+- Elections that do not result in a change in prime minister are rarely associated with topic changes.
+- The effect of these types of events is much more pronounced in the second half of our sample, and especially in the past two decades.
 
 
 
@@ -78,7 +75,7 @@ Test
 - A daily text record called Hansard of what was said in the Australian Federal Parliament has been made available since it was established in 1901. It's not vertatim, but it's pretty close.
 - Hansard records have been used in other counties but not really at scale in Australia.
 - Daily PDFs are available online and these are considered the official release. 
-- There are 14,551 days of publicly available Hansard records across both chambers of the Australian Federal Parliament.
+- There are 14,680 days of publicly available Hansard records across both chambers of the Australian Federal Parliament.
 
 ## Example PDF page
 
@@ -186,17 +183,6 @@ Again, sounds easy, but hard to implement, and they have a very nice algorithm.
 
 
 
-## Why not use STM?
-STM is great, but it is specific to various contexts and ours is slightly outside them:
-
-- No way to specify more complicated auto-correlated functional forms of the effects of events over time. 
-- There is no way to implement partial pooling across groups of similar documents. 
-- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model.
-In an ideal world we could modify the STM code, but instead we build a similar, but different, analysis model.
-
-<!-- Also you don't really understand something until you code it yourself. -->
-
-
 
 
 # Analysis model
@@ -207,8 +193,8 @@ In an ideal world we could modify the STM code, but instead we build a similar, 
 - This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
 ## Analysis model - Set-up
-- Define $\theta_{dp}$ to be the proportion of topic of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P=40$ are equal to the estimated values of $\theta_d$ from the CTM. 
-- We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are a total of 745 sitting periods over the period 1901 to 2017 inclusive.
+- Define $\theta_{dp}$ to be the proportion of topic of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P=80$ are equal to the estimated values of $\theta_d$ from the CTM. 
+- We assume that the majority of variation in topics is across sitting periods $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 745 sitting periods over the period 1901 to 2018 inclusive.
 
 ## Analysis model - Daily distribution
 The topic proportions on day $d$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
@@ -529,3 +515,16 @@ Given this set-up, we have a joint distribution for the variables and the analys
 <!-- If there is a strong reason for a particular number, then this can be used. Otherwise, one way to choose an appropriate number is to use cross validation. -->
 
 <!-- One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. Additionally, alternatives to the Dirichlet distribution can be used to extend the model to allow for correlation. This is the Correlated Topic Model, described in the next section. -->
+
+
+
+## Why not use STM?
+STM is great, but it is specific to various contexts and ours is slightly outside them:
+
+- No way to specify more complicated auto-correlated functional forms of the effects of events over time. 
+- There is no way to implement partial pooling across groups of similar documents. 
+- There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model.
+In an ideal world we could modify the STM code, but instead we build a similar, but different, analysis model.
+
+<!-- Also you don't really understand something until you code it yourself. -->
+
