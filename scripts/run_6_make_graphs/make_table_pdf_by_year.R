@@ -68,9 +68,12 @@ counts_by_year %>%
   gather(key = "Chamber", value = "Number", House:Senate) %>% 
   ungroup() %>% 
   ggplot(aes(x = Year, y = Number, fill = Chamber, group = Chamber)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  # geom_bar(stat = "identity", position = "dodge") +
+  geom_point(aes(color = Chamber), size = 2) +
   theme_classic() +
-  scale_fill_viridis_d()
+  # scale_fill_viridis_d() +
+  scale_colour_viridis_d() +
+  ylim(0, 125)
 
 ggsave(
   "outputs/figures/counts_by_year.pdf",

@@ -104,7 +104,7 @@ names(key_events_results_cols) <- c("Dates", "", "", "", "", "", "", "")
 
 Events are a well-known cause of political behaviour. But their effect is varied, and changes over time. Here we focus on just two types of events: elections, and changes in prime minister. We examine the effect of these types of events on the topics that are discussed in the Australian Federal Parliament. 
 
-The main data source for our paper is the text record, known as 'Hansard', of what was said in the Australian Federal Parliament. From this we create a dataset based on the sitting days from 1901 through to 2018. We have records for 7,934 days in the 'House of Representatives' (lower house) and 6,746 days in the 'Senate' (upper house). In contrast to the US, but similar to Canada and the UK, the executive is drawn from the legislature, and the Australian prime minister typically sits in the lower house. Unlike Canada or the UK, both houses are elected, although each has different mechanisms and constituencies. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lower-case; remove names, numbers, and punctuation; join commonly co-located words; and remove stop words.
+The main data source for our paper is the text record, known as 'Hansard', of what was said in the Australian Federal Parliament. From this we create a dataset based on the sitting days from 1901 through to 2018. We have records for 7,934 days in the House of Representatives (lower house) and 6,746 days in the Senate (upper house). In contrast to the US, but similar to Canada and the UK, the executive is drawn from the legislature, and the Australian prime minister typically sits in the lower house. Unlike Canada or the UK, both houses are elected, although each has different mechanisms and constituencies. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lower-case; remove names, numbers, and punctuation; join commonly co-located words; and remove stop words.
 
 We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in prime minister and elections. After taking these effects into consideration, we then explore other significant events.
 
@@ -145,7 +145,7 @@ The Australian Federal Parliament makes daily Hansard records available online a
 
 We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R [@R2018] to convert the PDFs into daily text records. An example of the workflow and some example scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate, especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
 
-The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This is evidence to suggest that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. We do not stem the words because @SchofieldMimno2016 suggest that there may not be any significant benefit. Then the sentences are de-constructed and each word considered individually. The resulting dataset used for analysis contains counts of words by day for each of the 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
+The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This is evidence to suggest that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. We do not stem the words because @SchofieldMimno2016 suggest that there may not be any significant benefit. Then the sentences are de-constructed and each word considered individually. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
 
 [^datasourcefootnote]: We have made our dataset available via the R package \texttt{hansardr}. R users can use the devtools package [@Wickham2018] to install it from: https://github.com/RohanAlexander/hansardr. Users of other languages can download the daily CSV files from the data-raw folder of that repository. While we are making our data public in an attempt to help other researchers, we cleaned the dataset toward the requirements of this paper. If you have different requirements or have suggestions for how we can improve the dataset for other uses please contact us.
 
@@ -197,7 +197,7 @@ However, the STM covariate framework has several limitations in terms of our goa
 
 To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 **[UPDATE]** sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(wastonywrong) contains more information about the sitting patterns over time.
+Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 **[UPDATE]** sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
 
 
 The topic proportions on day $d$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
@@ -409,7 +409,7 @@ In this paper we consider what was said in the Australian Federal Parliament bet
 
 By bringing a new dataset of what was said in the Australian Federal Parliament to bear for our analysis we are able to consider events over the full history of the Commonwealth of Australia. However even after cleaning the dataset remains imperfect and is more fit-for-purpose than of broad applicability. Future work could continue to improve the quality of this dataset. For instance, exploiting the availability of XML records to enhance the record parsed from the PDFs would enable the creation of a Hansard for research purposes that combined the best of both and would be used in a variety of research.
 
-Using text as data allows larger-scale analysis that would not be viable using less-automated approaches and so it can identify associations and patterns that may otherwise be overlooked. That said, text analysis has well-known shortcomings and weaknesses and should be considered a complement to more detailed analysis such as qualitative methods and case studies. For instance, the use of topic models is problematic because of the need to interpret the topics. This can be difficult especially when the number of topics is large, but in a dataset of the size that we have, a large number of topics is needed. Also, although topic modelling is an unsupervised machine learning technique, the inputs require fine-tuning. For instance, selecting stop words for removal and which words to merge because of common co-location has an impact on the topics. Even after doing this there tend to be topics that are not overly meaningful, especially on their own. One way to get around using topic models is to use the words more directly, for instance word2vec and other approaches. As computational power become cheaper and more appropriate analytical methods, such as @Taddy2015 as applied in @GentzkowShapiroTaddy2018, are developed this becomes a more feasible options and future research could explore that direction.
+Using text as data allows us to conduct larger-scale analysis that would not be viable using less-automated approaches and so researchers may be able to identify associations and patterns that would otherwise have been overlooked. That said, the approach has well-known shortcomings and weaknesses, such as those documented by @GrimmerStewart2013. Our paper should thus be considered a complement to more detailed analysis such as qualitative methods and case studies. An example of one of the more glaring issues when using topic models is the need to interpret the topics. This can be difficult, especially when the number of topics is large, but in a dataset of the size that we have, a large number of topics is needed. Also, although topic modelling is an unsupervised machine learning technique, the inputs require fine-tuning. Most obviously the number of topics needs to be specified, but there are also more nuanced aspects to be aware of. For instance, selecting stop words for removal and which words to merge because of common co-location has an impact on the topics. Even after doing this there tend to be topics that are not overly meaningful, especially on their own. One way to get around using topic models is to use a supervised learning approach, such as that used by @AshMorelliOsnabru2018 in the context of New Zealand Hansard. Another is to use the words more directly, for instance word2vec and other approaches. As computational power become cheaper and more appropriate analytical methods, such as @Taddy2015 as applied in @GentzkowShapiroTaddy2018, are developed this becomes a more feasible options and future research could explore that direction.
 
 In this paper we think of events as affecting daily discussion in parliament. Given the events that we consider and the broad topics of discussion we consider this the most appropriate direction for our paper. However, conducting a similar analysis at a person, instead of daily, level would lead to interesting results. This would allow the analysis model to include a rich set of person-level covariates such as gender or party, and account for broader factors such as the televising of question time, or the state of the economy and the budget position. It would also be especially interesting to consider reversing the direction of causality and examine the effect of what is said in parliament on various economic, political and social events.
 
@@ -448,6 +448,8 @@ knitr::include_graphics("../../figures/example_hansard_page.png")
 
 ## Summary statistics {#hansardsummarystatistics}
 
+### Counts per year
+
 The number of sitting days in a year varies considerably. The highest in the House of Representatives was 122 days in 1904, followed by 113 days in 1901 and 1920. The year with the most sitting days in the Senate was 1902 with 93 days, followed by 1989 with 92 days, and 1986 with 86 days (Figure \@ref(fig:countsbyyear)).
 
 ```{r countsbyyear, echo=FALSE, fig.cap="Number of sitting days, by year", out.width = '100%'}
@@ -456,7 +458,23 @@ knitr::include_graphics("../../figures/counts_by_year.pdf")
 
 Until the 1950s the House of Representatives tended to have more sitting days than the Senate. It was then similar, before the Senate had more days in the 1980s and 1990s. Since the 2000s the House of Representatives again has tended to have more sitting days than the Senate.
 
+
+### Distribution over the year
+
+The distribution of sitting days over the course of the year changes over time. It was initially more piecemeal. This can be seen by comparing the pattern of sitting days in the years to 1920 (Figure \@ref(fig:dayssattonineteentwenty)) with those in the 19 years from, and including, 2000 (Figure \@ref(fig:dayssatfromtwothousand)).
+
+```{r dayssattonineteentwenty, echo=FALSE, fig.cap="Number of sitting days, by year", out.width = '100%'}
+knitr::include_graphics("../../figures/sitting_dates_before_1920.pdf")
+```
+
+```{r dayssatfromtwothousand, echo=FALSE, fig.cap="Number of sitting days, by year", out.width = '100%'}
+knitr::include_graphics("../../figures/sitting_dates_from_2000.pdf")
+```
+
+The largest gap between sitting dates for both the House of Representatives and the Senate is 284 days, which happened when neither house sat between 25 November 1910 and 5 September 1911. The next longest gap is 244 the House of Representatives and 243 for the Senate when the lower house last sat on 9 October 1924, the upper house last sat on 10 October 1924 and neither sat again until 10 June 1925. 
+
 These counts of the number of sitting days are based on available PDFs. For this reason the counts may be slightly different to other counts. An example of one known issue of this type is detailed in the next section.
+
 
 
 \newpage
@@ -515,20 +533,23 @@ The exact scripts that we use are too long to provide here but are available on 
 
 **[Insert the example scripts.]**
 
-<!-- The first step is to scrape the websites for the PDFs. -->
+The first step is to scrape the websites for the PDFs.
 
-<!-- ```{r scrapingexample, echo=TRUE, eval = FALSE} -->
-<!-- visit_address_and_save_PDF <- -->
-<!--   function(name_of_address_to_visit, -->
-<!--            name_of_where_to_save) { -->
-<!--     # Do the actual downloading of the PDF -->
-<!--     download.file(name_of_address_to_visit, name_of_where_to_save) -->
-<!--     # Helpful so that you know progress when running it on all the records -->
-<!--     print(paste("Done with", name_of_where_to_save, "at", Sys.time()))   -->
-<!--     # Space out your requests so you don't overwhelm the website -->
-<!--     Sys.sleep(sample(15:30, 1))  -->
-<!--   } -->
-<!-- ``` -->
+```{r scrapingexample, echo=TRUE, eval = FALSE}
+name_of_address_to_visit <- c("wwww1", "wwww2")
+name_of_where_to_save <- c("2017-02-01.pdf", "2017-02-02.pdf")
+
+visit_address_and_save_PDF <-
+  function(name_of_address_to_visit,
+           name_of_where_to_save) {
+    # Do the actual downloading of the PDF
+    download.file(name_of_address_to_visit, name_of_where_to_save)
+    # Helpful so that you know progress when running it on all the records
+    print(paste("Done with", name_of_where_to_save, "at", Sys.time()))
+    # Space out your requests so you don't overwhelm the website
+    Sys.sleep(sample(15:30, 1))
+  }
+```
 
 
 <!-- The next step is to remove the front matter from the PDFs.  -->
@@ -785,12 +806,6 @@ However, the replacement of the Dirichlet distribution with the logistic multiva
 <!-- Here we change the number of sitting days considered either side of an event. The results in the main section of the paper are for the nearest ten days either side of an event. Here are show that the results are essentially the same if the nearest one, two, five, and twenty days either side of an event. -->
 
 
-\newpage
-
-# Sitting periods over time {#wastonywrong}
-
-
-**[Add the graph.]**
 
 
 \newpage
