@@ -709,9 +709,32 @@ However, the replacement of the Dirichlet distribution with the logistic multiva
 
 Although the example topics in the main paper have a military and defence theme, there are other topics that also share a broader theme. An example of these are those to do with economics. For instance Topics 17, 22, 25, 44, 51, 55, 59, 71, 72, 74, 76, and 77.
 
+In Figure \@ref(fig:greatd) we focus on the period around the Great Depression and the Premiers' Plan.
+
+```{r greatd, cache = TRUE, echo = FALSE, fig.cap = "Economic topic changes around the the Great Depression", out.width = '100%'}
+knitr::include_graphics("../../figures/topics_example-GreatD.pdf")
+```
 
 
-**[Insert the econ examples. Zoom in on the Great Depression, the Premiers' Plan, the 80s/90s, privatisation debate.]**
+
+In Figure \@ref(fig:theeightsnighties) we focus on the period of the 1980s and 1990s when there was a great deal of economic change.
+
+```{r theeightsnighties, cache = TRUE, echo = FALSE, fig.cap = "Economic topic changes during the 1980s and 1990s", out.width = '100%'}
+knitr::include_graphics("../../figures/topics_example-the80s.pdf")
+```
+
+
+
+
+
+In Figure \@ref(fig:economicsgfc) we focus on the financial crisis of 2007-08.
+
+```{r economicsgfc, cache = TRUE, echo = FALSE, fig.cap = "Economic topic changes around the 2007-08 financial crisis", out.width = '100%'}
+knitr::include_graphics("../../figures/topics_example-GFC.pdf")
+```
+
+
+
 
 
 
