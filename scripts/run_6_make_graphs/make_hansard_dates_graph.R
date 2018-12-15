@@ -132,3 +132,26 @@ test <- hansard_dates %>%
   geom_bar() +
   scale_y_continuous(trans = "log")
 
+
+  
+  
+  
+hansard_dates %>%
+  ggplot(mapping = aes(x = yday(hansardDates), 
+                       y = year(hansardDates))) +
+  geom_point(size = 0.25) +
+  facet_wrap(vars(chamber), ncol = 2) +
+  theme_classic() +
+  labs(x = "Day of year",
+       # caption = "Data based on Hansard PDF records available at https://parlinfo.aph.gov.au.",
+       y = "Year"
+       )
+
+  
+  
+ggsave(
+  "outputs/figures/sitting_dates_all.pdf",
+  height = 12,
+  width = 10,
+  units = "in"
+  )

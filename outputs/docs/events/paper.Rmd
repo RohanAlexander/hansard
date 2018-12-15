@@ -41,6 +41,8 @@ header-includes:
 - \usepackage{threeparttablex}
 - \usepackage[normalem]{ulem}
 - \usepackage{makecell}
+- \usepackage{subfig}
+
 
 ---
 
@@ -58,11 +60,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(readr)
 
-elections <-
-  read_csv("../../../outputs/misc/misc_elections.csv", col_types = cols())
+# elections <-
+#   read_csv("../../../outputs/misc/misc_elections.csv", col_types = cols()) 
 
-governments <-
-  read_csv("../../../outputs/misc/pm_dates.csv", col_types = cols())
+# governments <-
+#   read_csv("../../../outputs/misc/pm_dates.csv", col_types = cols()) 
 
 keyEvents <-
   read_csv("../../../inputs/misc/key_events.csv", col_types = cols())
@@ -135,7 +137,7 @@ Following the example of the UK a daily text record called Hansard of what was s
 
 [^Verbatimfootnote]: While Hansard is not necessarily verbatim, it is considered close enough for text-as-data purposes. For instance, @Mollin2008 found that in the case of the UK Hansard the differences would only affect specialised linguistic analysis. @Edwards2016 examined Australia, New Zealand and the UK, and found that changes were usually made by those responsible for creating the Hansard record, instead of the parliamentarians. As those who create Hansard are tasked with creating an accurate record of proceedings, this suggests the records should be fit for the purpose of our analysis.
 
-The recent digitisation of the Canadian Hansard, @BeelenEtc2017, has allowed increased analysis of Canadian parliament text records. For instance, @RheaultCochran2018 examined ideology and party polarisation in Britain and Canada using word embeddings. A digitised version of the UK Hansard has been available for some time. For instance, @Duthie2016 examined which politicians made supportive or aggressive statements toward other politicians, and @PetersonSpirling2018 examined polarisation. One exciting aspect of research using the UK Hansard has been linking text records with other datasets. For instance, @SlapinKirklandLazzaroLeslie2018 linked votes and speeches to examine grandstanding within parties. Another exciting aspect is that as digitisation methods improve, increasingly older UK records can be analysed, for instance, @Dimitruk2018 considered the effect of estate bills on prorogations in seventeenth century England. In New Zealand, @Curran2018 modelled the topics discussed between 2003 and 2016, and @Graham2016 examined unparliamentary language between 1890 and 1950. And in the US, @GentzkowShapiroTaddy2018 examined congressional speech records from 1873 to 2016 to find that partisanship has risen in the past few decades.
+The recent digitisation of the Canadian Hansard, @BeelenEtc2017, has allowed increased analysis of Canadian parliament text records. For instance, @RheaultCochran2018 examined ideology and party polarisation in Britain and Canada using word embeddings. A digitised version of the UK Hansard has been available for some time. For instance, @Duthie2016 examined which politicians made supportive or aggressive statements toward other politicians, and @PetersonSpirling2018 examined polarisation. One exciting aspect of research using the UK Hansard has been linking text records with other datasets. For instance, @SlapinKirklandLazzaroLeslie2018 linked votes and speeches to examine grandstanding within parties. Another exciting aspect is that as digitisation methods improve, increasingly older UK records can be analysed, for instance, @Dimitruk2018 considered the effect of estate bills on prorogations in seventeenth century England. In New Zealand, @Curran2018 modelled the topics discussed between 2003 and 2016, and @Graham2016 examined unparliamentary language between 1890 and 1950. 
 
 Parts of Australian Hansard records have been analysed for various purposes and our paper contributes to a small but growing literature. For instance, @Rasiah2010 examined Hansard records for the Australian House of Representatives to examine whether politicians attempted to evade questions about Iraq during February and March 2003. @GansLeigh2012 examined Australian Hansard records to associate mentions by politicians of certain public intellectuals with neutral or positive sentiment. @Salisbury2011 examined unparliamentary behaviour. And @FraussenGrahamHalpin2019 examined Australian Hansard records to assess the prominence of interest groups. The closest research to ours that we have found is @Boulous2013 who examined parliamentary debate in Australia between 1946 and 2012.
 
@@ -143,7 +145,9 @@ The Australian Federal Parliament makes daily Hansard records available online a
 
 [^XMLfootnote]: Tim Sherratt makes Commonwealth XML records for 1901 to 1980 available as a single download at: http://historichansard.net/. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website or the website can be scraped. We do not use the XML records or scrape the website because those records are known to be incomplete but the extent of how incomplete they are is unknown. The trade-off for a more-complete record is the errors introduced by having to parse the PDFs.
 
-We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R [@R2018] to convert the PDFs into daily text records. An example of the workflow and some example scripts are provided in Appendix \@ref(hansardworkflow). Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate, especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
+We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R [@R2018] to convert the PDFs into daily text records.[^scriptsfootnote] Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate, especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
+
+[^scriptsfootnote]: The exact scripts that we use are available on request or via the GitHub repository for this paper. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
 
 The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This is evidence to suggest that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. We do not stem the words because @SchofieldMimno2016 suggest that there may not be any significant benefit. Then the sentences are de-constructed and each word considered individually. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
 
@@ -172,8 +176,6 @@ The key assumption behind LDA is that each day's text, 'a document', in Hansard 
 
 An overview, and an example, of how topic modelling works is available in Appendix \@ref(LDAoverviewandexample). The underlying document generation process is discussed in Appendix \@ref(LDAdocgenprocess), and then Appendix \@ref(LDAposteriorestimation) explains how this is reversed to generate topics. Finally, Appendix \@ref(selecttopicnumber) contains a discussion of how the number of topics was chosen.
 
-<!-- One weakness of the LDA method is that it considers a 'bag of words' where the order of those words does not matter [@blei2012]. It is possible to extend the model to reduce the impact of the bag-of-words assumption and add conditionality to word order. -->
-
 One notable limitation of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. However, in reality topics are often related.  For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. 
 
 As such, we use the Correlated Topic Model (CTM) of @BleiLafferty2007 to obtain topic distributions. The CTM is a modification of LDA that allows for correlations between topics. More detail about the CTM is in Appendix \@ref(correlatedtopicmodelsection).
@@ -197,7 +199,7 @@ However, the STM covariate framework has several limitations in terms of our goa
 
 To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 **[UPDATE]** sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
+Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
 
 
 The topic proportions on day $d$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
@@ -257,29 +259,32 @@ We applied the CTM approach discussed in Appendix \@ref(correlatedtopicmodelsect
 
 Our main results are based on a topic model with 80 distinct topics. With almost 15,000 days and 80 topics, the analysis model is being fit to more than a million observations. The choice of 80 topics was made as a trade-off between standard diagnostic tests that suggested a larger number of topics would be more appropriate, and the need for the analysis model to be tractable. Those diagnostic tests are detailed in Appendix \@ref(selecttopicnumber). 
 
-Table \@ref(tab:topwords) lists the top ten words associated with each of the 80 topics. The topics cover areas such as budgets, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Similar to when topic models are run using the parliamentary text records of other countries, there are also some topics that appear to be about procedural or day-to-day matters, such as Topics 7 or 9. As expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
+LDA output defines a topic as a distribution of probabilities over words. In Table \@ref(tab:topwords) we display the ten words with the highest association for each of the 80 topics, but the topics are defined by probability distributions over all words. LDA does not apply labels to each topic, or collection of words, instead this has to be done by inspection. The topics cover areas such as budgets, demography, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Similar to when topic models are run using the parliamentary text records of other countries, there are also some topics that seem to be about procedural or day-to-day matters, such as Topics 7 or 9. As expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
 
 ```{r topwords, echo = FALSE, results = 'asis'}
 
 top_words %>% 
-  kable("latex", booktabs = T, longtable = TRUE, caption = "Top words associated with each topic") %>%
-  kable_styling(font_size = 8, latex_options = c("repeat_header")) %>% 
-  footnote(general = "We display only the top ten words for each topic, but the topics are defined by probability distributions over all words.")
-
+  kable("latex", 
+        booktabs = T, 
+        longtable = TRUE, 
+        caption = "The ten words most strongly associated with each topic"
+        ) %>%
+  kable_styling(font_size = 8, 
+                latex_options = c("repeat_header")
+                )
 ```
 
 Figure \@ref(fig:exampletopics) illustrates the CTM output based on a sample from the Hansard. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time. The highlighted topics are those related to war and conflict. The two chambers of the Australian Federal Parliament appear to be similar at a broad scale.
 
 ```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with five topics highlighted", out.width = '100%'}
-knitr::include_graphics("../../figures/topics_example.png")
+knitr::include_graphics("../../figures/topics_example.png", auto_pdf = FALSE)
 
 ```
 
 Figure \@ref(fig:threeexamples) shows the topic model output in the context of three notable periods of Australian political history. 
 
 ```{r threeexamples, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, for three periods", out.width = '100%'}
-knitr::include_graphics("../../figures/topics_examples_three.pdf")
-
+knitr::include_graphics("../../figures/topics_examples_three.png", auto_pdf = FALSE)
 ```
 
 The first panel of Figure \@ref(fig:threeexamples) is the second Menzies premiership. The dashed lines show the elections. While the results here abstract from differences based on topic mix, the shape of the distribution seems to be reasonably similar. Given 80 topics, it may be difficult to see differences in the topic mix manually, and so we would like for the analysis model to be able to suggest whether the mix is changing. The second panel shows the 1983 election, and the subsequent change from Fraser to Hawke on 11 March 1983, identified by a dotted line on that date. The distribution of topics seems less bunched after the change, but it is difficult to tell how different it is. We would like the analysis model to be able to distinguish between the two if they seem different. The third panel shows the first Rudd premiership. The important aspect to note is that the period after the 2007 election and the Rudd premiership contain essentially the same Hansard dates. The analysis model needs to be able to deal with this situation.
@@ -303,6 +308,7 @@ One of the main goals of the analysis model is to see which elections and change
 As detailed in Section \@ref(analysismodelexplanation), the model estimates a mean level-effect for each prime minister, $\alpha_g$ and each election, $\alpha_e$. We identify differences between neighbouring prime ministers and between neighbouring elections based on calculating 95 per cent credible intervals from posterior samples of these respective mean effects. When these do not overlap we consider that the model finds a difference between either the neighbouring prime ministers or elections, as appropriate. 
 
 We summarise our results in terms of prime ministers in Table \@ref(tab:primeministersresults) and in terms of elections in Table \@ref(tab:electionsresults). These tables focus on elections and prime ministers that were different to the ones that preceded them. Complete lists of the Australian elections and prime ministers are available in Appendices \@ref(fulllistofelections) and \@ref(fulllistofgovernments).
+
 
 ```{r primeministersresults, echo = FALSE, results = 'asis'}
 
@@ -331,16 +337,17 @@ elections_results %>%
 
 In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate significant differences between prime ministers and elections, respectively. In the graphs, the points show the estimated value of $\alpha_g$ and $\alpha_e$, respectively, for each of the topics specified. The error bars represent 95 per cent Bayesian credible intervals. As there are 80 topics it would be unwieldy to show all of them, and so we have again focused on Topics 4, 26, 28, 30 and 66 here which have to do with war and conflict. 
 
-```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "prime minister level effects on selected topics.", out.width = '100%'}
+```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "Level effects for prime ministers by selected topics.", out.width = '100%'}
 knitr::include_graphics("../../figures/mu_gov.pdf")
 ```
 
 
-```{r muelection, cache = TRUE, echo = FALSE, fig.cap = "Elections level effects on selected topics", out.width = '100%'}
+```{r muelection, cache = TRUE, echo = FALSE, fig.cap = "Level effects for election periods by selected topics", out.width = '100%'}
 knitr::include_graphics("../../figures/mu_election.pdf")
 ```
 
-In Appendix \@ref(resilientresults) we show that our main findings are resilient to both fewer - 60 - and more - 100 - topics.
+
+<!-- In Appendix \@ref(resilientresults) we show that our main findings are resilient to both fewer - 60 - and more - 100 - topics. -->
 
 
 
@@ -382,7 +389,7 @@ key_events_results_cols %>%
 
 <!-- **[Needs more.]** -->
 
-Of the 36 prime ministers over this period, we find that 20 of them are significantly different to the prime minister that preceded them. However, four of these results -- the significance of the Page Premiership, the First Menzies Premiership, the Chifley Premiership and the Abbott Premiership -- are likely due to the short length of either the prime minister or the predecessor and should be ignored, leaving only 16. The earliest of these are the First Fisher Premiership, the Cook Premiership and the Third Fisher Premiership, which were different to the Second Deakin Premiership, the Second Fisher Premiership, and the Cook Premiership, respectively. To a certain extent this is likely due to changes due to World War I.
+Of the 36 prime ministers over this period, we find that 20 of them are significantly different to the prime minister that preceded them. However, four of these results -- the significance of the Page premiership, the first Menzies premiership, the Chifley premiership and the Abbott premiership -- are likely due to the short length of either the prime minister or the predecessor and should be ignored, leaving only 16. The earliest of these are the first Fisher premiership, the Cook premiership and the third Fisher premiership, which were different to the second Deakin premiership, the second Fisher Premiership, and the Cook Premiership, respectively. To a certain extent this is likely due to changes due to World War I.
 
 The Second Menzies Premiership, begining in 1949, is the next government that is significantly different to its predecessor. The other governments that are different are concentrated in the second half of our sample, with three of them being in the past twenty years. Similarly, of the 45 general elections that have been held we find that 14 of them define periods that were significantly different to their immediate predecessor. 1974, 1980, 1990, 1998, 2004, and 2007 stand out as elections where the government did not change, but the model suggests there was considerable change in the topics discussed in parliament.
 
@@ -407,9 +414,11 @@ One advantage of our analysis model compared with using the STM approach is that
 # Summary, weaknesses and future work
 In this paper we consider what was said in the Australian Federal Parliament between 1901 and 2018. We download and parse PDFs of Hansard to create a new dataset of text. We use a correlated topic model to group the parliamentary discussion into topics to reduce the dimensionality, and then analyse the effect of various events on the distribution of these topics using a Bayesian hierarchical Dirichlet model. In general we find that changes in prime minister change the distribution of topics discussed in parliament, but that most elections did not. We find that significant events such as 9/11 and the Bali Bombings had a substantial effect.
 
-By bringing a new dataset of what was said in the Australian Federal Parliament to bear for our analysis we are able to consider events over the full history of the Commonwealth of Australia. However even after cleaning the dataset remains imperfect and is more fit-for-purpose than of broad applicability. Future work could continue to improve the quality of this dataset. For instance, exploiting the availability of XML records to enhance the record parsed from the PDFs would enable the creation of a Hansard for research purposes that combined the best of both and would be used in a variety of research.
+By bringing a new dataset of what was said in the Australian Federal Parliament to bear for our analysis we are able to consider events over the full history of the Commonwealth of Australia. However even after cleaning the dataset remains imperfect and is more fit-for-purpose than of broad applicability. Future work could continue to improve the quality of this dataset. For instance, exploiting the available XML records to enhance the record parsed from the PDFs would enable the creation of a Hansard for research purposes that combined the best of both and was more useful for variety of research.
 
-Using text as data allows us to conduct larger-scale analysis that would not be viable using less-automated approaches and so researchers may be able to identify associations and patterns that would otherwise have been overlooked. That said, the approach has well-known shortcomings and weaknesses, such as those documented by @GrimmerStewart2013. Our paper should thus be considered a complement to more detailed analysis such as qualitative methods and case studies. An example of one of the more glaring issues when using topic models is the need to interpret the topics. This can be difficult, especially when the number of topics is large, but in a dataset of the size that we have, a large number of topics is needed. Also, although topic modelling is an unsupervised machine learning technique, the inputs require fine-tuning. Most obviously the number of topics needs to be specified, but there are also more nuanced aspects to be aware of. For instance, selecting stop words for removal and which words to merge because of common co-location has an impact on the topics. Even after doing this there tend to be topics that are not overly meaningful, especially on their own. One way to get around using topic models is to use a supervised learning approach, such as that used by @AshMorelliOsnabru2018 in the context of New Zealand Hansard. Another is to use the words more directly, for instance word2vec and other approaches. As computational power become cheaper and more appropriate analytical methods, such as @Taddy2015 as applied in @GentzkowShapiroTaddy2018, are developed this becomes a more feasible options and future research could explore that direction.
+Using text as data allows us to conduct larger-scale analysis that would not be viable using less-automated approaches and so researchers may be able to identify associations and patterns that would otherwise have been overlooked. That said, the approach has well-known shortcomings and weaknesses, such as those documented by @GrimmerStewart2013. 
+
+Our paper should be considered a complement to more detailed analysis such as qualitative methods and case studies. An example of one of the more glaring issues when using topic models is the need to interpret the topics. This can be difficult, especially when the number of topics is large, but in a dataset of the size that we have, a large number of topics is needed. Also, although topic modelling is an unsupervised machine learning technique, the inputs require fine-tuning. Most obviously the number of topics needs to be specified, but there are also more nuanced aspects to be aware of. For instance, selecting stop words for removal and which words to merge because of common co-location has an impact on the topics. Even after doing this there tend to be topics that are not overly meaningful, especially on their own. One way to get around using topic models is to use a supervised learning approach, such as that used by @AshMorelliOsnabru2018 in the context of New Zealand Hansard. Another is to use the words more directly, for instance word2vec and other approaches. As computational power become cheaper and more appropriate analytical methods, such as @Taddy2015 as applied in @GentzkowShapiroTaddy2018 in the context of examining congressional speech records from 1873 to 2016 to find that partisanship has risen in the past few decades, are developed this becomes a more feasible options and future research could explore that direction.
 
 In this paper we think of events as affecting daily discussion in parliament. Given the events that we consider and the broad topics of discussion we consider this the most appropriate direction for our paper. However, conducting a similar analysis at a person, instead of daily, level would lead to interesting results. This would allow the analysis model to include a rich set of person-level covariates such as gender or party, and account for broader factors such as the televising of question time, or the state of the economy and the budget position. It would also be especially interesting to consider reversing the direction of causality and examine the effect of what is said in parliament on various economic, political and social events.
 
@@ -419,7 +428,7 @@ The way that we identify unusual periods could also be improved. We defined sitt
 
 Finally, the current modelling and analysis set-up is a two-stage process: we take the output of a topic model, and use this as the input to a second model. However, this approach does not appropriately propagate the uncertainty of the topic distribution estimation stage. Future methodological work could consider how to combine these two modelling steps, for instance by extending the STM approach into a more flexible framework. 
 
-Watching our politicians at work can sometimes be a little disheartening. It can be hard to believe that not only are those in charge shouting insults that would not be tolerated in a schoolyard, but that we voted to put them there. Nonetheless, our work suggests that important topics are discussed in parliament. It is easy to look back and think that we live in uniquely tumultuous times, but our analysis suggests events have always driven debate and that periods of stability may be the exception. However, we do find that since the 1990s the effect of prime ministers and elections on the topics discussed in the Australian parliament does seem to be more pronounced than it used to be.
+Watching Australian politicians at work can sometimes be a little disheartening. It can be hard to believe that not only are those in charge shouting insults that would not be tolerated in a schoolyard, but that the electorate voted to put them there. Nonetheless, our work suggests that important topics are discussed in parliament. It is easy to look back and think that we live in uniquely tumultuous times, but our analysis suggests events have always driven debate and that periods of stability may be the exception. However, we do find that since the 1990s the effect of prime ministers and elections on the topics discussed in the Australian parliament does seem more pronounced than it used to be.
 
 
 
@@ -461,7 +470,14 @@ Until the 1950s the House of Representatives tended to have more sitting days th
 
 ### Distribution over the year
 
-The distribution of sitting days over the course of the year changes over time. It was initially more piecemeal. This can be seen by comparing the pattern of sitting days in the years to 1920 (Figure \@ref(fig:dayssattonineteentwenty)) with those in the 19 years from, and including, 2000 (Figure \@ref(fig:dayssatfromtwothousand)).
+The distribution of sitting days over the course of the year changes over time (Figure \@ref(fig:allsittingdaysplotted)).
+
+```{r allsittingdaysplotted, echo=FALSE, fig.cap="All sitting days", out.width = '100%'}
+knitr::include_graphics("../../figures/sitting_dates_all.pdf")
+```
+
+
+It was initially more piecemeal. This can be seen by comparing the pattern of sitting days in the years to 1920 (Figure \@ref(fig:dayssattonineteentwenty)) with those in the 19 years from, and including, 2000 (Figure \@ref(fig:dayssatfromtwothousand)).
 
 ```{r dayssattonineteentwenty, echo=FALSE, fig.cap="Number of sitting days, by year", out.width = '100%'}
 knitr::include_graphics("../../figures/sitting_dates_before_1920.pdf")
@@ -524,142 +540,20 @@ In terms of other known issues, in the Senate, the PDF for the website date 10 A
 
 
 
-\newpage
-
-
-
-## Example Hansard PDF to text record workflow {#hansardworkflow}
-The exact scripts that we use are too long to provide here but are available on request. Instead here we provide example scripts that summarises the workflow to convert the PDFs to usable text datasets and may be a useful starting point for other researchers. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
-
-**[Insert the example scripts.]**
-
-The first step is to scrape the websites for the PDFs.
-
-```{r scrapingexample, echo=TRUE, eval = FALSE}
-name_of_address_to_visit <- c("wwww1", "wwww2")
-name_of_where_to_save <- c("2017-02-01.pdf", "2017-02-02.pdf")
-
-visit_address_and_save_PDF <-
-  function(name_of_address_to_visit,
-           name_of_where_to_save) {
-    # Do the actual downloading of the PDF
-    download.file(name_of_address_to_visit, name_of_where_to_save)
-    # Helpful so that you know progress when running it on all the records
-    print(paste("Done with", name_of_where_to_save, "at", Sys.time()))
-    # Space out your requests so you don't overwhelm the website
-    Sys.sleep(sample(15:30, 1))
-  }
-```
-
-
-<!-- The next step is to remove the front matter from the PDFs.  -->
-
-<!-- ```{r frontmatterexample, echo=TRUE, eval = FALSE} -->
-
-<!-- get_text_from_PDFs <- -->
-<!--   function(name_of_input_PDF_file, -->
-<!--            name_of_output_csv_file) { -->
-<!--     pdf_document <- pdf_text(name_of_input_PDF_file) -->
-<!--     # Convert to tibble so that tidyverse can be used -->
-<!--     pdf_document_tibble <- tibble(text = pdf_document) -->
-<!--     rm(pdf_document) -->
-<!--     # Each row is now a page of the PDF -->
-<!--     # Adding a column of the row numbers allows you to keep track of the page numbers -->
-<!--     pdf_document_tibble$pageNumbers <- 1:nrow(pdf_document_tibble) -->
-<!--     # Separate each line (of each page) into own row -->
-<!--     pdf_document_tibble <- -->
-<!--       separate_rows(pdf_document_tibble, text, sep = "\\n") -->
-<!--     # Identify page headers and footers and remove them -->
-<!--     pdf_document_tibble <- pdf_document_tibble %>% -->
-<!--       group_by(pageNumbers) %>% -->
-<!--       mutate(lineNumber = 1:n()) %>% # This gives you a line numbering for each page -->
-<!--       mutate(lastLine = n()) %>% # This tells you the number of the last line in each page -->
-<!--       ungroup() -->
-<!--     ## Identify front matter and remove it -->
-<!--     pdf_document_tibble <- pdf_document_tibble %>% -->
-<!--       mutate( -->
-<!--         firstSpeakerRow = str_detect(text, "SPEAKER") -->
-<!--       ) -->
-<!--     pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == FALSE] <- NA -->
-<!--     # Get the row and corresponding page and then filter to only pages from that page -->
-<!--     row_of_first_SPEAKER <- -->
-<!--       pdf_document_tibble$firstSpeakerRow[pdf_document_tibble$firstSpeakerRow == TRUE] %>% which() %>% first() -->
-<!--     first_page_of_interest_SPEAKER <- -->
-<!--       pdf_document_tibble[row_of_first_SPEAKER, "pageNumbers"] %>% as.integer() -->
-<!--     filter_from_here <- -->
-<!--       case_when( -->
-<!--         !is.na(first_page_of_interest_SPEAKER) ~ first_page_of_interest_SPEAKER -->
-<!--       ) -->
-<!--     pdf_document_tibble <- pdf_document_tibble %>% -->
-<!--       filter(pageNumbers >= filter_from_here) %>% -->
-<!--       select(-firstSpeakerRow) -->
-<!--     # Save file -->
-<!--     write_csv(pdf_document_tibble, name_of_output_csv_file) -->
-<!--     # Helpful to know where you're up to -->
-<!--     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time())) -->
-<!--   } -->
-
-<!-- ``` -->
-
-<!-- Then the rows need to be combined: -->
-<!-- ```{r combinerows, echo=TRUE, eval = FALSE} -->
-<!-- split_columns <- -->
-<!--   function(name_of_input_csv_file, -->
-<!--            name_of_output_csv_file) { -->
-<!--     # Read in the csv, based on the filename list -->
-<!--     csv_with_rows_to_combine <- -->
-<!--       read_csv(name_of_input_csv_file, -->
-<!--                trim_ws = FALSE, -->
-<!--                col_types = cols()) -->
-<!--     # Remove any extra whitespace i.e. two or more spaces and spaces at either end.  -->
-<!--     # Yes, I know that I turned this off in the read_csv, but it's better to be  -->
-<!--     #explicit because the whitespace is useful sometimes. -->
-<!--     csv_with_rows_to_combine$text <- -->
-<!--       str_squish(csv_with_rows_to_combine$text) -->
-<!--     # Put everything onto one line, which allows us to rejoin words that have been  -->
-<!--     #split across two lines e.g. Mon- ica -->
-<!--     csv_with_rows_to_combine <- csv_with_rows_to_combine %>% -->
-<!--       mutate(text = str_replace_all(text, "-$", "MONICA")) -->
-<!--     full_days_hansard <- csv_with_rows_to_combine %>% -->
-<!--       select(-pageNumbers) %>% -->
-<!--       summarise(text = paste(text, collapse = " ")) %>% -->
-<!--       mutate(text = str_replace_all(text, "MONICA ", "")) %>% -->
-<!--       mutate(text = str_replace_all(text, "[:space:]-(?=[:alpha:])", " - ")) -->
-<!--     rm(csv_with_rows_to_combine) -->
-<!--     write_csv(full_days_hansard, name_of_output_csv_file) -->
-<!--     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time())) -->
-<!--   } -->
-<!-- ``` -->
-
-<!-- Finally, we can fix the spelling: -->
-<!-- ```{r fixspelling, echo=TRUE, eval = FALSE} -->
-<!-- fix_spelling <- -->
-<!--   function(name_of_input_csv_file, -->
-<!--            name_of_output_csv_file) { -->
-<!--     csv_to_clean <- -->
-<!--       read_csv(name_of_input_csv_file, -->
-<!--                trim_ws = FALSE, -->
-<!--                col_types = cols()) -->
-<!--     #Fix the spelling -->
-<!--     csv_to_clean$text <- -->
-<!--       stri_replace_all_regex( -->
-<!--         csv_to_clean$text, -->
-<!--         "\\b" %s+% fix_wrong_spellings$original %s+% "\\b", -->
-<!--         fix_wrong_spellings$corrected, -->
-<!--         vectorize_all = FALSE -->
-<!--       ) -->
-<!--     # Save file -->
-<!--     write_csv(csv_to_clean, name_of_output_csv_file) -->
-<!--     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time())) -->
-<!--   } -->
-<!-- ``` -->
 
 
 \newpage
 
 
 ## Stopwords over time {#stopwordsgraph}
-**[Insert the graph of stop words over time.]**
+
+Figure \@ref(fig:stopwordsproportion) shows the proportion of five common words -- 'and', 'be', 'of', 'the', 'to' -- compared with the total number of words over time.
+
+```{r stopwordsproportion, echo=FALSE, fig.cap="Proportion that some common words comprise of all words, over time", out.width = '100%'}
+knitr::include_graphics("../../figures/stop_words.pdf")
+```
+
+
 
 
 \newpage
@@ -828,25 +722,53 @@ Although the example topics in the main paper have a military and defence theme,
 
 ## List of Elections {#fulllistofelections}
 
+The first of the two types of events that we consider in this paper is an election (Table \@ref(tab:elections)). 
+
 ```{r elections, echo = FALSE, results = 'asis'}
 
-elections %>% 
+read_csv("../../../outputs/misc/misc_elections.csv", col_types = cols())  %>% 
   filter(election == 1) %>% 
-  select(-election, -comment) %>% 
-  kable("latex", booktabs = T, caption = "Elections") %>%
-  kable_styling(font_size = 8)
+  select(-election, -comment) %>%
+  select(election_count, everything()) %>% 
+  rename(
+    "Number" = "election_count",
+    "Year" = "year", 
+    "Date" = "electionDate", 
+    "Total seats" = "seatsTotalNumber", 
+    "Winner" = "electionWinner"
+    ) %>%  
+  kable("latex", 
+        booktabs = T, 
+        longtable = TRUE, 
+        caption = "List of Australian elections"
+        ) %>%
+  kable_styling(font_size = 8) %>% 
+  footnote(
+    general = "This table contains summary information for each prime minister of Australia. HoR and Senate refer to the number of days that each chamber sat for between elections.",
+    footnote_as_chunk = T, 
+    threeparttable = TRUE
+    )
+
 
 ```
+
+Between 1901 and 2018 there are 45 elections, roughly one every two to three years. All of the election periods have a reasonable number of sitting days within them. The fewest was the election on 17 November 1928, with only 40 sitting days in the House of Representatives and 29 in the Senate, as there was another election almost a year later on 12 October 1929.
+
+The number of seats increases from 74 to 121 at the 10 December 1949 election, having been reasonably consistent to that point. Another large increase in the number of seats, this time from 125 to 148, happens at the 1 December 1984 election.
+
+In the first half of our sample especially, the name of the major opposition party changes. For this reason we distinguish between the Labor Party, and the non-Labor Party in terms of who won the election, that is which party was able to form government.
+
 
 
 \newpage
 
 ## List of Prime Ministers {#fulllistofgovernments}
 
+The second of the two types of events that we consider in this paper is a change in prime minister (Table \@ref(tab:governments)).
 
 ```{r governments, echo = FALSE, results = 'asis'}
 
-governments %>%
+read_csv("../../../outputs/misc/pm_dates.csv", col_types = cols()) %>%
   rename(
     "Government" = "government",
     "Prime Minister" = "primeMinister",
@@ -857,8 +779,12 @@ governments %>%
     "HoR" = "hor",
     "Senate" = "senate"
     ) %>% 
-  kable(booktabs = T, caption = "Change in prime ministers") %>%
-  kable_styling(font_size = 8) %>% 
+  kable(booktabs = T, 
+        longtable = TRUE, 
+        caption = "List of Australian prime ministers"
+        ) %>%
+  kable_styling(font_size = 8
+                ) %>% 
   footnote(general = "This table contains summary information for each prime minister of Australia. HoR and Senate refer to the number of days that each chamber sat for while that person was prime minister.",
   footnote_as_chunk = T, 
     threeparttable = TRUE
@@ -866,10 +792,13 @@ governments %>%
 
 
 
-
 ```
 
+Between 1901 and 2018 30 different people have been prime minister. Four of those---Deakin, Fisher, Menzies and Rudd---returned to the primiership at least once after being replaced, meaning Scott Morrison defines the 36th prime ministerial period.
 
+Three people have died while prime minister: Lyons in 1939, Curtin in 1945, and Holt in 1967. Their respective immediate successors were only prime minister for a short period. As such, we do not consider them when determining the neighbouring prime minister. Specifically, we compare: the first Menzies premiership with Lyons instead of Page; Chifley with Curtin instead of with Forde; and Gorton with Holt instead of with McEwan.
+
+The other prime ministerial period that we do not consider in this paper is the second Rudd premiership This is because it only contained a few sitting days. That is, we compare Tony Abbot with Julia Gillard.
 
 <!-- \newpage -->
 
@@ -891,11 +820,11 @@ governments %>%
 <!-- For background on the Gruen tariff cut see @Gruen1975. -->
 
 
-\newpage
+<!-- \newpage -->
 
-# Effect of number of topics on analysis model results {#resilientresults}
+<!-- # Effect of number of topics on analysis model results {#resilientresults} -->
 
-**[Add results for 60 and 100 topics.]**
+<!-- **[Add results for 60 and 100 topics.]** -->
 
 <!-- **[Add Lior's idea about running the model for 60 and for 100 and then showing that the main results don't change.]** -->
 
