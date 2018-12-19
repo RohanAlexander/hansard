@@ -73,6 +73,7 @@ split_columns <-
     
     full_days_hansard <- csv_with_rows_to_combine
     
+    
     # Clean the text a little more - toward making it possible to identify the politicians
     full_days_hansard$text <-
       str_replace_all(
@@ -154,53 +155,54 @@ split_columns <-
       )
     
     on_the_regular <- paste(
-      "(?<=(Mr [:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Mr [:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Mr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-",
-      "(?<=(Mrs [:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Mrs [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Mrs [:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Mrs [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Ms [:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Ms [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Ms [:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Ms [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Dr [:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Dr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Dr [:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Dr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-",
-      "(?<=(Dr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Sir [:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Mr [:upper:]{1,30}[:blank:]?))(asked)",
-      "(?<=(Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked",
-      "(?<=(Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked",
-      "(?<=(The CHAIRMAN ))-",
-      "(?<=(An HONOURABLE MEMBER[:blank:]?))-",
-      "(?<=(GOVERNMENT SUPPORTERS[:blank:]?))-",
-      "(?<=(Colonel [:upper:]{1,30}[:blank:]?))-",
-      "(?<=(Colonel [:upper:]{1,30}[:blank:]?))asked",
-      "(?<=(Dr [:upper:]{1,30}[:blank:]?))asked",
-      "(?<=(Dame [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
-      "(?<=(The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
-      "(?<=(The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(The [:upper:]{1,30}[:blank:]?))-",
-      "(?<=(The [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-",
+      "(?<=(^Mrs [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Mrs [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Mrs [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Mrs [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Ms [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Ms [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Ms [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Ms [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:]?(\\(.{1,20})\\)))-",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Sir [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Madam [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:]?))(asked)",
+      "(?<=(^Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(^The CHAIRMAN ))-",
+      "(?<=(^An HONOURABLE MEMBER[:blank:]?))-",
+      "(?<=(^GOVERNMENT SUPPORTERS[:blank:]?))-",
+      "(?<=(^Colonel [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Colonel [:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(^Dame [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^The [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^The [:upper:]{1,30}[:blank:]?))\\(",
       sep = "|")
     
     on_the_regular_since_may_2011 <- paste(
-      "(?<=(Mr [:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Ms [:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Dr [:upper:]{1,30}[:blank:]?))\\(",
-      "(?<=(Mr [:upper:]{1,30}[:blank:]?)):",
-      "(?<=(Ms [:upper:]{1,30}[:blank:]?)):",
-      "(?<=(Dr [:upper:]{1,30}[:blank:]?)):",
-      "(?<=(The [:upper:]{1,30}[:blank:]?)):",
-      "(?<=(The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?)):",
-      "(?<=(The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Ms [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Mr [:upper:]{1,30}[:blank:]?)):",
+      "(?<=(^Ms [:upper:]{1,30}[:blank:]?)):",
+      "(?<=(^Dr [:upper:]{1,30}[:blank:]?)):",
+      "(?<=(^The [:upper:]{1,30}[:blank:]?)):",
+      "(?<=(^The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?)):",
+      "(?<=(^The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
       "(?<=(^Mr [:alpha:]{1,30}[:blank:]?)):",
       sep = "|")
 
@@ -245,6 +247,9 @@ split_columns <-
 
 safely_split_columns <- safely(split_columns)
 
+walk2(file_names,
+      save_names,
+      ~ safely_split_columns(.x, .y))
 
 tic("Furrr walk2 stringr")
 future_walk2(file_names,

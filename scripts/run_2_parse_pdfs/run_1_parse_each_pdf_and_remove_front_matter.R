@@ -245,20 +245,19 @@ get_text_from_PDFs <-
 
 
 #### Walk through the lists and parse the PDFs ####
-# tic("Normal walk2")
-# walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y))
-# toc()
-
 safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
-
 # file_names <- file_names[1:10]
 # save_names <- save_names[1:10]
 # file_names <- file_names[1:(length(file_names)/2)]
 # save_names <- save_names[1:(length(save_names)/2)]
-
 tic("Furrr walk2 stringr")
 future_walk2(file_names,
              save_names,
              ~ safely_get_text_from_PDFs(.x, .y),
              .progress = TRUE)
 toc()
+
+
+walk2(file_names,
+      save_names,
+      ~ safely_get_text_from_PDFs(.x, .y))

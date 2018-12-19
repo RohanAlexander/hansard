@@ -93,3 +93,9 @@ future_walk2(file_names,
              ~ safely_fix_spelling(.x, .y),
              .progress = TRUE)
 toc()
+
+
+walk2(file_names,
+      save_names,
+      ~ safely_fix_spelling(.x, .y)
+      )

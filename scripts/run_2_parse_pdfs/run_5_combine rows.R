@@ -40,7 +40,7 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # Seems unnecessary, but sometimes useful to separate input and output
-use_this_path_to_save_csvs  <- "outputs/hansard/tempp"
+use_this_path_to_save_csvs  <- "outputs/hansard/temp"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
@@ -115,3 +115,9 @@ future_walk2(file_names,
              ~ safely_split_columns(.x, .y),
              .progress = TRUE)
 toc()
+
+walk2(file_names,
+      save_names,
+      ~ safely_split_columns(.x, .y)
+      )
+

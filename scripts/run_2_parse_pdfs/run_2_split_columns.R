@@ -61,7 +61,7 @@ split_columns <-
   function(name_of_input_csv_file,
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
-    # name_of_input_csv_file <- "outputs/hansard/temp/1971-10-05.csv" # uncomment for testing
+    # name_of_input_csv_file <- "outputs/hansard/temp/1971-03-30.csv" # uncomment for testing
     # name_of_input_csv_file <- "senate.csv" # uncomment for testing
     
     csv_to_split <-
@@ -234,6 +234,10 @@ split_columns <-
 # toc()
 
 safely_split_columns <- safely(split_columns)
+
+walk2(file_names,
+      save_names,
+      ~ safely_split_columns(.x, .y))
 
 tic("Furrr walk2 stringr")
 future_walk2(file_names,
