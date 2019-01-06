@@ -30,8 +30,8 @@ fix_wrong_spellings <-
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/tempp"
-# use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
+# use_this_path_to_get_csvs  <- "outputs/hansard/tempp"
+use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hortest"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -46,6 +46,8 @@ file_names <- file_names %>% sample() # Randomise the order
 
 use_this_path_to_save_csvs  <- "outputs/hansard/tempp"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
+use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hortest"
+
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
@@ -93,9 +95,3 @@ future_walk2(file_names,
              ~ safely_fix_spelling(.x, .y),
              .progress = TRUE)
 toc()
-
-
-walk2(file_names,
-      save_names,
-      ~ safely_fix_spelling(.x, .y)
-      )

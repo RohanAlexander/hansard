@@ -24,8 +24,8 @@ plan(multiprocess)
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/temp"
-# use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
+# use_this_path_to_get_csvs  <- "outputs/hansard/temp"
+use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -50,8 +50,8 @@ file_names <- file_names_tibble$file_name
 rm(file_names_tibble)
 
 #Sometimes it's useful to seperate the input and the output, but otherwise might prefer to overwrite - if you split it make sure to get the one column ones into the new folder
-use_this_path_to_save_csvs  <- "outputs/hansard/temp"
-# use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/hor"
+# use_this_path_to_save_csvs  <- "outputs/hansard/temp"
+use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
@@ -234,10 +234,6 @@ split_columns <-
 # toc()
 
 safely_split_columns <- safely(split_columns)
-
-walk2(file_names,
-      save_names,
-      ~ safely_split_columns(.x, .y))
 
 tic("Furrr walk2 stringr")
 future_walk2(file_names,
