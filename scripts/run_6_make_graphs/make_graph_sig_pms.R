@@ -44,4 +44,4 @@ ggplot() +
         axis.title.x=element_blank(),
         text = element_text(size=48))
 
-ggsave("outputs/figures/sig.pdf", height = 210, width = 297, units = "mm")
+ggsave("outputs/figures/sig.pdf", height = 210, width = 410, units = "mm")

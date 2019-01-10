@@ -8,13 +8,13 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "The Effect of Elections and Prime Ministers on Discussion in the Australian Federal Parliament (1901--2018)"
-thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, and the UofT Political Behavior Group. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
+thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, and the U of T Political Behavior Group. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "A large part of politics consists of reacting to events, but not all events provoke a reaction. As such, understanding political behaviour requires examining the reaction to events and how this changes over time. We systematically analyse how discussion in the Australian Federal Parliament changes in response to two types of events: elections and changed prime ministers. To do this we first create a new dataset of what was said in the Australian Federal Parliament from 1901 through to 2018 based on available public records. We reduce the dimensionality of this dataset by using a correlated topic model, and then analyse the effect of these two types of events using a Bayesian hierarchical Dirichlet model that has several advantages over existing models. We find that: changes in prime minister tend to be associated with topic changes even when the party in power does not change; and elections that do not result in a change in prime minister are rarely associated with topic changes in the first half of our sample, but have been increasingly significant since the 1990s."
+abstract: "A large part of politics consists of reacting to events, but not all events provoke a reaction. As such, understanding political behaviour requires examining the reaction to events and how this changes over time. We systematically analyse how discussion in the Australian Federal Parliament changes in response to two types of events: elections and changed prime ministers. To do this we first create a new dataset of what was said in the Australian Federal Parliament from 1901 through to 2018 based on available public records. We reduce the dimensionality of this dataset by using a correlated topic model, and then analyse the effect of these two types of events using a Bayesian hierarchical Dirichlet model that has several advantages over existing models. We find that: changes in prime minister tend to be associated with topic changes even when the party in power does not change; and elections that do not result in a change in prime minister are rarely associated with topic changes in the first half of our sample, but have been increasingly significant since the 1980s."
 keywords: "text-as-data, Australian politics, unsupervised machine learning, Bayesian hierarchical Dirichlet model"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
@@ -110,7 +110,7 @@ The main data source for our paper is the text record, known as 'Hansard', of wh
 
 We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in prime minister and elections. After taking these effects into consideration, we then explore other significant events.
 
-We find that: firstly, changes in prime minister tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the prime minister did not change but there was a significant change in topics. Finally, economic events, such as financial crises, have less significant effects than other events such as terrorism.
+We find that: firstly, changes in prime minister tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the prime minister did not change but there was a significant change in topics. 
 
 As our dataset covers 118 years we are able to see how the effect of these two types of events changes over time. We find that in Australia the effect of elections and a change in prime minister appear to have become more pronounced since the 1980s. With a small number of exceptions, in the first half of our dataset, even changes in prime minister where the party in power also changed were not associated with overly large changes in the topics of parliamentary discussion. It may be that more recent prime ministers are trying to more thoroughly distinguish themselves from their predecessor, or that the role of the government in agenda setting in the Australian Federal Parliament has changed.
 
@@ -149,9 +149,9 @@ We use the official PDF release and the formatting of the Hansard records change
 
 [^scriptsfootnote]: The exact scripts that we use are available on request or via the GitHub repository for this paper. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
 
-The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This is evidence to suggest that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper. We pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. We do not stem the words because we found, following @SchofieldMimno2016, that there did not appear to be much appreciable benefit. Then the sentences are de-constructed and each word considered individually. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
+The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This suggests that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper, and we pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. Then the sentences are de-constructed and each word considered individually. Not that we do not stem the words because, following @SchofieldMimno2016, we were not able to see much appreciable benefit. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
 
-[^datasourcefootnote]: We have made our dataset available via the R package \texttt{hansardr}. R users can use the devtools package [@Wickham2018] to install it from: https://github.com/RohanAlexander/hansardr. Users of other languages can download the daily CSV files from the data-raw folder of that repository. While we are making our data public in an attempt to help other researchers, we cleaned the dataset toward the requirements of this paper. If you have different requirements or have suggestions for how we can improve the dataset for other uses please contact us.
+[^datasourcefootnote]: Our dataset is available at: https://github.com/RohanAlexander/hansardr. While we are making our data public in an attempt to help other researchers, we cleaned the dataset toward the requirements of this paper. If you have different requirements or have suggestions for how we can improve the dataset for other uses please contact us.
 
 
 
@@ -199,7 +199,7 @@ However, the STM covariate framework has several limitations in terms of our goa
 
 To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-Define $\theta_{cdp}$ to be the proportion of topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_{cd}$ from the CTM. We assume that the majority of variation in topics by day is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
+Define $\theta_{cdp}$ to be the proportion of topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots, P = 80$ are equal to the estimated values of $\theta_{cd}$ from the CTM. We assume that the majority of variation in topics by day is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
 
 
 The topic proportions on day $d$ in chamber $c$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{c,d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[c,d],1:P}$:
@@ -350,21 +350,23 @@ knitr::include_graphics("../../figures/mu_election.pdf")
 
 Once prime minister and election effects have been taken into consideration, some days stand out compared with others in their sitting period. We do not explicitly include them in the model because of over-fitting and effect-type concerns, but we are interested to see if these can be explained by events that occurred on or before that sitting day. For instance, we may expect that events of a historical magnitude, such as the 9/11 attacks would change the discussion, or that the sitting day when, for instance, the Apology to the Stolen Generation was delivered, or some particularly prominent legislation introduced, would be different to others in that sitting period.
 
-To do this we estimate sitting-period level-effects (essentially a mean for each topic by sitting period). The difference between this mean distribution and a particular day's topic distribution defines a measure that can be thought of as essentially a residual which allows us to identify outlying days. This approach means that the model generates dates that are interesting without us having to specify interesting dates. More specifically, we define a day to be 'outlying' or 'different-to-expected' if the topic distribution on that particular day is more than three standard deviations different to the mean topic distribution for the relevant sitting period. Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week.
+To do this we estimate sitting-period level-effects (essentially a mean for each topic by sitting period). The difference between this mean distribution and a particular day's topic distribution defines a measure that can be thought of as essentially a residual which allows us to identify outlying days. This approach means that the model generates dates that are interesting without us having to specify interesting dates. More specifically, we define a day to be 'outlying' or 'different-to-expected' if the topic distribution on that particular day is more than three standard deviations different to the mean topic distribution for the relevant sitting period. 
+
+<!-- Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week. -->
 
 
-```{r keyeventsresultstable, echo = FALSE, results = 'asis'}
+<!-- ```{r keyeventsresultstable, echo = FALSE, results = 'asis'} -->
 
-key_events_results_cols %>%
-  kable(booktabs = T, caption = "Days that were significantly different to other days in their sitting period") %>%
-  kable_styling(font_size = 10) %>% 
-  footnote(
-    general = "These days were significantly different to others in their sitting period after taking election and prime minister effects into consideration.", 
-    footnote_as_chunk = T, 
-    threeparttable = TRUE)
+<!-- key_events_results_cols %>% -->
+<!--   kable(booktabs = T, caption = "Days that were significantly different to other days in their sitting period") %>% -->
+<!--   kable_styling(font_size = 10) %>%  -->
+<!--   footnote( -->
+<!--     general = "These days were significantly different to others in their sitting period after taking election and prime minister effects into consideration.",  -->
+<!--     footnote_as_chunk = T,  -->
+<!--     threeparttable = TRUE) -->
 
 
-```
+<!-- ``` -->
 
 
 
@@ -819,7 +821,7 @@ Between 1901 and 2018 30 different people have been prime minister. Four of thos
 
 Three people have died while prime minister: Lyons in 1939, Curtin in 1945, and Holt in 1967. Their respective immediate successors were only prime minister for a short period. As such, we do not consider them when determining the neighbouring prime minister. Specifically, we compare: the first Menzies term with Lyons instead of Page; Chifley with Curtin instead of with Forde; and Gorton with Holt instead of with McEwan.
 
-The other prime ministerial period that we do not consider in this paper is the second Rudd term This is because it only contained a few sitting days. That is, we compare Tony Abbot with Julia Gillard.
+The other prime ministerial period that we do not consider in this paper is the second Rudd term. This is because it only contained a few sitting days. That is, we compare Tony Abbot with Julia Gillard.
 
 <!-- \newpage -->
 
