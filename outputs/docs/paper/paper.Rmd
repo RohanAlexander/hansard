@@ -193,58 +193,53 @@ One option for relating the topic distributions to events would be to use the St
 
 However, the STM covariate framework has several limitations in terms of our goal to assess the relationship between topics and events:
 
-1. There is no way of specifying more complicated auto-correlated functional forms of the effects of events over time. For example, we believe that the effect of an election would peak at the time of the election, then gradually decay as a function of days since election. In the STM framework, it is possible to specify a constant or linear effect of elections over time, or a spline relationship over elections, but it is not possible to restrict the effect of a specific election over time to be monotonically decreasing. 
-2. There is no way to implement partial pooling across groups of similar documents. The STM framework assumes that documents are independently and identically distributed, conditional on the model covariates. However, it could be expected that topic distributions within a particular prime minister's time, for example, may be more- or less-likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period. 
-3. There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 attacks had an effect on parliamentary discourse, then a dummy for 9/11 would have to be included in the STM framework, but the specifics of the dummy construction affect the results. Instead we would like to identify important events based on different-to-expected topic distributions, after accounting for time trends, prime minister and election effects. 
+1. There is no way of specifying more complicated auto-correlated functional forms of the effects of events over time. For example, we believe that the effect of an election would peak at the time of the election, then gradually decay as a function of days since election. In the STM framework, it is possible to specify a constant or linear effect of elections over time, or a spline relationship over elections, but it is not possible to restrict the effect of a specific election over time to be monotonically decreasing. We are interested in time effects within election periods, which requires a more flexible framework. 
+2. There is no way to implement partial pooling across groups of similar documents. The STM framework assumes that documents are independently and identically distributed, conditional on the model covariates. However, it could be expected that topic distributions within a particular prime minister's time, for example, may be more- or less-likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period, or election period. 
+3. There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 attacks had an effect on parliamentary discourse, then a dummy for 9/11 would have to be included in the STM framework, but the specifics of the dummy construction affect the results. Instead we would like to identify important events based on different-to-expected topic distributions, after accounting for prime minister and election effects. 
 
 To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-Define $\theta_{dp}$ to be the proportion of topic $p$ on day $d$. Note that the $\theta_{d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_d$ from the CTM. We assume that the majority of variation in topics is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
+Define $\theta_{cdp}$ to be the proportion of topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots P = 80$ are equal to the estimated values of $\theta_{cd}$ from the CTM. We assume that the majority of variation in topics by day is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
 
 
-The topic proportions on day $d$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[d],1:P}$:
+The topic proportions on day $d$ in chamber $c$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{c,d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[c,d],1:P}$:
 $$
-\theta_{d,1:P} \sim \mbox{Dirichlet}(\mu_{s[d],1:P})
+\theta_{c,d,1:P} \sim \mbox{Dirichlet}(\mu_{s[c,d],1:P})
 $$
-where the notation $s[d]$ refers to the sitting period $s$ to which day $d$ belongs. This distributional assumption accounts for the fact that on any given day, the sum of all proportions in each topic must be one. 
+where the notation $s[c,d]$ refers to the sitting period $s$ to which day $d$ of chamber $c$ belongs. This distributional assumption accounts for the fact that on any given day in either chamber, the sum of all proportions in each topic must be one. 
 
-The goal of the model is to relate these proportions to the prime minister $g$, at time $d$, and also the days since the most recent election $e$, while accounting for underlying time trends. The mean parameters $\mu_{s,p}$ are modelled on the log scale as:
-$$
-\log \mu_{s,p} = \alpha_{g[s],p} + \cdot\alpha_{e[s],d,p}  + \sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k} + \delta_{s,p}
-$$
-where: $\alpha_{g[s],p}$ is the mean effect for prime ministers $g$ (which covers sitting period $s$) and topic $p$; $\alpha_{e[s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$) for topic $p$ on day $d$ since the election; $\sum_{k=1}^{K} \beta_{p,k} \cdot x_{s,k}$ is the underlying time trend, modelled using splines: $x_{s,k}$ is the $k$th basis spline in sitting period $s$ and $\beta_{p,k}$ is a coefficient on the $k$th basis spline; and $\delta_{s,p}$ is a structured random, or levels, effect for each sitting period and topic. 
+The goal of the model is to relate these proportions to the current prime minister $g$ and election period $e$, assuming that an 'election effect' would be at its peak in the days close to the election, then decay over the period. The mean parameters $\mu_{s,p}$ are modelled on the log scale as:
 
-The term for the prime minister, $\alpha_{g[s],p}$, assumes there is some underlying mean effect of each prime minister on the topic distribution. We place uninformative priors on each of these parameters:
 $$
-\alpha_{g[s],p} \sim \mbox{Normal}(0, 100).
+\log \mu_{s,p} = \alpha_{g[c,s],p} + \beta_{e[c,s],p} \cdot (N_{s[e]} - s) + \delta_{s[c],p}
 $$
+where: $\alpha_{g[c,s],p}$ is the mean effect for prime ministers $g$ (which covers sitting period $s$ in chamber $c$) and topic $p$; $\beta_{e[c,s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$, in chamber $c$) for topic $p$; $N_s$ is the total number of sitting periods in election period $e$; and $\delta_{s,p}$ is a random, or levels, effect for each sitting period and topic. 
 
-The election term, $\alpha_{e[s],d,p}$, assumes there is an initial effect of an election on the topic distribution, which then decays as a function of days since election, $d$. In particular, we model this as an AR(1) in $d$:
+The term for the prime minister, $\alpha_{g[c,s],p}$, assumes there is some underlying mean effect of each prime minister on the topic distribution. We place uninformative priors on each of these parameters:
 $$
-\alpha_{e[s],d,p} = \rho_{e[s],p} \cdot \alpha_{e[s],d-1,p}.
+\alpha_{g[c,s],p} \sim \mbox{Normal}(0, 100).
 $$
 
-One advantage of our model over using the STM is that we can restrict the effect of an election to be monotonically decreasing. This allows us to identify differences between prime minister and election effects even when there is a one-term prime minister. The value of the initial effect, $\alpha_{e[s],0,p}$, and the AR(1) term, $\rho$, both have non-informative priors:
+The election term, $\beta_{e[c,s],p}$, assumes there is an initial effect of an election on the topic distribution, which then decays as a function of sitting periods since election, $s$. In the model above, $\beta_{e[c,s],p}$ is multiplied by the numbers of sitting periods since the election, $(N_{s[e]} - s)$. When the sitting period counter is small, $(N_{s[e]} - s)$ is large, so the election effect is larger. 
+
+One advantage of our model over using the STM is that we can restrict the effect of an election to be monotonically decreasing. This allows us to identify differences between prime minister and election effects even when there is a one-term prime minister. The value of the initial effect, $\beta_{e[c,s],p}$, has a non-informative prior:
 $$
-\begin{aligned}
-\alpha_{e[s],0,p} &\sim \mbox{Normal}(0, 100) \mbox{ and} \nonumber \\
-\rho_{e[s],p} &\sim \mbox{Uniform}(0,1). \nonumber
-\end{aligned}
+\beta_{e[c,s],p} \sim \mbox{Normal}(0, 100).
 $$
 
-We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes to Australian society, culture, and the economy. The $x_{s,k}$ for $k = 1,2,\dots, K$ are the value of cubic basis splines for sitting period $s$ at knot point $k$. We place knot points every five sitting periods as this is the average length of time for parliament to sit. Non-informative priors are placed on the splines coefficients:
+<!-- We model the underlying time trend in topics using splines regression. The intuition behind this term is to capture the underlying non-linear trend in topic distributions over time, which is caused by large-scale structural changes to Australian society, culture, and the economy. The $x_{s,k}$ for $k = 1,2,\dots, K$ are the value of cubic basis splines for sitting period $s$ at knot point $k$. We place knot points every five sitting periods as this is the average length of time for parliament to sit. Non-informative priors are placed on the splines coefficients: -->
+<!-- $$ -->
+<!-- \beta_{p,k} \sim \mbox{Normal}(0, 100). -->
+<!-- $$ -->
+
+Finally, the sitting-period-specific random effect $\delta_{s[c],p}$ allows for the topic distributions in some sitting periods to be different than expected based on prime minister and election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-prime-minister and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{s[c],p}$ values are modelled as:
 $$
-\beta_{p,k} \sim \mbox{Normal}(0, 100).
+\delta_{s,p} \sim \mbox{Normal}(0, \sigma_{g[c,s],p}^2).
 $$
 
-Finally, the sitting-period-specific random effect $\delta_{s,p}$ allows for the topic distributions in some sitting periods to be different than expected based on prime minister and election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-prime-minister and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{s,p}$ values are modelled as:
+The variance parameters $\sigma_{g[c,s],p}^2$ give an indication of the how the variation in topics is changing over government periods. If the estimates of the variance are larger, then there is more variation in the topics discussed within a government period. Non-informative priors are placed on the variance parameters:
 $$
-\delta_{s,p} \sim \mbox{Normal}(0, \sigma_{e[s],p}^2).
-$$
-
-The variance parameters $\sigma_{e[s],p}^2$ give an indication of the how the variation in topics is changing over election periods. If the estimates of the variance are larger, then there is more variation in the topics discussed within an election period. Non-informative priors are placed on the variance parameters:
-$$
-\sigma_{e[s],p} \sim \mbox{Uniform}(0,3).
+\sigma_{g[c,s],p} \sim \mbox{Uniform}(0,3).
 $$
 
 We run the model in JAGS using the \texttt{rjags} package of @Plummer2018. 
