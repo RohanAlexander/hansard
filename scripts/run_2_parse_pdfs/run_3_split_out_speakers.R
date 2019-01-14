@@ -32,8 +32,8 @@ fix_wrong_names <-
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-# use_this_path_to_get_csvs  <- "outputs/hansard/temp"
-use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
+use_this_path_to_get_csvs  <- "outputs/hansard/run_2_output"
+# use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -47,8 +47,8 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # Seems unnecessary, but sometimes useful to separate input and output
-# use_this_path_to_save_csvs  <- "outputs/hansard/temp"
-use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
+use_this_path_to_save_csvs  <- "outputs/hansard/run_3_output"
+# use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
@@ -60,7 +60,7 @@ split_columns <-
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
     # name_of_input_csv_file <- "outputs/hansard/temp/1901-07-19.csv" # uncomment for testing
-    # name_of_input_csv_file <- "outputs/hansard/temp/2016-11-23.csv" # uncomment for testing
+    name_of_input_csv_file <- "outputs/hansard/run_2_output/hor-2016-11-23.csv" # uncomment for testing
     
     csv_with_rows_to_combine <-
       read_csv(name_of_input_csv_file,
@@ -103,6 +103,11 @@ split_columns <-
     full_days_hansard$text <-
       str_replace_all(
         full_days_hansard$text, 
+        "M c (?=[:upper:]+)", 
+        "MC") # Change M c DOUGALL to MCDONALD
+    full_days_hansard$text <-
+      str_replace_all(
+        full_days_hansard$text, 
         "Mac(?=[:upper:]+)", 
         "MAC") # Change MacDONALD to MACDONALD
     full_days_hansard$text <-
@@ -110,6 +115,11 @@ split_columns <-
         full_days_hansard$text, 
         "(?<=\\S)Mr", 
         " Mr") # If there is not a space to the left of Mr then put one there
+    full_days_hansard$text <-
+      str_replace_all(
+        full_days_hansard$text, 
+        "O'KEEFE", 
+        "OKEEFE") 
     full_days_hansard$text <-
       str_replace_all(
         full_days_hansard$text, 
@@ -191,6 +201,16 @@ split_columns <-
       "(?<=(^The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
       "(?<=(^The [:upper:]{1,30}[:blank:]?))-",
       "(?<=(^The [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Senator [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Senator [:lower:]{1,30}[:blank:]?))-",
+      "(?<=(^Senator [:lower:]{1,30}[:blank:][:lower:]{1,30}[:blank:]?))-",
+      "(?<=(^Senator [:lower:]{1,30}[:blank:]?))-",
+      "(?<=(^Senator [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Senator [:upper:]{1,30}[:blank:]?))asked",
+      "(?<=(^Senator Sir [:upper:]{1,30}[:blank:]?))-",
+      "(?<=(^Senator Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]))\\(",
+      "(?<=(^The Clerk))-",
+      "(?<=(^The ACTING DEPUTY PRESIDENT ))\\(",
       sep = "|")
     
     on_the_regular_since_may_2011 <- paste(
@@ -204,6 +224,14 @@ split_columns <-
       "(?<=(^The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?)):",
       "(?<=(^The [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
       "(?<=(^Mr [:alpha:]{1,30}[:blank:]?)):",
+      "(?<=(^Senator [:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Senator [:upper:]{1,30}[:blank:]?)):",
+      "(?<=(^Senator [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Senator Sir [:upper:]{1,30}[:blank:][:upper:]{1,30}[:blank:]?))\\(",
+      "(?<=(^Senator [:lower:]{1,30}[:blank:]?)):",
+      "(?<=(^Senator [:lower:]{1,30}[:blank:][:lower:]{1,30}[:blank:]?)):",
+      "(?<=(^Senator [:lower:]{1,30}[:blank:]?)):",
+      "(?<=(^The ACTING DEPUTY PRESIDENT ))\\(",
       sep = "|")
 
     # From 2011-05-10 the way that the speakers are split becomes :.
@@ -239,17 +267,20 @@ split_columns <-
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
   }
 
-
-#### Walk through the lists and parse the PDFs ####
-# tic("Normal walk2")
-# walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y))
-# toc()
-
 safely_split_columns <- safely(split_columns)
 
-tic("Furrr walk2 stringr")
-future_walk2(file_names,
-             save_names,
-             ~ safely_split_columns(.x, .y),
-             .progress = TRUE)
+
+#### Walk through the lists and parse the PDFs ####
+tic("Normal walk2")
+walk2(file_names,
+      save_names,
+      ~ safely_split_columns(.x, .y))
 toc()
+
+
+# tic("Furrr walk2")
+# future_walk2(file_names,
+#              save_names,
+#              ~ safely_split_columns(.x, .y),
+#              .progress = TRUE)
+# toc()

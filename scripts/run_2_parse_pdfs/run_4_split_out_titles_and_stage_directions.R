@@ -39,7 +39,7 @@ plan(multiprocess)
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/temp"
+use_this_path_to_get_csvs  <- "outputs/hansard/run_3_output"
 # use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
@@ -54,7 +54,7 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # Seems unnecessary, but sometimes useful to separate input and output
-use_this_path_to_save_csvs  <- "outputs/hansard/tempp"
+use_this_path_to_save_csvs  <- "outputs/hansard/run_4_output"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
@@ -67,7 +67,7 @@ split_titles <-
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
     # name_of_input_csv_file <- "outputs/hansard/temp/1901-07-19.csv" # uncomment for testing
-    # name_of_input_csv_file <- "outputs/hansard/temp/1991-10-08.csv" # uncomment for testing
+    name_of_input_csv_file <- "outputs/hansard/run_3_output/hor-1913-12-17.csv" # uncomment for testing
     
     csv_with_titles_to_split <-
       read_csv(name_of_input_csv_file,
@@ -81,27 +81,49 @@ split_titles <-
     full_days_hansard <- csv_with_titles_to_split
     
     # Clean the text a little more - toward making it possible to identify the politicians
+    full_days_hansard <- replace_na(full_days_hansard, list(Text = "EmptyHere"))
     
-    full_days_hansard <- replace_na(full_days_hansard, list(Text = "EMPTYHERE"))
+    # Looking for stage directions
     
-    on_the_regular <-
-      paste("(?<=(^Opposition members interjecting[:space:]?))-",
-            "(?<=(^Sitting suspended)) ",
-            "(?<=(^Honorable members interjecting)),",
+    regex_for_directions <-
+      paste("^Opposition members interjecting",
+            "^Sitting suspended from ",
+            "^Honourable members interjecting-$",
+            "^Government members interjecting-$"
             # "(?<=(^[:^lower:]$))",
             sep = "|")
     
     # str_replace("QUESTIONSWITHOUTNOTICE", "[:upper:]", "")
     
-    full_days_hansard <- separate(
-      full_days_hansard,
-      Text,
-      into = c("Misc", "Text"),
-      sep = on_the_regular,
-      extra = "merge",
-      fill = "left",
-      remove = TRUE
-    )
+    full_days_hansard <- full_days_hansard %>% 
+      mutate(isDirection = if_else(str_detect(Text, regex_for_directions), 1,0),
+             Speaker = ifelse(isDirection == 1, "Deus ex machina", Speaker)) %>% 
+      select(-isDirection)
+    
+    
+    
+    
+    
+    # Now looks for titles
+    regex_for_titles <- "^[[:upper:][:space:]]{4,}$"
+      # paste("^[[:upper:][:space:]]{4,}$",
+      # 
+      #       sep = "|")
+    
+    # str_replace("QUESTIONSWITHOUTNOTICE", "[:upper:]", "")
+    
+  
+    full_days_hansard <- full_days_hansard %>% 
+      mutate(isTitle = if_else(str_detect(Text, regex_for_titles), 1, 0),
+             Title = ifelse(isTitle == 1, Text, NA),
+             Text = ifelse(isTitle == 1, NA, Text)
+             ) %>% 
+      select(-isTitle)
+    
+    
+    full_days_hansard <- fill(full_days_hansard, Title)
+    
+    
     
     # write_csv(full_days_hansard, "test.csv") # Just for testing
     write_csv(full_days_hansard, name_of_output_csv_file)
@@ -109,21 +131,20 @@ split_titles <-
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
   }
 
-#### Walk through the lists and parse the PDFs ####
-# tic("Normal walk2")
-# walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y))
-# toc()
-
 safely_split_titles <- safely(split_titles)
 
+
+#### Walk through the lists and parse the PDFs ####
+tic("Normal walk2")
 walk2(file_names,
       save_names,
       ~ safely_split_titles(.x, .y))
-
-
-tic("Furrr walk2 stringr")
-future_walk2(file_names,
-             save_names,
-             ~ safely_split_columns(.x, .y),
-             .progress = TRUE)
 toc()
+
+
+# tic("Furrr walk2")
+# future_walk2(file_names,
+#              save_names,
+#              ~ safely_split_columns(.x, .y),
+#              .progress = TRUE)
+# toc()

@@ -24,8 +24,8 @@ plan(multiprocess)
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-# use_this_path_to_get_csvs  <- "outputs/hansard/temp"
-use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
+use_this_path_to_get_csvs  <- "outputs/hansard/run_1_output"
+# use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
 file_names <-
@@ -39,19 +39,20 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # The two columns is only an issue up to 12 November 2013 so remove the file if it is after 2013-11-12
-file_names_tibble <- tibble(file_name = file_names)
-file_names_tibble <- file_names_tibble %>% 
-  mutate(date = basename(file_names) %>% 
-           str_replace(".csv", "") %>%
-           ymd()) %>% 
-  filter(date < "2013-11-12")
+file_names_tibble <- tibble(file_name = file_names, file_date = file_names) %>% 
+  mutate(file_date = str_replace(file_date, ".csv", ""),
+         file_date = str_replace(file_date, "outputs/hansard/run_1_output/hor-", ""),
+         file_date = str_replace(file_date, "outputs/hansard/run_1_output/senate-", ""),
+         file_date = ymd(file_date)
+         ) %>% 
+  filter(file_date < "2013-11-12")
 
 file_names <- file_names_tibble$file_name
 rm(file_names_tibble)
 
 #Sometimes it's useful to seperate the input and the output, but otherwise might prefer to overwrite - if you split it make sure to get the one column ones into the new folder
-# use_this_path_to_save_csvs  <- "outputs/hansard/temp"
-use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/hor"
+use_this_path_to_save_csvs  <- "outputs/hansard/run_2_output"
+# use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
 
@@ -68,6 +69,7 @@ split_columns <-
       read_csv(name_of_input_csv_file,
                trim_ws = FALSE,
                col_types = cols())
+    
     
     # Work out whether a line has two columns in it or only the left or only the right.
     # This is done based on the number of characters in the column.
@@ -117,8 +119,7 @@ split_columns <-
           "})[:space:]"
         )
       ) %>%
-      select(-bit_to_the_left_of_half,
-             -bit_to_the_left_of_half_plus_10)
+      select(-bit_to_the_left_of_half,-bit_to_the_left_of_half_plus_10)
     # Looking at the histogram - ggplot(lines_with_both_columns_middle_space, aes(x = length)) + geom_bar() - and then the rows, when there is less than 60 it seems to be just left column. Change the type to be first column only and remove them
     # If it's less than 60 then change the type to be first column only
     lines_with_both_columns_middle_space <-
@@ -142,10 +143,10 @@ split_columns <-
         ),
         split = str_detect(text, "MONICAHOWLETT")
       ) %>%
-      select(-reg_pattern,-length)
+      select(-reg_pattern, -length)
     
     # Push those back together
-    lines_with_both_columns <- lines_with_both_columns %>% 
+    lines_with_both_columns <- lines_with_both_columns %>%
       filter(split == TRUE)
     lines_with_both_columns <-
       rbind(lines_with_both_columns,
@@ -206,7 +207,7 @@ split_columns <-
     # Now the columns of the PDF are split into two columns and we need to put them back together in order; within each page: first column on top then second column
     all_one_column <- all_one_column %>%
       select(-ordering) %>%
-      gather(position, textInPosition, -c(pageNumbers)) %>%
+      gather(position, textInPosition,-c(pageNumbers)) %>%
       mutate(counter = 1:n()) %>%
       arrange(pageNumbers, counter)
     
@@ -215,8 +216,8 @@ split_columns <-
       mutate(emptyCell = if_else(textInPosition == "" |
                                    is.na(textInPosition), 1, 0)) %>%
       filter(emptyCell == 0) %>%
-      select(-emptyCell, -position, -counter) %>%
-      rename(text = textInPosition) %>% 
+      select(-emptyCell,-position,-counter) %>%
+      rename(text = textInPosition) %>%
       select(text, pageNumbers)
     
     # Check whether at the start of a row
@@ -225,19 +226,25 @@ split_columns <-
     write_csv(all_one_column, name_of_output_csv_file)
     
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
+    
+    
   }
-
-
-#### Walk through the lists and parse the PDFs ####
-# tic("Normal walk2")
-# walk2(file_names, save_names, ~ get_text_from_PDFs(.x, .y))
-# toc()
 
 safely_split_columns <- safely(split_columns)
 
-tic("Furrr walk2 stringr")
-future_walk2(file_names,
-             save_names,
-             ~ safely_split_columns(.x, .y),
-             .progress = TRUE)
+
+#### Walk through the lists and parse the PDFs ####
+tic("Normal walk2")
+walk2(file_names,
+      save_names,
+      ~ safely_split_columns(.x, .y))
 toc()
+
+
+#
+# tic("Furrr walk2")
+# future_walk2(file_names,
+#              save_names,
+#              ~ safely_split_columns(.x, .y),
+#              .progress = TRUE)
+# toc()

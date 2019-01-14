@@ -29,11 +29,11 @@ plan(multiprocess)
 
 #### Create lists of PDFs to read and file names to save text as ####
 # Change the path as required:
-use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
-# use_this_path_to_get_pdfs  <- "inputs/for_testing_hansard_pdf"
+# use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
+use_this_path_to_get_pdfs  <- "inputs/for_testing_pdfs"
 
-# use_this_path_to_save_csv_files  <- "outputs/hansard/temp"
-use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/hor"
+use_this_path_to_save_csv_files  <- "outputs/hansard/run_1_output"
+# use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard PDF filenames
 file_names <-
@@ -243,16 +243,20 @@ get_text_from_PDFs <-
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
   }
 
-
-#### Walk through the lists and parse the PDFs ####
 safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
 
-# file_names <- file_names[1:10]
-# save_names <- save_names[1:10]
 
-tic("Furrr walk2 stringr")
-future_walk2(file_names,
-             save_names,
-             ~ safely_get_text_from_PDFs(.x, .y),
-             .progress = TRUE)
+#### Walk through the lists and parse the PDFs ####
+tic("Normal walk2")
+walk2(file_names,
+      save_names,
+      ~ safely_get_text_from_PDFs(.x, .y))
 toc()
+
+
+# tic("Furrr walk2")
+# future_walk2(file_names,
+#              save_names,
+#              ~ safely_get_text_from_PDFs(.x, .y),
+#              .progress = TRUE)
+# toc()
