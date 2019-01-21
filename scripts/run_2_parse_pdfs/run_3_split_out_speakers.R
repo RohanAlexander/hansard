@@ -60,7 +60,7 @@ split_columns <-
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
     # name_of_input_csv_file <- "outputs/hansard/temp/1901-07-19.csv" # uncomment for testing
-    name_of_input_csv_file <- "outputs/hansard/run_2_output/hor-2016-11-23.csv" # uncomment for testing
+    # name_of_input_csv_file <- "outputs/hansard/run_2_output/hor-2016-11-23.csv" # uncomment for testing
     
     csv_with_rows_to_combine <-
       read_csv(name_of_input_csv_file,

@@ -52,19 +52,19 @@ split_columns <-
   function(name_of_input_csv_file,
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
-    # name_of_input_csv_file <- "outputs/hansard/run_4_output/hor-1961-10-26.csv" # uncomment for testing
+    # name_of_input_csv_file <- "outputs/hansard/run_4_output/hor-2004-11-29.csv" # uncomment for testing
     
     csv_with_rows_to_combine <-
       read_csv(name_of_input_csv_file,
                trim_ws = FALSE,
-               col_types = "cccd")
+               col_types = cols())
     
     # Remove any extra whitespace i.e. two or more spaces and spaces at either end. Yes, I know that I turned this off in the read_csv, but it's important to be explicit because the whitespcae is useful sometimes.
     csv_with_rows_to_combine$Text <-
       str_squish(csv_with_rows_to_combine$Text)
     
-    csv_with_rows_to_combine$Misc <-
-      str_squish(csv_with_rows_to_combine$Misc)
+    csv_with_rows_to_combine$Title <-
+      str_squish(csv_with_rows_to_combine$Title)
     
     # # Put everything onto one line, which allows us to rejoin words that have been split across two lines e.g. Mon- ica
     csv_with_rows_to_combine <- csv_with_rows_to_combine %>%
@@ -83,9 +83,9 @@ split_columns <-
     # Thanks to Mark Needham for this: https://markhneedham.com/blog/2015/06/27/r-dplyr-squashing-multiple-rows-per-group-into-one/
     csv_with_rows_to_combine <- csv_with_rows_to_combine %>%
       group_by(speakerGroups) %>%
-      mutate(Misc = replace_na(Misc, "ZZZZZ")) %>% 
+      mutate(Title = replace_na(Title, "ZZZZZ")) %>% 
       summarise(Speaker = first(Speaker),
-                Misc = min(Misc),
+                Title = first(Title),
                 text = paste(Text, collapse = " "),
                 pageNumbers = min(pageNumbers)
                 )

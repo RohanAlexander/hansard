@@ -8,7 +8,7 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "The Effect of Elections and Prime Ministers on Discussion in the Australian Federal Parliament (1901--2018)"
-thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, and the U of T Political Behavior Group. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
+thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, the U of T Political Behavior Group, and the 2019 PSA Political Methodology Conference. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
 author:
 - name: Monica Alexander
   affiliation: University of Toronto

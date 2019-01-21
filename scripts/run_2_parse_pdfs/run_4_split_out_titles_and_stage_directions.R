@@ -67,7 +67,7 @@ split_titles <-
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
     # name_of_input_csv_file <- "outputs/hansard/temp/1901-07-19.csv" # uncomment for testing
-    name_of_input_csv_file <- "outputs/hansard/run_3_output/hor-1913-12-17.csv" # uncomment for testing
+    # name_of_input_csv_file <- "outputs/hansard/run_3_output/hor-1913-12-17.csv" # uncomment for testing
     
     csv_with_titles_to_split <-
       read_csv(name_of_input_csv_file,
@@ -89,7 +89,7 @@ split_titles <-
       paste("^Opposition members interjecting",
             "^Sitting suspended from ",
             "^Honourable members interjecting-$",
-            "^Government members interjecting-$"
+            "^Government members interjecting-$",
             # "(?<=(^[:^lower:]$))",
             sep = "|")
     
@@ -99,8 +99,6 @@ split_titles <-
       mutate(isDirection = if_else(str_detect(Text, regex_for_directions), 1,0),
              Speaker = ifelse(isDirection == 1, "Deus ex machina", Speaker)) %>% 
       select(-isDirection)
-    
-    
     
     
     
