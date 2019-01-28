@@ -30,7 +30,8 @@ fix_wrong_spellings <-
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/run_5_output"
+# use_this_path_to_get_csvs  <- "outputs/hansard/run_5_output"
+use_this_path_to_get_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_5_output"
 # use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hortest"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
@@ -44,7 +45,8 @@ file_names <-
 
 file_names <- file_names %>% sample() # Randomise the order
 
-use_this_path_to_save_csvs  <- "outputs/hansard/run_6_output"
+# use_this_path_to_save_csvs  <- "outputs/hansard/run_6_output"
+use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_6_output"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hortest"
 
@@ -84,17 +86,21 @@ safely_fix_spelling <- safely(fix_spelling)
 
 #### Walk through the lists and parse the PDFs ####
 # Normal walk2
-tic("Normal walk2")
-walk2(file_names,
-      save_names,
-      ~ safely_fix_spelling(.x, .y)
-      )
-toc()
-
-# # Furrr walk2
-# tic("Furrr walk2")
-# future_walk2(file_names,
-#              save_names,
-#              ~ safely_fix_spelling(.x, .y),
-#              .progress = TRUE)
+# tic("Normal walk2")
+# walk2(file_names,
+#       save_names,
+#       ~ safely_fix_spelling(.x, .y)
+#       )
 # toc()
+
+# file_names_d <- file_names[1:3]
+# save_names_d <- save_names[1:3]
+
+
+# Furrr walk2
+tic("Furrr walk2")
+future_walk2(file_names,
+             save_names,
+             ~ safely_fix_spelling(.x, .y),
+             .progress = TRUE)
+toc()

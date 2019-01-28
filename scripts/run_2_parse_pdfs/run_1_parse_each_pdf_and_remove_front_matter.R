@@ -30,10 +30,12 @@ plan(multiprocess)
 #### Create lists of PDFs to read and file names to save text as ####
 # Change the path as required:
 # use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
-use_this_path_to_get_pdfs  <- "inputs/for_testing_pdfs"
+# use_this_path_to_get_pdfs  <- "inputs/for_testing_pdfs"
+use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
 
-use_this_path_to_save_csv_files  <- "outputs/hansard/run_1_output"
+# use_this_path_to_save_csv_files  <- "outputs/hansard/run_1_output"
 # use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/hor"
+use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_1_output"
 
 # Get list of Hansard PDF filenames
 file_names <-
@@ -44,6 +46,19 @@ file_names <-
     full.names = TRUE
   )
 file_names <- file_names %>% sample() # Randomise the order
+
+# Just use this to filter if needed
+file_tibble <- tibble(filename = file_names)
+file_tibble <- file_tibble %>% 
+  mutate(the_year = filename,
+         the_year = str_replace(the_year, "/Volumes/Hansard/pdfs/federal/hor/", ""),
+         the_year = str_replace(the_year, ".pdf", ""),
+         the_year = ymd(the_year)) %>% 
+  # filter(year(the_year) < 1981) %>% 
+  filter(year(the_year) > 1979)
+file_names <- file_tibble$filename
+rm(file_tibble)
+  
 # file_names <- file_names %>% sample(500) # Get 500
 
 # Use this to get and remove the ones already done
@@ -247,16 +262,15 @@ safely_get_text_from_PDFs <- safely(get_text_from_PDFs)
 
 
 #### Walk through the lists and parse the PDFs ####
-tic("Normal walk2")
-walk2(file_names,
-      save_names,
-      ~ safely_get_text_from_PDFs(.x, .y))
-toc()
-
-
-# tic("Furrr walk2")
-# future_walk2(file_names,
-#              save_names,
-#              ~ safely_get_text_from_PDFs(.x, .y),
-#              .progress = TRUE)
+# tic("Normal walk2")
+# walk2(file_names,
+#       save_names,
+#       ~ safely_get_text_from_PDFs(.x, .y))
 # toc()
+
+tic("Furrr walk2")
+future_walk2(file_names,
+             save_names,
+             ~ safely_get_text_from_PDFs(.x, .y),
+             .progress = TRUE)
+toc()

@@ -24,7 +24,8 @@ plan(multiprocess)
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/run_6_output"
+# use_this_path_to_get_csvs  <- "outputs/hansard/run_6_output"
+use_this_path_to_get_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_6_output"
 # use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs
@@ -38,7 +39,8 @@ file_names <-
 
 file_names <- file_names %>% sample() # Randomise the order
 
-use_this_path_to_save_csvs  <- "outputs/hansard/run_7_output"
+# use_this_path_to_save_csvs  <- "outputs/hansard/run_7_output"
+use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_7_output"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
@@ -49,7 +51,7 @@ general_clean_up <-
   function(name_of_input_csv_file,
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
-    # name_of_input_csv_file <- "/Volumes/Backup/temp/1971-10-05.csv" # uncomment for testing
+    # name_of_input_csv_file <- "/Volumes/Hansard/parsed/federal/for_zoe/run_6_output/2016-09-14.csv" # uncomment for testing
     # name_of_input_csv_file <- "outputs/hansard/temp/hor-2016-11-23.csv" # uncomment for testing
     
     csv_to_clean <-
@@ -59,7 +61,7 @@ general_clean_up <-
     
     # Based on hor-2017-10-26:
     # First look for ones like: "Dawson) (10:42):"
-    csv_to_clean$text <- str_replace(csv_to_clean$text, "^.{0,60}\\)[:space:]\\([:digit:]{2}:[:digit:]{2}\\)\\:", "")
+    csv_to_clean$text <- str_remove(csv_to_clean$text, "^.{0,60}\\)[:space:]\\([:digit:]{2}:[:digit:]{2}\\)\\:")
     # Then for ones like: "Mr Rob Mitchell):"
     csv_to_clean$text <- str_replace(csv_to_clean$text, "^.{0,30}\\)\\:", "")
     # Bit specific, but Dan Tehan has the longest title I've ever seen: Wannon-Minister for Veterans' Affairs, Minister Assisting the Prime Minister for the Centenary of ANZAC, Minister Assisting the Prime Minister for Cyber Security and Minister for Defence Personnel) (12:04):
@@ -67,7 +69,8 @@ general_clean_up <-
 
     #Based on hor-2016:
     csv_to_clean$text <- str_replace(csv_to_clean$text, "^Stirling-Minister for Justice and Minister Assisting the Prime Minister for Counter-Terrorism\\)[:space:]\\([:digit:]{2}:[:digit:]{2}\\):", "")
-    csv_to_clean$text <- str_replace(csv_to_clean$text, "^^Farrer-Minister for Sport and Minister for Health and Aged Care\\)[:space:]\\([:digit:]{2}:[:digit:]{2}\\):", "")
+    csv_to_clean$text <- str_replace(csv_to_clean$text, "^Farrer-Minister for Sport and Minister for Health and Aged Care\\)[:space:]\\([:digit:]{1,2}:[:digit:]{2}\\):", "")
+    csv_to_clean$text <- str_replace(csv_to_clean$text, "^New England-Leader of the National Party of Australia\\)[:space:]\\([:digit:]{1,2}:[:digit:]{2}\\):", "")
     
     
     # Similarly, but earlier dates used - not :" also Calwell) (9.52 a.m.)- dots with the am or pm.
@@ -90,14 +93,24 @@ general_clean_up <-
     
     # Clean up from earlier
     csv_to_clean$text <- str_replace_all(csv_to_clean$text, "EMPTYHERE", "")
+    csv_to_clean$text <- str_replace_all(csv_to_clean$text, "EmptyHere", "")
     csv_to_clean$text <- str_replace_all(csv_to_clean$text, "MONICA", "")
+    
+    
     
     # Clean the names of whitespace
     csv_to_clean$Speaker <-
       str_squish(csv_to_clean$Speaker)
     
     
-    # write_csv(csv_to_clean, "test.csv")
+    # Clean the names of whitespace
+    csv_to_clean$text <-
+      str_replace_all(csv_to_clean$text, "\\( ", "\\(")
+    
+    # csv_to_clean <- csv_to_clean %>% 
+    #   select(-speakerGroups)
+    # 
+    # write_csv(csv_to_clean, "2016-09-14.csv")
     
     # Need to deal with interjecting....  
     # "Mr Brendan O'Connor interjectingMONICA"
@@ -115,15 +128,16 @@ safely_general_clean_up <- safely(general_clean_up)
 
 
 #### Walk through the lists and parse the PDFs ####
-tic("Normal walk2")
-walk2(file_names,
-      save_names,
-      ~ safely_general_clean_up(.x, .y))
-toc()
-
-# tic("Furrr walk2")
-# future_walk2(file_names,
-#              save_names,
-#              ~ safely_fix_spelling(.x, .y),
-#              .progress = TRUE)
+# tic("Normal walk2")
+# walk2(file_names,
+#       save_names,
+#       ~ safely_general_clean_up(.x, .y))
 # toc()
+
+
+tic("Furrr walk2")
+future_walk2(file_names,
+             save_names,
+             ~ safely_general_clean_up(.x, .y),
+             .progress = TRUE)
+toc()

@@ -1,3 +1,4 @@
+# !diagnostics off
 # Misc other:
 # Motion (by Mr OHIFUBY). agreed .to-
 # Honorable members interjecting,
@@ -39,7 +40,8 @@ plan(multiprocess)
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/run_3_output"
+# use_this_path_to_get_csvs  <- "outputs/hansard/run_3_output"
+use_this_path_to_get_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_3_output"
 # use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
@@ -54,7 +56,8 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # Seems unnecessary, but sometimes useful to separate input and output
-use_this_path_to_save_csvs  <- "outputs/hansard/run_4_output"
+# use_this_path_to_save_csvs  <- "outputs/hansard/run_4_output"
+use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_4_output"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
@@ -97,7 +100,7 @@ split_titles <-
     
     full_days_hansard <- full_days_hansard %>% 
       mutate(isDirection = if_else(str_detect(Text, regex_for_directions), 1,0),
-             Speaker = ifelse(isDirection == 1, "Deus ex machina", Speaker)) %>% 
+             Speaker = ifelse(isDirection == 1, "Unknown", Speaker)) %>% 
       select(-isDirection)
     
     
@@ -140,9 +143,9 @@ walk2(file_names,
 toc()
 
 
-# tic("Furrr walk2")
-# future_walk2(file_names,
-#              save_names,
-#              ~ safely_split_columns(.x, .y),
-#              .progress = TRUE)
-# toc()
+tic("Furrr walk2")
+future_walk2(file_names,
+             save_names,
+             ~ safely_split_titles(.x, .y),
+             .progress = TRUE)
+toc()

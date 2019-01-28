@@ -32,7 +32,8 @@ fix_wrong_names <-
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/run_2_output"
+# use_this_path_to_get_csvs  <- "outputs/hansard/run_2_output"
+use_this_path_to_get_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_2_output"
 # use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
@@ -46,8 +47,23 @@ file_names <-
 
 file_names <- file_names %>% sample() # Randomise the order
 
+# files <- tibble(run2 = file_names)
+# files$just_name <- basename(files$run2)
+# files_3_done <- 
+#   list.files(
+#     path = "/Volumes/Hansard/parsed/federal/for_zoe/run_3_output",
+#     pattern = "*.csv",
+#     recursive = FALSE,
+#     full.names = FALSE
+#   )
+# files$done <- if_else(files$just_name %in% files_3_done, 1,0)
+# files <- files %>% 
+#   filter(done == 0)
+# file_names <- files$run2
+
+
 # Seems unnecessary, but sometimes useful to separate input and output
-use_this_path_to_save_csvs  <- "outputs/hansard/run_3_output"
+use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_3_output"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 save_names <- file_names %>%
   str_replace(use_this_path_to_get_csvs, use_this_path_to_save_csvs)
@@ -271,16 +287,15 @@ safely_split_columns <- safely(split_columns)
 
 
 #### Walk through the lists and parse the PDFs ####
-tic("Normal walk2")
-walk2(file_names,
-      save_names,
-      ~ safely_split_columns(.x, .y))
-toc()
-
-
-# tic("Furrr walk2")
-# future_walk2(file_names,
-#              save_names,
-#              ~ safely_split_columns(.x, .y),
-#              .progress = TRUE)
+# tic("Normal walk2")
+# walk2(file_names,
+#       save_names,
+#       ~ safely_split_columns(.x, .y))
 # toc()
+
+tic("Furrr walk2")
+future_walk2(file_names,
+             save_names,
+             ~ safely_split_columns(.x, .y),
+             .progress = TRUE)
+toc()

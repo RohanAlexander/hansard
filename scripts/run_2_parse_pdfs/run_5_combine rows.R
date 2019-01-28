@@ -25,7 +25,8 @@ plan(multiprocess)
 
 #### Create lists of CSVs to read ####
 # Change the path as required:
-use_this_path_to_get_csvs  <- "outputs/hansard/run_4_output"
+# use_this_path_to_get_csvs  <- "outputs/hansard/run_4_output"
+use_this_path_to_get_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_4_output"
 # use_this_path_to_get_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 
 # Get list of Hansard csvs that have been parsed from PDFs and had front matter removed
@@ -40,7 +41,8 @@ file_names <-
 file_names <- file_names %>% sample() # Randomise the order
 
 # Seems unnecessary, but sometimes useful to separate input and output
-use_this_path_to_save_csvs  <- "outputs/hansard/run_5_output"
+# use_this_path_to_save_csvs  <- "outputs/hansard/run_5_output"
+use_this_path_to_save_csvs  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_5_output"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hor"
 # use_this_path_to_save_csvs <- "/Volumes/Hansard/parsed/federal/hortest"
 save_names <- file_names %>%
@@ -48,7 +50,7 @@ save_names <- file_names %>%
 
 
 #### Create the function that will be applied to the files ####
-split_columns <-
+combine_rows <-
   function(name_of_input_csv_file,
            name_of_output_csv_file) {
     # Read in the csv, based on the filename list
@@ -83,7 +85,7 @@ split_columns <-
     # Thanks to Mark Needham for this: https://markhneedham.com/blog/2015/06/27/r-dplyr-squashing-multiple-rows-per-group-into-one/
     csv_with_rows_to_combine <- csv_with_rows_to_combine %>%
       group_by(speakerGroups) %>%
-      mutate(Title = replace_na(Title, "ZZZZZ")) %>% 
+      mutate(Title = replace_na(Title, "Unknown")) %>% 
       summarise(Speaker = first(Speaker),
                 Title = first(Title),
                 text = paste(Text, collapse = " "),
@@ -108,21 +110,24 @@ split_columns <-
     print(paste0("Done with ", name_of_output_csv_file, " at ", Sys.time()))
   }
 
-safely_split_columns <- safely(split_columns)
+safely_combine_rows <- safely(combine_rows)
 
 
 #### Walk through the lists and parse the PDFs ####
 # Normal walk2
-tic("Normal walk2")
-walk2(file_names,
-      save_names,
-      ~ safely_split_columns(.x, .y))
-toc()
-
-# # Furrr walk2
-# tic("Furrr walk2")
-# future_walk2(file_names,
-#              save_names,
-#              ~ safely_split_columns(.x, .y),
-#              .progress = TRUE)
+# tic("Normal walk2")
+# walk2(file_names,
+#       save_names,
+#       ~ safely_combine_rows(.x, .y))
 # toc()
+
+
+
+
+# Furrr walk2
+tic("Furrr walk2")
+future_walk2(file_names,
+             save_names,
+             ~ safely_combine_rows(.x, .y),
+             .progress = TRUE)
+toc()
