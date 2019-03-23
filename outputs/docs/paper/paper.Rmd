@@ -8,14 +8,14 @@ output:
     latex_engine: pdflatex
     template: svm-latex-ms.tex
 title: "The Effect of Elections and Prime Ministers on Discussion in the Australian Federal Parliament (1901--2018)"
-thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, the U of T Political Behavior Group, and the 2019 PSA Political Methodology Conference. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
+thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, the UofT Political Behavior Group, and the 2019 PSA Political Methodology Conference. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
 author:
-- name: Monica Alexander
-  affiliation: University of Toronto
 - name: Rohan Alexander
   affiliation: Australian National University
-abstract: "A large part of politics consists of reacting to events, but not all events provoke a reaction. As such, understanding political behaviour requires examining the reaction to events and how this changes over time. We systematically analyse how discussion in the Australian Federal Parliament changes in response to two types of events: elections and changed prime ministers. To do this we first create a new dataset of what was said in the Australian Federal Parliament from 1901 through to 2018 based on available public records. We reduce the dimensionality of this dataset by using a correlated topic model, and then analyse the effect of these two types of events using a Bayesian hierarchical Dirichlet model that has several advantages over existing models. We find that: changes in prime minister tend to be associated with topic changes even when the party in power does not change; and elections that do not result in a change in prime minister are rarely associated with topic changes in the first half of our sample, but have been increasingly significant since the 1980s."
-keywords: "text-as-data, Australian politics, unsupervised machine learning, Bayesian hierarchical Dirichlet model"
+- name: Monica Alexander
+  affiliation: University of Toronto
+abstract: "A large part of politics consists of reacting to events, but not all events provoke a reaction. As such, understanding political behaviour requires examining the reaction to events and how this changes over time. We systematically analyse how discussion in the Australian Federal Parliament changes in response to two types of events: elections and changed prime ministers. To do this we first create a new dataset of what was said in the Australian Federal Parliament from 1901 through to 2018 based on available public records. We reduce the dimensionality of this dataset using a correlated topic model, relate those topics to the Comparative Agendas Project, and then analyse the effect of these two types of events using a Bayesian hierarchical Dirichlet model that has several advantages over existing models. We find that: changes in prime minister tend to be associated with topic changes even when the party in power does not change; and elections that do not result in a change in prime minister are rarely associated with topic changes in the first half of our sample, but have been increasingly significant since the 1980s."
+keywords: "text-as-data, Australian politics, unsupervised machine learning, Bayesian hierarchical Dirichlet model, Comparative Agendas Project"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 geometry: margin=1in
 fontfamily: mathpazo
@@ -71,6 +71,10 @@ keyEvents <-
 
 significances <-
   read_csv("../../../outputs/misc/significance.csv", col_types = cols())
+
+top_words_comp <-
+  read_csv2("../../../outputs/results-topic_models_and_gammas/top_words_80_comparative_agendas.csv", col_types = cols()) %>% 
+  select(-`CAP number`)
 
 top_words <-
   read_csv2("../../../outputs/results-topic_models_and_gammas/top_words_80.csv", col_types = cols()) %>% 
@@ -149,7 +153,7 @@ We use the official PDF release and the formatting of the Hansard records change
 
 [^scriptsfootnote]: The exact scripts that we use are available on request or via the GitHub repository for this paper. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
 
-The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This suggests that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper, and we pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. Then the sentences are de-constructed and each word considered individually. Not that we do not stem the words because, following @SchofieldMimno2016, we were not able to see much appreciable benefit. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
+The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This suggests that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper, and we pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. Then the sentences are de-constructed and each word considered individually. We do not stem the words because, following @SchofieldMimno2016, we were not able to see much appreciable benefit. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
 
 [^datasourcefootnote]: Our dataset is available at: https://github.com/RohanAlexander/hansardr. While we are making our data public in an attempt to help other researchers, we cleaned the dataset toward the requirements of this paper. If you have different requirements or have suggestions for how we can improve the dataset for other uses please contact us.
 
@@ -168,13 +172,13 @@ In the following section, we briefly describe the topic modelling approach, befo
 ## Overview of topic modelling
 Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. 
 
-Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addressed this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. 
+Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addressed this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. @AshMorelliOsnabru2018 combined the best of both in the context of the New Zealand Hansard, using a supervised machine learning approach that would likly be beneficial in the Australian Hansard case as well. 
 
-In order to effectively categorise the topics of the entire Hansard, we chose to use topic modelling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent. One advantage of using the Dirichlet distribution is that it formalises the idea that there is a trade-off in what is talked about in parliament given the limited time. A multinomial approach would not have this property.
+In order to effectively categorise the topics of the entire Hansard, we use topic modelling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent. One advantage of using the Dirichlet distribution is that it formalises the idea that there is a trade-off in what is talked about in parliament given the limited time. A multinomial approach would not have this property.
 
 The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method, and it is in this sense that this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult.
 
-An overview, and an example, of how topic modelling works is available in Appendix \@ref(LDAoverviewandexample). The underlying document generation process is discussed in Appendix \@ref(LDAdocgenprocess), and then Appendix \@ref(LDAposteriorestimation) explains how this is reversed to generate topics. Finally, Appendix \@ref(selecttopicnumber) contains a discussion of how the number of topics was chosen.
+An overview, and an example, of how topic modelling works is available in Appendix \@ref(LDAoverviewandexample). The underlying document generation process is discussed in Appendix \@ref(LDAdocgenprocess), and then Appendix \@ref(LDAposteriorestimation) explains how this is reversed to generate topics given documents. Finally, Appendix \@ref(selecttopicnumber) contains a discussion of how the number of topics was chosen.
 
 One notable limitation of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. However, in reality topics are often related.  For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. 
 
@@ -184,7 +188,7 @@ As such, we use the Correlated Topic Model (CTM) of @BleiLafferty2007 to obtain 
 
 The CTM output of interest is the proportion of each topic appearing in each document. The aim of this stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with many topics for each of the roughly 14,680 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
 
-One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of Hansard, the prime minister or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
+One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of our paper, the prime minister or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
 
 <!-- More specifically, consider a matrix of covariates. $X_d$, where each column relates to a different covariate or metadata aspect, and each row refers to a document. Then a cell has the value of each covariate for a particular document. Similar to the CTM, the STM assumes the topics within a document $\theta_d$ are a draw from a logistic Normal distribution with mean $\mu$. However, the STM framework assumes that the mean parameter is a linear function of covariates $X_d$: -->
 <!-- $$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma).$$ -->
@@ -257,17 +261,34 @@ Our main results are based on a topic model with 80 distinct topics. With almost
 LDA output defines a topic as a distribution of probabilities over words. In Table \@ref(tab:topwords) we display the ten words with the highest association for each of the 80 topics, but the topics are defined by probability distributions over all words. LDA does not apply labels to each topic, or collection of words, instead this has to be done by inspection. The topics cover areas such as budgets, demography, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Similar to when topic models are run using the parliamentary text records of other countries, there are also some topics that seem to be about procedural or day-to-day matters, such as Topics 7 or 9. As expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
 
 ```{r topwords, echo = FALSE, results = 'asis'}
+# 
+# top_words %>% 
+#   kable("latex", 
+#         booktabs = T, 
+#         longtable = TRUE, 
+#         caption = "The ten words most strongly associated with each topic"
+#         ) %>%
+#   kable_styling(font_size = 8, 
+#                 latex_options = c("repeat_header")
+#                 )
+```
 
-top_words %>% 
+
+```{r topwordscomp, echo = FALSE, results = 'asis'}
+
+top_words_comp %>% 
   kable("latex", 
         booktabs = T, 
         longtable = TRUE, 
         caption = "The ten words most strongly associated with each topic"
         ) %>%
-  kable_styling(font_size = 8, 
+  kable_styling(font_size = 7, 
                 latex_options = c("repeat_header")
                 )
 ```
+
+
+
 
 Figure \@ref(fig:exampletopics) illustrates the CTM output based on a sample from the Hansard. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time. The highlighted topics are those related to war and conflict. The two chambers of the Australian Federal Parliament appear to be similar at a broad scale.
 
@@ -285,6 +306,12 @@ knitr::include_graphics("../../figures/topics_examples_three.png", auto_pdf = FA
 The first panel of Figure \@ref(fig:threeexamples) is the second Menzies term. The dashed lines show the elections. While the results here abstract from differences based on topic mix, the shape of the distribution seems to be reasonably similar. Given 80 topics, it may be difficult to see differences in the topic mix manually, and so we would like for the analysis model to be able to suggest whether the mix is changing. The second panel shows the 1983 election, and the subsequent change from Fraser to Hawke on 11 March 1983, identified by a dotted line on that date. The distribution of topics seems less bunched after the change, but it is difficult to tell how different it is. We would like the analysis model to be able to distinguish between the two if they seem different. The third panel shows the first Rudd term. The important aspect to note is that the period after the 2007 election and the Rudd term contain essentially the same Hansard dates. The analysis model needs to be able to deal with this situation.
 
 Appendix \@ref(topicmodeleconresultsdiscussion) provides another example from the topic model results in the context of economic events.
+
+In the final column of Table \@ref(tab:topwords) we summarise the results of our 80-topic model using the categories of the Comparative Agendas Project (CAP), as summarised by @Bevan2017.\footnote{We use Version 1.0 of the Master Codebook, as at 31 July 2014 available at \url{http://sbevan.com/cap-master-codebook.html}.} We do this firstly, to assist other researchers in understanding our results, by trying to relate them to a a more well-known approach. We also do this because it allows us to further reduce our 80-topic model to only 21 topics.\footnote{Although the CAP Codebook topic numbering goes to 23, there are only 21 topics because there is no topic 11 or topic 22. Our 80 topics did not relate to CAP topics 21 or 23, meaning that we have 19 CAP-based categories.} It is these 19 CAP groupings to which we apply our analysis model.
+
+
+
+
 
 ## Analysis model
 
@@ -415,7 +442,7 @@ By bringing a new dataset of what was said in the Australian Federal Parliament 
 
 Using text as data allows us to conduct larger-scale analysis that would not be viable using less-automated approaches and so researchers may be able to identify associations and patterns that would otherwise have been overlooked. That said, the approach has well-known shortcomings and weaknesses, such as those documented by @GrimmerStewart2013. Because of these, our paper should be considered a complement to more detailed analysis such as qualitative methods and case studies. 
 
-An obvious weakness of topic models is that the number of topics needs to be specified but there is rarely a clear reason to choose some particular number. There are also more nuanced weaknesses to be aware of. For instance, the topics need to be interpreted. Some of our topics were not overly meaningful, especially on their own. Interpretation is especially difficult when the number of topics is large, but we found that a large number of topics worked best for our dataset. 
+One weakness of topic models is that the number of topics needs to be specified but there is rarely a clear reason to choose some particular number. There are also more nuanced weaknesses to be aware of. For instance, the topics need to be interpreted. Some of our topics were not overly meaningful, especially on their own. Interpretation is especially difficult when the number of topics is large, but we found that a large number of topics worked best for our dataset. 
 
 Although topic modelling is an unsupervised machine learning technique, the inputs require fine-tuning. For instance, selecting stop words for removal and which words to merge because of common co-location has an impact on the topics. Topic model outcomes are known to be sensitive to preprocessing [@DennySpirling2018] and ours was no exception. 
 
@@ -500,7 +527,7 @@ These counts of the number of sitting days are based on available PDFs. For this
 ## Annual counts of sitting days, compared with parliamentary website {#knownhansardissues}
 The parliamentary website provides a summary table of the number of sitting days in each year by chamber.[^parliamentarywebsitelink] Comparing the numbers provided in that table with number of days that we have provides an indication of how complete our dataset is.
 
-[^parliamentarywebsitelink]: As at 5 November, the website was available at: https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear. 
+[^parliamentarywebsitelink]: As at 5 November 2018, the website was available at: https://www.aph.gov.au/Parliamentary_Business/Statistics/Senate_StatsNet/General/sittingdaysyear. 
 
 In general the number of sitting days on the parliamentary website summary table is similar to the number of PDFs that we have although it does identify a few particularly concerning years (Figure \@ref(fig:differencesbyyear)).
 
@@ -649,7 +676,7 @@ The choice of the number of topics, *k*, drives the results and must be specifie
 
 The choice of the number of topics to use in a topic model has a substantial effect on the results of the model. For instance, in our topic model, choosing a smaller number of topics, such as 10 or 20 results in a model that is not all that useful because the topics are so broad.
 
-There are a variety of diagnostic measures that can guide the selection of the topics, but there is rarely an obvious best choice, especially at a finer level such as choosing between 60 and 65 topics. We found it useful to try a few quite different measures before settling on 80 topics. This provided a balance between being granular enough to be informative---anything less than 40 topics tended to be too broad---yet still being tractable for our analysis model in a reasonable amount of time. In addition to looking at the topics and how they changed over time, diagnostic measures that we considered include the held-out likelihood, the lower bound, residuals, exclusivity. and semantic coherence (Figures \@ref(fig:topicsdiagnostics)).[^Silgefootnote] 
+There are a variety of diagnostic measures that can guide the selection of the topics, but there is rarely a clear best choice, especially at a finer level such as choosing between 60 and 65 topics. We found it useful to try a few quite different measures before settling on 80 topics. This provided a balance between being granular enough to be informative---anything less than 40 topics tended to be too broad---yet still being tractable for our analysis model in a reasonable amount of time. In addition to looking at the topics and how they changed over time, diagnostic measures that we considered include the held-out likelihood, the lower bound, residuals, exclusivity. and semantic coherence (Figures \@ref(fig:topicsdiagnostics)).[^Silgefootnote] 
 
 [^Silgefootnote]: The code for creating the figures in this section is based on @Silge2018.
 

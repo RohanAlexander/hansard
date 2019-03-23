@@ -1,0 +1,81 @@
+Topic; Terms; CAP number; CAP name
+1; women, rights, marriage, human, discrimination, law, equal, community, society, support; 2; Civil Rights
+2; death, compensation, injury, estate, abolition, accident, injured, deaths, loss, died; 5; Labor
+3; constitution, parliament, power, powers, constitutional, referendum, convention, representatives, proposal; 20; Government Operations
+4; defence, forces, personnel, army, military, defence_force, equipment, base, aircraft, air; 16; Defense
+5; party, communist, matter, time, mckenna, communists, organization, country, position, henty; 2; Civil Rights
+6; vietnam, countries, south, china, united_states, world, aid, asia, country, foreign; 19; International Affairs
+7; petition, petitioners, citizens, pray, parliament, assembled, representatives, duty, bound, undersigned; 20; Government Operations
+8; sugar, industry, bounty, queensland, growers, production, fruit, cotton, ton, paid; 4; Agriculture
+9; na, senate, president, question, greens, time, committee, support, australians, country; 20; Government Operations
+10; service, public, board, officers, officer, department, salary, commissioner, appointment, salaries; 5; Labor
+11; senators, ill, time, gardiner, measure, western_australia, collings, position, read, leader; 20; Government Operations
+12; television, broadcasting, service, stations, radio, post, services, commercial, abc, telephone; 17; Technology
+13; senate, senators, chamber, representatives, representing, business, party, week, position, public; 20; Government Operations
+14; workers, employees, relations, industrial, employers, workplace, employment, employer, union, business; 5; Labor
+15; president, sympathy, public, word, world, personal, regret, presiding, standing, bias; 20; Government Operations
+16; commission, report, royal, royal_commission, inquiry, evidence, commissioner, commissions, body; 20; Government Operations
+17; tax, income, taxation, sales, treasurer, per_cent, pay, revenue, rate, taxes; 1; Macroeconomics
+18; fl, senate, question, greens, time, carbon, president, support, change, move; 7; Environment
+19; industrial, union, arbitration, workers, unions, trade, court, industry, conciliation, employers; 5; Labor
+20; matter, labor_party, question, debate, situation, time, organisation, lo, cavanagh, greenwood; 20; Government Operations
+21; department, matter, time, question, regard, money, expenditure, connection, business, information; 15; Domestic Commerce
+22; per_cent, ad, val, subitem, item, omitting, inserting, exceeding, duty, intermediate; 18; Foreign Trade
+23; court, law, high_court, justice, federal, courts, attorneygeneral, legal, judge, tribunal; 12; Law and Crime
+24; debate, time, labor_party, issue, deputy, political, question, matter, country, process; 20; Government Operations
+25; life, superannuation, fund, insurance, scheme, funds, national, contributions, retirement, age; 5; Labor
+26; security, iraq, support, detention, international, intelligence, time, world, australias, terrorism; 16; Defense
+27; education, schools, students, school, university, universities, training, student, funding, children; 6; Education
+28; war, production, country, matter, control, governments, industry, time, prices, services; 16; Defense
+29; health, medical, hospital, private, insurance, medicare, hospitals, scheme, services, public; 3; Health
+30; defence, military, naval, training, navy, forces, officers, time, force, service; 16; Defense
+31; matter, information, letter, department, evidence, document, documents, report, statement, office; 20; Government Operations
+32; british, great_britain, germany, empire, trade, country, canada, new_zealand, imperial, conference; 19; International Affairs
+33; committee, report, parliament, committees, public, parliamentary, recommendations, time, joint, inquiry; 20; Government Operations
+34; immigration, country, migration, migrants, citizenship, policy, immigrants, citizens, english, countries; 9; Immigration
+35; question, time, debate, standing_orders, matter, business, parliament, standing, chairman, chair; 20; Government Operations
+36; tasmania, queensland, western_australia, new_south_wales, south_australia, victoria, federal, south; 20; Government Operations
+37; rules, december, service, hon, association, january, november, october, july, june; 20; Government Operations
+38; housing, building, homes, home, capital, site, houses, new_south_wales, construction, canberra; 14; Housing
+39; question, department, answer, notice, provided, services, total, staff, nil, ii; 20; Government Operations
+40; shipping, ships, ship, vessels, line, trade, port, vessel, ports, sea; 18; Foreign Trade
+41; amendments, subsection, section, schedule, omit, item, line, substitute, person, title; 20; Government Operations
+42; prime_minister, party, country, leader, parliament, policy, opposite, political, time, election; 20; Government Operations
+43; aircraft, aviation, air, airport, airlines, transport, civil, qantas, airline, services; 10; Transportation
+44; duty, per_cent, item, duties, imported, committee, revenue, industry, article, manufacturers; 18; Foreign Trade
+45; main, electorate, million, committee, community, regional, services, per_cent, time, program; 20; Government Operations
+46; late, parliament, loss, time, lost, public, memorial, friend, passing, regret; 20; Government Operations
+47; report, senate, matter, democrats, governments, leave, per_cent, aboriginal, program, button; 20; Government Operations
+48; roads, road, water, railway, line, transport, construction, river, country, money; 10; Transportation
+49; development, time, service, national, programme, overseas, field, matter, department, country; 19; International Affairs
+50; world, nations, international, united_nations, countries, treaty, peace, japan, united_states, japanese; 19; International Affairs
+51; tariff, industry, trade, industries, board, customs, protection, country, duties, duty; 18; Foreign Trade
+52; pension, pensions, pensioners, week, social, age, benefits, service, services, repatriation; 5; Labor
+53; community, electorate, na, time, local, support, australians, day, ms, national; 20; Government Operations
+54; northern_territory, territory, regulations, regulation, parliament, council, governor_general, ordinance; 20; Government Operations
+55; ill, money, position, country, time, amount, financial, matter, treasurer, dr; 1; Macroeconomics
+56; environment, heritage, nsw, environmental, conservation, community, project, management, forest; 7; Environment
+57; energy, gas, nuclear, fuel, change, industry, emissions, power, climate, carbon; 8; Energy
+58; question, department, matter, answer, time, notice, information, report, questions, national; 20; Government Operations
+59; per_cent, budget, increase, economic, country, unemployment, economy, inflation, increased, time; 1; Macroeconomics
+60; care, aged, veterans, community, services, support, home, nursing, child_care, childcare; 3; Health
+61; bank, commonwealth_bank, banking, private, credit, money, savings, treasurer, board, trading; 15; Domestic Commerce
+62; research, tobacco, scientific, fishing, disease, quarantine, science, fisheries, health, fish; 4; Agriculture
+63; law, person, offence, criminal, police, crime, offences, evidence, penalty, attorneygeneral; 12; Law and Crime
+64; agreement, trade, local, grants, governments, council, development, financial, national, conference; 18; Foreign Trade
+65; democrats, issue, committee, question, time, million, pmi, report, issues, process; 20; Government Operations
+66; war, soldiers, service, country, returned, time, ill, forces, military, soldier; 16; Defense
+67; electoral, vote, election, voting, votes, system, party, electors, elections, candidates; 20; Government Operations
+68; land, settlement, property, lands, country, lease, leases, pastoral, money, acres; 4; Agriculture
+69; information, amendments, support, ensure, report, services, national, review, financial, provide; 20; Government Operations
+70; wheat, wool, growers, industry, farmers, board, prices, scheme, marketing, production; 4; Agriculture
+71; industry, export, meat, market, dairy, farmers, producers, levy, wine, rural; 18; Foreign Trade
+72; expenditure, loan, increase, revenue, amount, total, budget, money, financial, estimated; 1; Macroeconomics
+73; question, time, matter, desire, regard, learned, opinion, deal, position, party; 20; Government Operations
+74; budget, tax, billion, million, per_cent, business, economy, support, jobs, governments; 15; Domestic Commerce
+75; millen, senators, question, mcgregor, de, dobson, givens, lt, clemons, time; 20; Government Operations
+76; company, oil, companies, industry, coal, profits, capital, business, private, mining; 8; Energy
+77; per_cent, industry, tax, policy, time, governments, economic, system, program, national; 1; Macroeconomics
+78; clause, provision, section, proposed, agreed, committee, words, provisions, person, matter; 20; Government Operations
+79; aboriginal, per_cent, program, governments, commission, question, assistance, funds, development; 13; Social Welfare
+80; family, children, families, parents, income, welfare, time, poverty, allowance, parent; 13; Social Welfare
