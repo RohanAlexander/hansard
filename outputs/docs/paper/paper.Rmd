@@ -206,20 +206,20 @@ To overcome these challenges, we formalise a statistical framework that allows u
 Define $\theta_{cdp}$ to be the proportion of topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots, P = 80$ are equal to the estimated values of $\theta_{cd}$ from the CTM. We assume that the majority of variation in topics by day is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
 
 
-The topic proportions on day $d$ in chamber $c$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{c,d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{s[c,d],1:P}$:
+The topic proportions on day $d$ in chamber $c$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{c,d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{c,s[d],1:P}$:
 $$
-\theta_{c,d,1:P} \sim \mbox{Dirichlet}(\mu_{s[c,d],1:P})
+\theta_{c,d,1:P} \sim \mbox{Dirichlet}(\mu_{c,s[d],1:P})
 $$
-where the notation $s[c,d]$ refers to the sitting period $s$ to which day $d$ of chamber $c$ belongs. This distributional assumption accounts for the fact that on any given day in either chamber, the sum of all proportions in each topic must be one. 
+where the notation $s[d]$ refers to the sitting period $s$ to which day $d$ of chamber $c$ belongs. This distributional assumption accounts for the fact that on any given day in either chamber, the sum of all proportions in each topic must be one. 
 
-The goal of the model is to relate these proportions to the current prime minister $g$ and election period $e$, assuming that an 'election effect' would be at its peak in the days close to the election, then decay over the period. The mean parameters $\mu_{s,p}$ are modelled on the log scale as:
+The goal of the model is to relate these proportions to the current prime minister $g$ and election period $e$, assuming that an 'election effect' would be at its peak in the days close to the election, then decay over the period. The mean parameters $\mu_{c,s,p}$ are modelled on the log scale as:
 
 $$
-\log \mu_{s,p} = \alpha_{g[c,s],p} + \beta_{e[c,s],p} \cdot (N_{s[e]} - s) + \delta_{s[c],p}
+\log \mu_{c,s,p} = \alpha_{g[c,s],p} + \beta_{e[c,s],p} \cdot (N_{s[e]} - s) + \delta_{c,s,p}
 $$
-where: $\alpha_{g[c,s],p}$ is the mean effect for prime ministers $g$ (which covers sitting period $s$ in chamber $c$) and topic $p$; $\beta_{e[c,s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$, in chamber $c$) for topic $p$; $N_s$ is the total number of sitting periods in election period $e$; and $\delta_{s,p}$ is a random, or levels, effect for each sitting period and topic. 
+where: $\alpha_{g[c,s],p}$ is the mean effect for prime ministers $g$ (which covers sitting period $s$ in chamber $c$) and topic $p$; $\beta_{e[c,s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$, in chamber $c$) for topic $p$; $N_s$ is the total number of sitting periods in election period $e$; and $\delta_{c,s,p}$ is a random, or levels, effect for each chamber, sitting period and topic. 
 
-The term for the prime minister, $\alpha_{g[c,s],p}$, assumes there is some underlying mean effect of each prime minister on the topic distribution. We place uninformative priors on each of these parameters:
+The term for the prime minister, $\alpha_{g[c,s],p}$, assumes there is some underlying mean effect of each prime minister on the topic distribution that is common across chambers. We place uninformative priors on each of these parameters:
 $$
 \alpha_{g[c,s],p} \sim \mbox{Normal}(0, 100).
 $$
@@ -236,9 +236,9 @@ $$
 <!-- \beta_{p,k} \sim \mbox{Normal}(0, 100). -->
 <!-- $$ -->
 
-Finally, the sitting-period-specific random effect $\delta_{s[c],p}$ allows for the topic distributions in some sitting periods to be different than expected based on prime minister and election effects. This allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-prime-minister and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{s[c],p}$ values are modelled as:
+Finally, the sitting-period-specific random effect $\delta_{c,s,p}$ allows for chamber- and sitting-period specific deviations in the topic distributions. This allows us to identify periods where there may be differences in the topics discussed across the two chambers. It also allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-prime-minister and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{c,s,p}$ values are modelled as:
 $$
-\delta_{s,p} \sim \mbox{Normal}(0, \sigma_{g[c,s],p}^2).
+\delta_{c,s,p} \sim \mbox{Normal}(0, \sigma_{g[c,s],p}^2).
 $$
 
 The variance parameters $\sigma_{g[c,s],p}^2$ give an indication of the how the variation in topics is changing over government periods. If the estimates of the variance are larger, then there is more variation in the topics discussed within a government period. Non-informative priors are placed on the variance parameters:
