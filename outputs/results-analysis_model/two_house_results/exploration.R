@@ -51,3 +51,43 @@ delta_hor %>%
   geom_smooth(span = 0.3, se = TRUE) + 
   ylab("difference between HoR and Senate") + xlab("date")
 ggsave("outputs/results-analysis_model/two_house_results/diff_hor_senate.pdf", width = 9, height = 6)
+
+
+y_hor %>%
+  mutate(chamber="hor") %>% 
+  #bind_rows(y_senate %>% mutate(chamber = "senate")) %>% 
+  mutate(topic = topics[topic]) %>% 
+  mutate(gamma_out = gamma>upper) %>% 
+  filter(gamma_out==TRUE) %>% 
+  filter(topic %in% c(1,2,7,13,15,16,18,19)) %>% 
+  mutate(mult = gamma/median) %>% 
+  filter(mult>15) %>% 
+  filter(gamma>0.5, median>0.03) %>% 
+  arrange(dt, topic, mult) %>% 
+  select(sitting, dt, topic, mult) %>% 
+  write_csv("outputs/results-analysis_model/two_house_results/outliers.csv")
+
+
+
+
+alpha_hor %>% 
+  mutate(chamber = "hor") %>% 
+  bind_rows(alpha_senate %>% mutate(chamber = "senate")) %>% 
+  left_join(sitting_dates) %>% 
+  filter(topic == 15, chamber=="hor") %>% 
+  ggplot(aes(dt, median)) + 
+  geom_line(aes(color = chamber)) + 
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = chamber), alpha = 0.2) + 
+  facet_wrap(~topic)
+
+y_hor %>% 
+  filter(topic==15) %>% 
+  ggplot(aes(dt, gamma)) + 
+  geom_line(alpha = 0.7, aes(color = "data")) + 
+  geom_line(aes(dt, median, color = "fitted")) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "red") +
+  scale_color_manual(name = "", values = c("data" = "black", "fitted" = "red")) +
+  theme_minimal() + 
+  xlab("date") + ylab("proportion") 
+ggsave("outputs/results-analysis_model/two_house_results/defense_topic_fitted_data.pdf", width = 8, height = 5)
+  
