@@ -83,11 +83,15 @@ alpha_hor %>%
 y_hor %>% 
   filter(topic==15) %>% 
   ggplot(aes(dt, gamma)) + 
-  geom_line(alpha = 0.7, aes(color = "data")) + 
+  geom_point(alpha = 0.7, aes(color = "data")) + 
   geom_line(aes(dt, median, color = "fitted")) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "red") +
-  scale_color_manual(name = "", values = c("data" = "black", "fitted" = "red")) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+  # scale_color_manual(name = "", values = c("data" = "black", "fitted" = "red")) +
+  scale_color_viridis_d() +
   theme_minimal() + 
-  xlab("date") + ylab("proportion") 
+  labs(x = "Date",
+       y = "Gamma",
+       color = "Type")
+  # xlab("date") + ylab("proportion") 
 ggsave("outputs/results-analysis_model/two_house_results/defense_topic_fitted_data.pdf", width = 8, height = 5)
   

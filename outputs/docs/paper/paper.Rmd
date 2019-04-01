@@ -7,8 +7,8 @@ output:
     number_sections: true
     latex_engine: pdflatex
     template: svm-latex-ms.tex
-title: "The Effect of Elections and Prime Ministers on Discussion in the Australian Federal Parliament (1901--2018)"
-thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, the UofT Political Behavior Group, and the 2019 PSA Political Methodology Conference. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
+title: "The Increased Effect of Elections and Prime Ministers on Discussion in the Australian Federal Parliament between 1901 and 2018"
+thanks: "Thank you to Chris Cochrane, Dan Simpson, Jill Sheppard, John McAndrews, John Tang, Leslie Root, Martine Mariotti, Matt Jacob, Matthew Kerby, Myles Clark, Ruth Howlett, Tianyi Wang, Tim Hatton, and Zach Ward for their helpful suggestions; and to the UC Berkeley Demography Department for the use of their computing resources. We are grateful for the many excellent comments that we received from seminar participants at the ANU SPIR, the ANU RSE, the Australian Parliamentary Library, the Max Planck Institute for Demographic Research, the U of T Political Behavior Group, and the 2019 PSA Political Methodology Conference. The code and data for this paper is available at: https://github.com/RohanAlexander/hansard. Comments and suggestions on the `r format(Sys.time(), '%d %B %Y')` version of this paper welcome at: rohan.alexander@anu.edu.au."
 author:
 - name: Rohan Alexander
   affiliation: Australian National University
@@ -100,7 +100,7 @@ key_events_results <-
 key_events_results_cols <-
   read_csv("../../../outputs/results-analysis_model/results-outliers_in_columns.csv", col_types = cols())
   
-names(key_events_results_cols) <- c("Dates", "", "", "", "", "", "", "")
+names(key_events_results_cols) <- c("Dates", "", "", "", "", "")
 
 ```
 
@@ -112,9 +112,9 @@ Events are a well-known cause of political behaviour. But their effect is varied
 
 The main data source for our paper is the text record, known as 'Hansard', of what was said in the Australian Federal Parliament. From this we create a dataset based on the sitting days from 1901 through to 2018. We have records for 7,934 days in the House of Representatives (lower house) and 6,746 days in the Senate (upper house). In contrast to the US, but similar to Canada and the UK, in Australia the executive is drawn from the legislature, and the prime minister typically sits in the lower house. Unlike Canada or the UK, both houses are elected, although each has different mechanisms and constituencies. Our dataset consists of counts of every word that occurs at least thrice, after we convert all words to lower-case; remove names, numbers, and punctuation; join commonly co-located words; and remove stop words.
 
-We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in prime minister and elections. After taking these effects into consideration, we then explore other significant events.
+We systematically analyse the text in two stages, each of which takes advantage of a different statistical technique. First, to reduce the dimensionality of our dataset we use a topic model that allows correlation between topics, and then further reduce those topics to match the Comparative Agendas Project. Second, we analyse those topics using a Bayesian hierarchical Dirichlet model to examine changes at various types of events. We explicitly consider two types of events: changes in prime minister and elections. 
 
-We find that: firstly, changes in prime minister tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1922, Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Whitlam in 1972, Fraser in 1975, Hawke in 1983, Howard in 1996, Rudd in 2007, and Abbott in 2013 are associated with topic changes, but the 1974 Whitlam, 1980 Fraser, and the 1998 and 2004 Howard re-elections, stand out as elections where the prime minister did not change but there was a significant change in topics. 
+We find that: firstly, changes in prime minister tend be associated with topic changes even when the party in power does not change. For instance, the change from Hughes to Bruce in 1923, Forde to Chifley in 1945; Menzies to Holt in 1966; Hawke to Keating in 1991; and Rudd to Gillard in 2010 are all associated with significant changes in topics despite no change in the party in power. Secondly, as expected, elections where the party in power also changes, such as Fisher in 1910 and 1914, Menzies in 1949, Hawke in 1983, and Howard in 1996 are associated with topic changes, but the 1974 Whitlam, and 1984 Hawke re-elections stand out as elections where the prime minister did not change but there was a significant change in topics. 
 
 As our dataset covers 118 years we are able to see how the effect of these two types of events changes over time. We find that in Australia the effect of elections and a change in prime minister appear to have become more pronounced since the 1980s. With a small number of exceptions, in the first half of our dataset, even changes in prime minister where the party in power also changed were not associated with overly large changes in the topics of parliamentary discussion. It may be that more recent prime ministers are trying to more thoroughly distinguish themselves from their predecessor, or that the role of the government in agenda setting in the Australian Federal Parliament has changed.
 
@@ -147,15 +147,15 @@ Parts of Australian Hansard records have been analysed for various purposes and 
 
 The Australian Federal Parliament makes daily Hansard records available online as PDFs and these are considered the official release. Although we do not use them here, XML records are also available in most cases.[^XMLfootnote] We provide an example of a Hansard PDF page in Appendix \@ref(examplehansardpage). There are 14,680 days of publicly available Hansard records across the two chambers of the Australian Federal Parliament for which we have PDFs and further summary statistics for this are provided in Appendix \@ref(hansardsummarystatistics). Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues).
 
-[^XMLfootnote]: Tim Sherratt makes Commonwealth XML records for 1901 to 1980 available as a single download at: http://historichansard.net/. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website or the website can be scraped. We do not use the XML records or scrape the website because those records are known to be incomplete but the extent of how incomplete they are is unknown. The trade-off for a more-complete record is the errors introduced by having to parse the PDFs.
+[^XMLfootnote]: Tim Sherratt makes Commonwealth XML records for 1901 to 1980 available as a single download at: http://historichansard.net/. Commonwealth XML records from 1998 to 2014 are available from Andrew Turpin’s website, and from 2006 through to today from Open Australia’s website. The records can also be downloaded from the Australian Hansard website or the website can be scraped. We do not use the XML records or scrape the website for this paper because those records are known to be incomplete but the extent of how incomplete they are is unknown. The trade-off for a more-complete record is the errors introduced by having to parse the PDFs.
 
-We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R [@R2018] to convert the PDFs into daily text records.[^scriptsfootnote] Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate, especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified.
+We use the official PDF release and the formatting of the Hansard records changes over time. We use scripts written in R [@R2018] to convert the PDFs into daily text records.[^scriptsfootnote] Some error is introduced at this stage because many of the records are in a two-column format that need to be separated, and the PDF parsing is not always accurate, especially for older records. An example of the latter issue is that 'the' is often parsed as 'thc'. These errors are corrected when they can be identified, but as there are almost a billion words in the dataset, we are restricted to changes that can be made at scale.
 
-[^scriptsfootnote]: The exact scripts that we use are available on request or via the GitHub repository for this paper. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
+[^scriptsfootnote]: Our code and data are available on request or via the GitHub repository for this paper: https://github.com/RohanAlexander/hansard. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
 
-The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This suggests that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper, and we pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. Then the sentences are de-constructed and each word considered individually. We do not stem the words because, following @SchofieldMimno2016, we were not able to see much appreciable benefit. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote] 
+The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This suggests that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. We use Hansard records on a daily basis in this paper, and we pre-process our text before applying a topic model. The specific steps that we take are to: remove numbers and punctuation; change the words to lower case; and concatenate multi-word names titles and phrases, such as new south wales to new_south_wales. Then the sentences are de-constructed and each word considered individually. We do not stem the words because, following @SchofieldMimno2016, we were not able to see much appreciable benefit. The resulting dataset used for analysis contains counts of words by day for 14,680 sitting days between 1901 and 2018.[^datasourcefootnote]
 
-[^datasourcefootnote]: Our dataset is available at: https://github.com/RohanAlexander/hansardr. While we are making our data public in an attempt to help other researchers, we cleaned the dataset toward the requirements of this paper. If you have different requirements or have suggestions for how we can improve the dataset for other uses please contact us.
+[^datasourcefootnote]: Our dataset is available at: https://github.com/RohanAlexander/hansard. While we are making our data public in an attempt to help other researchers, we cleaned the dataset toward the requirements of this paper. If you have different requirements or have suggestions for how we can improve the dataset for other uses please contact us.
 
 
 
@@ -165,16 +165,16 @@ The percentage of stop-words each day is reasonably consistent over time (see Ap
 
 The goal of our modelling strategy is twofold. Firstly, we want to use topic modelling [@Blei2003latent] to summarise the Hansard text into meaningful topics that reduce the dimensionality of the text data and capture the main themes discussed in parliament over time. Secondly, we want to relate the resulting topic distributions to temporal trends, changes, and events, such as a change in prime minister, elections, and other external events.  The output of the first stage is the input to the second stage.
 
-We first use a Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time. We consider these topic distributions as inputs that can be analysed by another model. Thus, the second modelling step involves using a Bayesian hierarchical Dirichlet model to analyse changes in the topic distributions (obtained from the first step) in relation to events of interest. 
+We first use a Correlated Topic Model (CTM) [@BleiLafferty2007] to obtain estimated topic distributions over time, and then further group these topics to match those of the Comparative Agendas Project. We consider these topic distributions as inputs that can be analysed by another model. Thus, the second modelling step involves using a Bayesian hierarchical Dirichlet model to analyse changes in the topic distributions (obtained from the first step) in relation to events of interest. 
 
 In the following section, we briefly describe the topic modelling approach, before discussing the Bayesian hierarchical Dirichlet analysis model used to investigate changes in topics. Background detail on topic modelling is available in Appendix \@ref(LDAexample).
 
 ## Overview of topic modelling
 Although more- or less-fine levels of analysis are possible, here we are primarily interested in considering a day's topics. This means that each day's Hansard record needs to be classified by its topics. Sometimes Hansard records includes titles that make the topic clear. But not every statement has a title and the titles do not always define topics in a well-defined and consistent way, especially over longer time periods. 
 
-Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addressed this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. @AshMorelliOsnabru2018 combined the best of both in the context of the New Zealand Hansard, using a supervised machine learning approach that would likly be beneficial in the Australian Hansard case as well. 
+Other work such as @BaumgartnerJones1993 and @DowdingHindmoor2010 addressed this problem by creating a standardised codebook of policy categories and sub-categories and then manually assigning text to topics as appropriate. This approach ensures the categorisation is reasonable but as it is a manual process the size of the text that can be categorised is limited. @AshMorelliOsnabru2018 combined the best of both in the context of the New Zealand Hansard, using a supervised machine learning approach that would likely be beneficial in the Australian Hansard case as well. 
 
-In order to effectively categorise the topics of the entire Hansard, we use topic modelling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent. One advantage of using the Dirichlet distribution is that it formalises the idea that there is a trade-off in what is talked about in parliament given the limited time. A multinomial approach would not have this property.
+In order to effectively categorise the topics of the entire Hansard, we use topic modelling, a statistical technique which aims to extract the underlying or latent 'topics' from a collection of texts. In particular, we use a method which is similar to Latent Dirichlet Allocation (LDA), first developed by @Blei2003latent. One advantage of using the Dirichlet distribution is that it formalises the idea that there is a trade-off in what is talked about in parliament given the limited time. A multinomial approach would not necessarily have this property.
 
 The key assumption behind LDA is that each day's text, 'a document', in Hansard is made by speakers who decide the topics they would like to talk about in that document, and then choose words, 'terms', that are appropriate to those topics. A topic could be thought of as a collection of terms, and a document as a collection of topics, where these collections are defined by probability distributions. The topics are not specified *ex ante*; they are an outcome of the method, and it is in this sense that this approach can be considered unsupervised machine learning. Terms are not necessarily unique to a particular topic, and a document could be about more than one topic. The goal is to have the words found in each day's Hansard group themselves to define topics. This can provide more flexibility than other approaches such as a strict word count method, but can require a larger dataset and make interpretation more difficult.
 
@@ -182,11 +182,11 @@ An overview, and an example, of how topic modelling works is available in Append
 
 One notable limitation of LDA is that the model assumes that the presence of one topic is not correlated with the presence of another topic. However, in reality topics are often related.  For instance, in the Hansard context, we may expect topics related to the army to be more commonly found with topics related to the navy, but less commonly with topics related to banking. 
 
-As such, we use the Correlated Topic Model (CTM) of @BleiLafferty2007 to obtain topic distributions. The CTM is a modification of LDA that allows for correlations between topics. More detail about the CTM is in Appendix \@ref(correlatedtopicmodelsection).
+As such, we use the Correlated Topic Model (CTM) of @BleiLafferty2007 to obtain topic distributions. The CTM is a modification of LDA that allows for correlations between topics. More detail about the CTM is in Appendix \@ref(correlatedtopicmodelsection). There are various methods to help determine the appropriate number of topics to specify, and we further discuss the implications given our setting later in the paper. However the main implication is that the optimal number of topics was too large to be tractable by our analysis model, and too large to be easily visualised or examined. For this reason we manually group the topics identified by the CTM into those of the Comparative Agendas Project. It is these proportions that we use as an input to our analysis model.
 
 ## Analysis model  {#analysismodelexplanation}
 
-The CTM output of interest is the proportion of each topic appearing in each document. The aim of this stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with many topics for each of the roughly 14,680 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
+The output of interest from the topic modelling stage, is the proportion of each topic appearing in each document. The aim of the analysis stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with many topics for each of the roughly 14,680 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
 
 One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of our paper, the prime minister or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
 
@@ -203,7 +203,7 @@ However, the STM covariate framework has several limitations in terms of our goa
 
 To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
 
-Define $\theta_{cdp}$ to be the proportion of topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots, P = 80$ are equal to the estimated values of $\theta_{cd}$ from the CTM. We assume that the majority of variation in topics by day is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
+Define $\theta_{cdp}$ to be the proportion of topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots, P = 19$ are equal to the estimated values of $\theta_{cd}$ from the CTM after we group them into the Comparative Agendas Project topics. We assume that the majority of variation in topics by day is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
 
 
 The topic proportions on day $d$ in chamber $c$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{c,d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{c,s[d],1:P}$:
@@ -213,7 +213,6 @@ $$
 where the notation $s[d]$ refers to the sitting period $s$ to which day $d$ of chamber $c$ belongs. This distributional assumption accounts for the fact that on any given day in either chamber, the sum of all proportions in each topic must be one. 
 
 The goal of the model is to relate these proportions to the current prime minister $g$ and election period $e$, assuming that an 'election effect' would be at its peak in the days close to the election, then decay over the period. The mean parameters $\mu_{c,s,p}$ are modelled on the log scale as:
-
 $$
 \log \mu_{c,s,p} = \alpha_{g[c,s],p} + \beta_{e[c,s],p} \cdot (N_{s[e]} - s) + \delta_{c,s,p}
 $$
@@ -251,14 +250,14 @@ We run the model in JAGS using the \texttt{rjags} package of @Plummer2018.
 
 # Results
 
-Firstly, we describe the results of the CTM approach, which defined 80 topics over the period 1901 to 2018. We then describe the results of the Bayesian analysis model, which identified prime ministers, elections and other events that were associated with a change in the topics discussed. 
+Firstly, we describe the results of the CTM approach, which defined 80 topics over the period 1901 to 2018, and which we then further reduced to match the Comparative Agendas Project. We then describe the results of the Bayesian analysis model, which identified prime ministers, elections and other events that were associated with a change in the topics discussed. 
 
 ## Topic modelling
 We applied the CTM approach discussed in Appendix \@ref(correlatedtopicmodelsection) on the processed Hansard text database outlined in Section \@ref(hansarddata). The main output of interest are the types of topics identified by the model, and the prevalence of each topic for each day of parliamentary discussion. 
 
 Our main results are based on a topic model with 80 distinct topics. With almost 15,000 days and 80 topics, the analysis model is being fit to more than a million observations. The choice of 80 topics was made as a trade-off between standard diagnostic tests that suggested a larger number of topics would be more appropriate, and the need for the analysis model to be tractable. Those diagnostic tests are detailed in Appendix \@ref(selecttopicnumber). 
 
-LDA output defines a topic as a distribution of probabilities over words. In Table \@ref(tab:topwords) we display the ten words with the highest association for each of the 80 topics, but the topics are defined by probability distributions over all words. LDA does not apply labels to each topic, or collection of words, instead this has to be done by inspection. The topics cover areas such as budgets, demography, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Similar to when topic models are run using the parliamentary text records of other countries, there are also some topics that seem to be about procedural or day-to-day matters, such as Topics 7 or 9. As expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
+LDA output defines a topic as a distribution of probabilities over words. In Table \@ref(tab:topwordscomp) we display the ten words with the highest association for each of the 80 topics, but the topics are defined by probability distributions over all words. LDA does not apply labels to each topic, or collection of words, instead this has to be done by inspection. The topics cover areas such as budgets, demography, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Similar to when topic models are run using the parliamentary text records of other countries, there are also some topics that seem to be about procedural or day-to-day matters, such as Topics 7 or 9. As expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
 
 ```{r topwords, echo = FALSE, results = 'asis'}
 # 
@@ -307,7 +306,7 @@ The first panel of Figure \@ref(fig:threeexamples) is the second Menzies term. T
 
 Appendix \@ref(topicmodeleconresultsdiscussion) provides another example from the topic model results in the context of economic events.
 
-In the final column of Table \@ref(tab:topwords) we summarise the results of our 80-topic model using the categories of the Comparative Agendas Project (CAP), as summarised by @Bevan2017.\footnote{We use Version 1.0 of the Master Codebook, as at 31 July 2014 available at \url{http://sbevan.com/cap-master-codebook.html}.} We do this firstly, to assist other researchers in understanding our results, by trying to relate them to a a more well-known approach. We also do this because it allows us to further reduce our 80-topic model to only 21 topics.\footnote{Although the CAP Codebook topic numbering goes to 23, there are only 21 topics because there is no topic 11 or topic 22. Our 80 topics did not relate to CAP topics 21 or 23, meaning that we have 19 CAP-based categories.} It is these 19 CAP groupings to which we apply our analysis model.
+In the final column of Table \@ref(tab:topwordscomp) we summarise the results of our 80-topic model using the categories of the Comparative Agendas Project (CAP), as summarised by @Bevan2017.\footnote{We use Version 1.0 of the Master Codebook, as at 31 July 2014 available at \url{http://sbevan.com/cap-master-codebook.html}.} We do this firstly, to assist other researchers in understanding our results, by trying to relate them to a more well-known approach. We also do this because it allows us to further reduce our 80-topic model to only 21 topics.\footnote{Although the CAP Codebook topic numbering goes to 23, there are only 21 topics because there is no topic 11 or topic 22. Our 80 topics did not relate to CAP topics 21 or 23, meaning that we have 19 CAP-based categories.} It is these 19 CAP groupings to which we apply our analysis model.
 
 
 
@@ -317,12 +316,12 @@ In the final column of Table \@ref(tab:topwords) we summarise the results of our
 
 ### Main results
 
-We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. As discussed in Section \@ref(analysismodelexplanation), the modelling process takes the topic proportions estimated by the CTM, and examines the association between these topic distributions and outside events. That is, the topic model outputs are inputs for our analysis model.
+We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. As discussed in Section \@ref(analysismodelexplanation), the modelling process takes the topic proportions estimated by the CTM and reduced to the Comparative Agendas Project, and examines the association between these topic distributions and outside events. That is, the topic groupings are inputs for our analysis model.
 
-There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by prime ministers or elections tend not to provide enough variability. For instance, examining Topics 4, 26, 28, 30 and 66, which have to do with war and conflict illustrates Australia's involvement in World War I, World War II, the Korean War, the Vietnam War, the First Gulf War, the War in Afghanistan and the Second Gulf War (Figure \@ref(fig:wartopicsgraph)). 
+There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by prime ministers or elections tend not to provide enough variability. For instance, examining topics that have to do with war and conflict illustrates discussions of Australia's military involvement (Figure \@ref(fig:wartopicsgraph)). 
 
 ```{r wartopicsgraph, cache = TRUE, echo = FALSE, fig.cap = "Model estimates of topic prevalance by sitting period for those related to war and conflict", out.width = '100%'}
-knitr::include_graphics("../../figures/war_stack.pdf")
+knitr::include_graphics("../../results-analysis_model/two_house_results/defense_topic_fitted_data.pdf")
 ```
 
 One of the main goals of the analysis model is to see which elections and changes of prime minister are associated with changes in the prevalence of topics over time. By way of background, as Australia has a parliamentary system it is possible for the prime minister to change without an election and we do not distinguish between terms or cabinet composition although this more-detailed analysis is possible. If a person was prime minister more than once then these periods are considered independently. 
@@ -359,13 +358,13 @@ elections_results %>%
 
 In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate significant differences between prime ministers and elections, respectively. In the graphs, the points show the estimated value of $\alpha_g$ and $\alpha_e$, respectively, for each of the topics specified. The error bars represent 95 per cent Bayesian credible intervals. As there are 80 topics it would be unwieldy to show all of them, and so we have again focused on Topics 4, 26, 28, 30 and 66 here which have to do with war and conflict. 
 
-```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "Level effects for prime ministers by selected topics.", out.width = '100%'}
-knitr::include_graphics("../../figures/mu_gov.pdf")
+```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "Level effects for prime ministers by selected topics.", out.width = '90%'}
+knitr::include_graphics("../../results-analysis_model/two_house_results/mu_gov_big_topics")
 ```
 
 
-```{r muelection, cache = TRUE, echo = FALSE, fig.cap = "Level effects for election periods by selected topics", out.width = '100%'}
-knitr::include_graphics("../../figures/mu_election.pdf")
+```{r muelection, cache = TRUE, echo = FALSE, fig.cap = "Level effects for election periods by selected topics", out.width = '90%'}
+knitr::include_graphics("../../results-analysis_model/two_house_results/mu_election_big_topics.pdf")
 ```
 
 
@@ -379,21 +378,21 @@ Once prime minister and election effects have been taken into consideration, som
 
 To do this we estimate sitting-period level-effects (essentially a mean for each topic by sitting period). The difference between this mean distribution and a particular day's topic distribution defines a measure that can be thought of as essentially a residual which allows us to identify outlying days. This approach means that the model generates dates that are interesting without us having to specify interesting dates. More specifically, we define a day to be 'outlying' or 'different-to-expected' if the topic distribution on that particular day is more than three standard deviations different to the mean topic distribution for the relevant sitting period. 
 
-<!-- Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week. -->
+Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week.
 
 
-<!-- ```{r keyeventsresultstable, echo = FALSE, results = 'asis'} -->
+```{r keyeventsresultstable, echo = FALSE, results = 'asis'}
 
-<!-- key_events_results_cols %>% -->
-<!--   kable(booktabs = T, caption = "Days that were significantly different to other days in their sitting period") %>% -->
-<!--   kable_styling(font_size = 10) %>%  -->
-<!--   footnote( -->
-<!--     general = "These days were significantly different to others in their sitting period after taking election and prime minister effects into consideration.",  -->
-<!--     footnote_as_chunk = T,  -->
-<!--     threeparttable = TRUE) -->
+key_events_results_cols %>%
+  kable(booktabs = T, caption = "Days that were significantly different to other days in their sitting period") %>%
+  kable_styling(font_size = 10) %>%
+  footnote(
+    general = "These days were significantly different to others in their sitting period after taking election and prime minister effects into consideration.",
+    footnote_as_chunk = T,
+    threeparttable = TRUE)
 
 
-<!-- ``` -->
+```
 
 
 
@@ -413,17 +412,19 @@ To do this we estimate sitting-period level-effects (essentially a mean for each
 
 <!-- **[Needs more.]** -->
 
-Of the 36 prime ministers over this period, we find that 20 of them are significantly different to the prime minister that preceded them. However, four of these results -- the significance of the Page term, the first Menzies term, the Chifley term and the Abbott term -- are likely due to the short length of either the prime minister or the predecessor and should be ignored, leaving only 16. The earliest of these are the first Fisher term, the Cook term and the third Fisher term, which were different to the second Deakin term, the second Fisher term, and the Cook term, respectively. To a certain extent this is likely due to changes due to World War I.
+Of the 36 prime ministers over this period, we find that 17 of them were significantly different to the prime minister that preceded them, after we account for and remove some that had especially short terms. The three earliest of them occur in the first decade after Federation, and to a certain extent this may be due to the variety of the issues that had to be addressed in those initial years. Joseph Cook's time as prime minister is found to be significantly different to that of his predecessor, Andrew Fisher, although it may be that this is due to World War I.
 
 The second Menzies term, beginning in 1949, is the next government that is significantly different to its predecessor. The other governments that are different are concentrated in the second half of our sample, with three of them being in the past twenty years. Similarly, of the 45 general elections that have been held we find that 14 of them define periods that were significantly different to their immediate predecessor. 1974, 1980, 1990, 1998, 2004, and 2007 stand out as elections where the government did not change, but the model suggests there was considerable change in the topics discussed in parliament.
 
 The second Menzies term was associated with a variety of changes compared with the preceding Chifley Government. Chifley had governed through the end of World War II and the difficult economic times that followed. There was also a large increase in the number of seats in the House of Representatives at the 1949 election. Many new politicians entered parliament, and this changed representation may also have been partly to do with the changed distribution of discussion topics, although further investigation of this is left for future work. The sixteen-year length of the second Menzies term, and better economic conditions over this time make it understandable why parliamentary discussion would have been different. There were six elections within the second Menzies term. Three toward the middle of that government were associated with significant changes in the topics discussed. 
 
-Menzies was succeeded  Holt in January 1966. This is an example where there was a change in prime minister without an election, as the next election only happened in November 1966. We find that Holt is different to Menzies. In Figures \@ref(fig:muelectionall) we compare the topics during Menzies' final term with the topics of Holt.
+Menzies was succeeded  Holt in January 1966. This is an example where there was a change in prime minister without an election, as the next election only happened in November 1966. We find that Holt is different to Menzies. 
 
-```{r muelectionall, cache = TRUE, echo = FALSE, fig.cap = "Differences between various elections", out.width = '100%'}
-knitr::include_graphics("../../figures/mu_election-differences.pdf")
-```
+<!-- In Figures \@ref(fig:muelectionall) we compare the topics during Menzies' final term with the topics of Holt. -->
+
+<!-- ```{r muelectionall, cache = TRUE, echo = FALSE, fig.cap = "Differences between various elections", out.width = '100%'} -->
+<!-- knitr::include_graphics("../../figures/mu_election-differences.pdf") -->
+<!-- ``` -->
 
 Whitlam's term is especially interesting as we find a difference in the topics after he was first elected in December 1972, compared with his second election win in May 1974. Figure \@ref(fig:muelectionall) compares the topics that are significant before and after the election.
 
@@ -431,7 +432,7 @@ Howard is also interesting because of the significant differences between electi
 
 To a certain extent the change after the November 2001 election is expected because of the 9/11 terrorist attacks that had only occurred two months earlier, the Bali Bombings that occurred in October 2002, and the dramatic increase in the discussion related to terrorism and conflict over these years. However, the change in 1998 and 2004 is more unexpected. Although Howard is the second-longest serving prime minister and commonly thought of as a period of stability because the senior ministers were consistent as well, it might be that it is better to think of Howard as a combination of three or four different periods and that Howard reinvented itself over this period.
 
-One advantage of our analysis model compared with using the STM approach is that we can create a measure that is equivalent to testing for outliers in a model where the underlying variables were not latent. The results of this reduction in supervision are promising, but suggest the specifics of our process may need further refinement. For instance, our approach appropriately identifies the sitting day that first follows 11 September 2001 and 12 October 2002, which were the dates of the 9/11 Attacks and Bali Bombings respectively. But there are many dates that we would have expected to be identified that were not, and similarly some of the dates that were identified are surprising. When we examine this we find that some of them, such as 4 February 2009, are associated with significant legislation. However the over-weighting of dates in the first half of our sample in Table \@ref(tab:keyeventsresultstable) highlights further work is needed to improve this approach. For instance, our approach may not be appropriately considering step-changes or it may be that our identification of sitting periods is not appropriate for the entire period.
+One advantage of our analysis model compared with using the STM approach is that we can create a measure that is equivalent to testing for outliers in a model where the underlying variables were not latent. The results of this reduction in supervision are promising, but suggest the specifics of our process may need further refinement. For instance, our approach appropriately identifies the sitting day that first follows 11 September 2001. But there are many dates that we would have expected to be identified that were not, and similarly some of the dates that were identified are surprising. When we examine this we find that some of them are associated with significant legislation. Although our results are not overly over-weighted in the first half of our sample, there is a substantial gap between 1965 and 1991. Table \@ref(tab:keyeventsresultstable) highlights further work is needed to improve this approach. For instance, it may be that our approach is not appropriately considering step-changes or it may be that our identification of sitting periods is not appropriate for the entire period, given the changed sitting pattern that we identify.
 
 
 
