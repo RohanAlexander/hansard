@@ -165,7 +165,7 @@ These steps were performed using R [@R2018].[^scriptsfootnote] Some error is int
 
 [^scriptsfootnote]: Our code and data are available on request or via the GitHub repository for this paper: https://github.com/RohanAlexander/hansard. The scripts are primarily based on: the \texttt{PDFtools} R package of @Ooms2018pdftools; the \texttt{tidyverse} R package of @Wickham2017; the \texttt{tm} R package of @FeinererHornik2018; the \texttt{lubridate} R package of @GrolemundWickham2011; the \texttt{tidytext} R package of @SilgeRobinson2016; and the \texttt{stringi} R package of @Gagolewski2018. The functions of those packages are augmented by: the \texttt{furrr} R package of @VaughanDancho2018; and the \texttt{tictoc} R package of @Izrailev2014. The \texttt{hunspell} R package of @Ooms2017 is used to help find spelling issues; and the \texttt{quanteda} R package of @Benoit2018 is used to compound multiword expressions. 
 
-There are 14,680 days of publicly available Hansard records across the two chambers of the Australian Federal Parliament for which we have PDFs. Further summary statistics for this are provided in Appendix \@ref(hansardsummarystatistics). In general, the frequency of sitting days based on information from the Hansard dataset compared to the actual number of sitting days is comparable, almost complete coverage of our dataset. XX MAYBE pull out a few more summary stats here XX
+There are 14,680 days of publicly available Hansard records across the two chambers of the Australian Federal Parliament for which we have PDFs. Further summary statistics for this are provided in Appendix \@ref(hansardsummarystatistics). In general, the frequency of sitting days based on information from the Hansard dataset compared to the actual number of sitting days is comparable, almost complete coverage of our dataset. XX MAYBE PULL OUT MORE SUMMARY STATS IN PARTICULAR HIGHLIGHT THE TWO CHAMBERS XX
 
 Our data cleaning process indicates concerns with a small number of PDFs and these are detailed in Appendix \@ref(knownhansardissues). The percentage of stop-words each day is reasonably consistent over time (see Appendix \@ref(stopwordsgraph)). This suggests that the data are fit-for-purpose, although manual inspection does suggest there is some improvement in quality over time. 
 
@@ -210,9 +210,9 @@ For this reason we manually group the topics identified by the CTM into those of
 
 ## Analysis model  {#analysismodelexplanation}
 
-The output of interest from the topic modelling stage, is the proportion of each topic appearing in each document. The aim of the analysis stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with many topics for each of the roughly 14,680 chamber-sitting-days the data are still too noisy to easily visualise changes around events.
+The output of interest from the topic modelling stage is the proportion of each topic appearing in each document. The aim of the analysis stage of the modelling process is to analyse how the distribution of topics changes in relation to different types of events. But with many topics for each of the roughly 14,680 chamber-sitting-days spanning 118 years, the data are still too noisy to easily visualise changes around events.
 
-One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or the time at which it was written, or, in the case of our paper, the prime minister or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
+One option for relating the topic distributions to events would be to use the Structural Topic Model (STM) of @RobertsStewartAiroldi2016. The distinguishing aspect of the STM is that it considers more than just a document's content when constructing topics. For example, we may believe a document's author, or, in the case of our paper, the prime minister or election period, may affect the topics within that document. The STM allows this additional information, or metadata, to affect the construction of topics, though influencing either topical prevalence or topical content. The assumption that there is some document generation process is the same as in LDA, it is just that this process now includes metadata.
 
 <!-- More specifically, consider a matrix of covariates. $X_d$, where each column relates to a different covariate or metadata aspect, and each row refers to a document. Then a cell has the value of each covariate for a particular document. Similar to the CTM, the STM assumes the topics within a document $\theta_d$ are a draw from a logistic Normal distribution with mean $\mu$. However, the STM framework assumes that the mean parameter is a linear function of covariates $X_d$: -->
 <!-- $$\theta_d|X_d\gamma\Sigma \sim \mbox{Logistic Normal}(\mu = X_d\gamma, \Sigma).$$ -->
@@ -225,9 +225,11 @@ However, the STM covariate framework has several limitations in terms of our goa
 2. There is no way to implement partial pooling across groups of similar documents. The STM framework assumes that documents are independently and identically distributed, conditional on the model covariates. However, it could be expected that topic distributions within a particular prime minister's time, for example, may be more- or less-likely to contain certain topics for reasons that are not reflected in the topic prevalence covariates. To account for this, we would like a covariate model that allows for the partial pooling of variance in topic distributions by group, such as sitting period, or election period. 
 3. There is no way of identifying 'outlying' topic distributions -- and therefore events that had an important effect -- without pre-specifying the event of interest in the model. For example, if we think that the 9/11 attacks had an effect on parliamentary discourse, then a dummy for 9/11 would have to be included in the STM framework, but the specifics of the dummy construction affect the results. Instead we would like to identify important events based on different-to-expected topic distributions, after accounting for prime minister and election effects. 
 
-To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the CTM described in the previous section as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections. This set-up also allows us to identify 'outlying' topic distributions and relate these to other events. 
+To overcome these challenges, we formalise a statistical framework that allows us to systematically identify significant changes in topic distributions over time. Specifically, we use the estimated topic distributions from the previous step as an input into a Bayesian hierarchical Dirichlet regression framework, which relates the proportions of each topic to underlying time trends, changes in prime minister and elections.
 
-Define $\theta_{cdp}$ to be the proportion of topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots, P = 19$ are equal to the estimated values of $\theta_{cd}$ from the CTM after we group them into the Comparative Agendas Project topics. We assume that the majority of variation in topics by day is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
+### Model set-up
+
+Define $\theta_{c,d,p}$ to be the proportion of speech that refers to topic $p$ on day $d$ in chamber $c$ (where chamber refers to either the House of Representatives or the Senate). Note that the $\theta_{c,d,1:P}$ for $p = 1,2,\dots, P = 19$ are equal to the estimated values of $\theta_{cd}$ from the CTM after we group them into the Comparative Agendas Project topics. We assume that the majority of variation in topics by day $d$ is across sitting periods, $s$, where a sitting period is defined as any group of days that are less than one week apart. Using this definition, there are 822 sitting periods over the period 1901 to 2018 inclusive. Appendix \@ref(hansardsummarystatistics) contains more information about the sitting patterns over the course of the year, which have changed considerably since Federation.
 
 
 The topic proportions on day $d$ in chamber $c$ are modelled in reference to their membership of a particular sitting period $s$. Firstly, we assume that each distribution of topics, $\theta_{c,d,1:P}$ for each day is a draw from a Dirichlet distribution with mean parameter $\mu_{c,s[d],1:P}$:
@@ -237,15 +239,18 @@ $$
 where the notation $s[d]$ refers to the sitting period $s$ to which day $d$ of chamber $c$ belongs. This distributional assumption accounts for the fact that on any given day in either chamber, the sum of all proportions in each topic must be one. 
 
 The goal of the model is to relate these proportions to the current prime minister $g$ and election period $e$, assuming that an 'election effect' would be at its peak in the days close to the election, then decay over the period. The mean parameters $\mu_{c,s,p}$ are modelled on the log scale as:
+
 $$
 \log \mu_{c,s,p} = \alpha_{g[c,s],p} + \beta_{e[c,s],p} \cdot (N_{s[e]} - s) + \delta_{c,s,p}
 $$
 where: $\alpha_{g[c,s],p}$ is the mean effect for prime ministers $g$ (which covers sitting period $s$ in chamber $c$) and topic $p$; $\beta_{e[c,s],d,p}$ is the effect of election $e$ (which occurs in sitting period $s$, in chamber $c$) for topic $p$; $N_s$ is the total number of sitting periods in election period $e$; and $\delta_{c,s,p}$ is a random, or levels, effect for each chamber, sitting period and topic. 
 
-The term for the prime minister, $\alpha_{g[c,s],p}$, assumes there is some underlying mean effect of each prime minister on the topic distribution that is common across chambers. We place uninformative priors on each of these parameters:
+The term for the prime minister, $\alpha_{g[c,s],p}$, assumes there is some underlying mean effect of each prime minister on the topic distribution that is common across chambers. Non-informative priors are placed on $\alpha_{g[c,s],p}$:
+
 $$
 \alpha_{g[c,s],p} \sim \mbox{Normal}(0, 100).
 $$
+
 
 The election term, $\beta_{e[c,s],p}$, assumes there is an initial effect of an election on the topic distribution, which then decays as a function of sitting periods since election, $s$. In the model above, $\beta_{e[c,s],p}$ is multiplied by the numbers of sitting periods since the election, $(N_{s[e]} - s)$. When the sitting period counter is small, $(N_{s[e]} - s)$ is large, so the election effect is larger. 
 
@@ -259,12 +264,15 @@ $$
 <!-- \beta_{p,k} \sim \mbox{Normal}(0, 100). -->
 <!-- $$ -->
 
-Finally, the sitting-period-specific random effect $\delta_{c,s,p}$ allows for chamber- and sitting-period specific deviations in the topic distributions. This allows us to identify periods where there may be differences in the topics discussed across the two chambers. It also allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-prime-minister and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{c,s,p}$ values are modelled as:
+Finally, the sitting-period-specific random effect $\delta_{c,s,p}$ allows for chamber- and sitting-period specific deviations in the topic distributions. This allows us to identify periods where there may be differences in the topics discussed across the two chambers. It also allows us to identify large deviations away from the expected distribution, thus helping to identify the effect of other, non-prime-minister and non-election events. In addition, this set up also partially pools effects across sitting periods. The $\delta_{c,s,p}$ values are modelled heirarchically as:
+
 $$
-\delta_{c,s,p} \sim \mbox{Normal}(0, \sigma_{g[c,s],p}^2).
+\delta_{c,s,p} \sim \mbox{Normal}(\mu_{c,p}, \sigma_{g[c,s],p}^2).
 $$
+This structure assumes that the sitting period effect is a draw from a distribution with a mean that is common to that particular chamber and topic, with some associated variance. This allows for the sitting-period-specific random effect $\delta_{c,s,p}$ to be partially informed by other sitting periods for that chamber and topic combination. 
 
 The variance parameters $\sigma_{g[c,s],p}^2$ give an indication of the how the variation in topics is changing over government periods. If the estimates of the variance are larger, then there is more variation in the topics discussed within a government period. Non-informative priors are placed on the variance parameters:
+
 $$
 \sigma_{g[c,s],p} \sim \mbox{Uniform}(0,3).
 $$
