@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  31 OCT 2019 19:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  1 NOV 2019 10:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -986,14 +986,14 @@ LaTeX Font Info:    Try loading font information for T1+cmtt on input line 444.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/base/t1cmtt.fd
 File: t1cmtt.fd 2014/09/29 v2.5h Standard LaTeX font definitions
-) [4] [5] [6] [7] [8] [9] [10] [11] <../../figures/topics_example.png, id=349, 
+) [4] [5] [6] [7] [8] [9] [10] [11] <../../figures/topics_example.png, id=345, 
 844.15375pt x 853.1875pt>
 File: ../../figures/topics_example.png Graphic file (type png)
 <use ../../figures/topics_example.png>
 Package pdftex.def Info: ../../figures/topics_example.png used on input line 93
 0.
 (pdftex.def)             Requested size: 469.76031pt x 474.78748pt.
-<../../figures/topics_examples_three.png, id=353, 549.05125pt x 720.6925pt>
+<../../figures/topics_examples_three.png, id=349, 549.05125pt x 720.6925pt>
 File: ../../figures/topics_examples_three.png Graphic file (type png)
 <use ../../figures/topics_examples_three.png>
 Package pdftex.def Info: ../../figures/topics_examples_three.png used on input 
@@ -1001,186 +1001,186 @@ line 953.
 (pdftex.def)             Requested size: 469.77043pt x 616.62738pt.
 
 <../../results-analysis_model/two_house_results/defense_topic_fitted_data.pdf, 
-id=356, 578.16pt x 361.35pt>
+id=352, 578.16pt x 361.35pt>
 File: ../../results-analysis_model/two_house_results/defense_topic_fitted_data.
 pdf Graphic file (type pdf)
 
 <use ../../results-analysis_model/two_house_results/defense_topic_fitted_data.p
 df>
 Package pdftex.def Info: ../../results-analysis_model/two_house_results/defense
-_topic_fitted_data.pdf used on input line 978.
+_topic_fitted_data.pdf used on input line 974.
 (pdftex.def)             Requested size: 469.75385pt x 293.59616pt.
 [12] [13 <../../figures/topics_example.png>] [14 <../../figures/topics_examples
 _three.png>] [15 <../../results-analysis_model/two_house_results/defense_topic_
 fitted_data.pdf>]
-<../../results-analysis_model/two_house_results/mu_gov_big_topics.pdf, id=396, 
+<../../results-analysis_model/two_house_results/mu_gov_big_topics.pdf, id=393, 
 650.43pt x 433.62pt>
 File: ../../results-analysis_model/two_house_results/mu_gov_big_topics.pdf Grap
 hic file (type pdf)
 <use ../../results-analysis_model/two_house_results/mu_gov_big_topics.pdf>
 Package pdftex.def Info: ../../results-analysis_model/two_house_results/mu_gov_
-big_topics.pdf used on input line 1088.
+big_topics.pdf used on input line 1086.
 (pdftex.def)             Requested size: 422.78441pt x 281.85628pt.
 
 <../../results-analysis_model/two_house_results/mu_election_big_topics.pdf, id=
-397, 650.43pt x 433.62pt>
+394, 650.43pt x 433.62pt>
 File: ../../results-analysis_model/two_house_results/mu_election_big_topics.pdf
  Graphic file (type pdf)
 
 <use ../../results-analysis_model/two_house_results/mu_election_big_topics.pdf>
 Package pdftex.def Info: ../../results-analysis_model/two_house_results/mu_elec
-tion_big_topics.pdf used on input line 1092.
+tion_big_topics.pdf used on input line 1090.
 (pdftex.def)             Requested size: 422.78441pt x 281.85628pt.
 [16] [17 <../../results-analysis_model/two_house_results/mu_gov_big_topics.pdf>
 ] [18 <../../results-analysis_model/two_house_results/mu_election_big_topics.pd
 f>]
 
 LaTeX Warning: Reference `fig:muelectionall' on page 19 undefined on input line
- 1195.
+ 1194.
 
 [19]
 
 LaTeX Warning: Reference `fig:muelectionall' on page 20 undefined on input line
- 1202.
+ 1201.
 
-[20] [21] [22] <../../figures/example_hansard_page.png, id=465, 555.07375pt x 8
+[20] [21] [22] <../../figures/example_hansard_page.png, id=463, 555.07375pt x 8
 44.15375pt>
 File: ../../figures/example_hansard_page.png Graphic file (type png)
 <use ../../figures/example_hansard_page.png>
 Package pdftex.def Info: ../../figures/example_hansard_page.png used on input l
-ine 1351.
+ine 1350.
 (pdftex.def)             Requested size: 305.34232pt x 464.36328pt.
 [23 <../../figures/example_hansard_page.png>] <../../figures/counts_by_year.pdf
-, id=473, 578.16pt x 433.62pt>
+, id=471, 578.16pt x 433.62pt>
 File: ../../figures/counts_by_year.pdf Graphic file (type pdf)
 <use ../../figures/counts_by_year.pdf>
 Package pdftex.def Info: ../../figures/counts_by_year.pdf used on input line 13
-71.
+70.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
-<../../figures/sitting_dates_all.pdf, id=475, 722.7pt x 867.24pt>
+<../../figures/sitting_dates_all.pdf, id=473, 722.7pt x 867.24pt>
 File: ../../figures/sitting_dates_all.pdf Graphic file (type pdf)
 <use ../../figures/sitting_dates_all.pdf>
 Package pdftex.def Info: ../../figures/sitting_dates_all.pdf used on input line
- 1387.
+ 1386.
 (pdftex.def)             Requested size: 469.76045pt x 563.71257pt.
-<../../figures/sitting_dates_before_1920.pdf, id=478, 433.62pt x 289.08pt>
+<../../figures/sitting_dates_before_1920.pdf, id=476, 433.62pt x 289.08pt>
 File: ../../figures/sitting_dates_before_1920.pdf Graphic file (type pdf)
 <use ../../figures/sitting_dates_before_1920.pdf>
 Package pdftex.def Info: ../../figures/sitting_dates_before_1920.pdf used on in
-put line 1396.
+put line 1395.
 (pdftex.def)             Requested size: 433.63878pt x 289.09251pt.
 [24 <../../figures/counts_by_year.pdf>] [25 <../../figures/sitting_dates_all.pd
-f>] <../../figures/sitting_dates_from_2000.pdf, id=503, 433.62pt x 289.08pt>
+f>] <../../figures/sitting_dates_from_2000.pdf, id=501, 433.62pt x 289.08pt>
 File: ../../figures/sitting_dates_from_2000.pdf Graphic file (type pdf)
 <use ../../figures/sitting_dates_from_2000.pdf>
 Package pdftex.def Info: ../../figures/sitting_dates_from_2000.pdf used on inpu
-t line 1400.
+t line 1399.
 (pdftex.def)             Requested size: 433.63878pt x 289.09251pt.
 [26 <../../figures/sitting_dates_before_1920.pdf>] <../../figures/differences_b
-y_year.pdf, id=517, 578.16pt x 433.62pt>
+y_year.pdf, id=515, 578.16pt x 433.62pt>
 File: ../../figures/differences_by_year.pdf Graphic file (type pdf)
 <use ../../figures/differences_by_year.pdf>
 Package pdftex.def Info: ../../figures/differences_by_year.pdf used on input li
-ne 1432.
+ne 1431.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
 [27 <../../figures/sitting_dates_from_2000.pdf>] [28 <../../figures/differences
-_by_year.pdf>] [29] <../../figures/stop_words.pdf, id=545, 578.16pt x 433.62pt>
+_by_year.pdf>] [29] <../../figures/stop_words.pdf, id=543, 578.16pt x 433.62pt>
 File: ../../figures/stop_words.pdf Graphic file (type pdf)
 <use ../../figures/stop_words.pdf>
-Package pdftex.def Info: ../../figures/stop_words.pdf used on input line 1481.
+Package pdftex.def Info: ../../figures/stop_words.pdf used on input line 1480.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
 [30 <../../figures/stop_words.pdf>]
-<paper_MA_structure_edit_files/figure-latex/topicsoverdocuments-1.pdf, id=561, 
+<paper_MA_structure_edit_files/figure-latex/topicsoverdocuments-1.pdf, id=558, 
 453.695pt x 279.0425pt>
 File: paper_MA_structure_edit_files/figure-latex/topicsoverdocuments-1.pdf Grap
 hic file (type pdf)
 <use paper_MA_structure_edit_files/figure-latex/topicsoverdocuments-1.pdf>
 Package pdftex.def Info: paper_MA_structure_edit_files/figure-latex/topicsoverd
-ocuments-1.pdf used on input line 1509.
+ocuments-1.pdf used on input line 1508.
 (pdftex.def)             Requested size: 453.6939pt x 279.04181pt.
 
-<paper_MA_structure_edit_files/figure-latex/topicsoverterms-1.pdf, id=563, 453.
+<paper_MA_structure_edit_files/figure-latex/topicsoverterms-1.pdf, id=560, 453.
 695pt x 279.0425pt>
 File: paper_MA_structure_edit_files/figure-latex/topicsoverterms-1.pdf Graphic 
 file (type pdf)
 <use paper_MA_structure_edit_files/figure-latex/topicsoverterms-1.pdf>
 Package pdftex.def Info: paper_MA_structure_edit_files/figure-latex/topicsovert
-erms-1.pdf used on input line 1521.
+erms-1.pdf used on input line 1520.
 (pdftex.def)             Requested size: 453.6939pt x 279.04181pt.
 [31 <./paper_MA_structure_edit_files/figure-latex/topicsoverdocuments-1.pdf>] [
 32 <./paper_MA_structure_edit_files/figure-latex/topicsoverterms-1.pdf>]
-Overfull \hbox (2.94888pt too wide) in paragraph at lines 1575--1579
+Overfull \hbox (2.94888pt too wide) in paragraph at lines 1574--1578
 \T1/ppl/m/n/12 multi-no-mial dis-tri-bu-tion over top-ics in that doc-u-ment, $
 \OML/zplm/m/it/12 z[] \OMS/zplm/m/n/12 ^^X []\OT1/zplm/m/n/12 (\OML/zplm/m/it/1
 2 ^^R[]\OT1/zplm/m/n/12 )$\T1/ppl/m/n/12 . 
  []
 
 [33]
-Overfull \hbox (1.0837pt too wide) in paragraph at lines 1647--1653
+Overfull \hbox (1.0837pt too wide) in paragraph at lines 1646--1652
 \T1/ppl/m/n/12 as-signed to that topic pre-vi-ously, and how com-mon the topic 
 is in that doc-u-ment ([][]Steyvers
  []
 
-[34] <../../figures/diagnostics_for_k.pdf, id=650, 578.16pt x 433.62pt>
+[34] <../../figures/diagnostics_for_k.pdf, id=648, 578.16pt x 433.62pt>
 File: ../../figures/diagnostics_for_k.pdf Graphic file (type pdf)
 <use ../../figures/diagnostics_for_k.pdf>
 Package pdftex.def Info: ../../figures/diagnostics_for_k.pdf used on input line
- 1684.
+ 1683.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
 [35 <../../figures/diagnostics_for_k.pdf>] <../../figures/exclusivity_vs_cohere
-nce.pdf, id=678, 578.16pt x 433.62pt>
+nce.pdf, id=676, 578.16pt x 433.62pt>
 File: ../../figures/exclusivity_vs_coherence.pdf Graphic file (type pdf)
 <use ../../figures/exclusivity_vs_coherence.pdf>
 Package pdftex.def Info: ../../figures/exclusivity_vs_coherence.pdf used on inp
-ut line 1717.
+ut line 1716.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
 [36] [37 <../../figures/exclusivity_vs_coherence.pdf>] [38] <../../figures/topi
-cs_example-GreatD.pdf, id=716, 578.16pt x 433.62pt>
+cs_example-GreatD.pdf, id=714, 578.16pt x 433.62pt>
 File: ../../figures/topics_example-GreatD.pdf Graphic file (type pdf)
 <use ../../figures/topics_example-GreatD.pdf>
 Package pdftex.def Info: ../../figures/topics_example-GreatD.pdf used on input 
-line 1773.
+line 1772.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
-<../../figures/topics_example-the80s.pdf, id=721, 578.16pt x 433.62pt>
+<../../figures/topics_example-the80s.pdf, id=719, 578.16pt x 433.62pt>
 File: ../../figures/topics_example-the80s.pdf Graphic file (type pdf)
 <use ../../figures/topics_example-the80s.pdf>
 Package pdftex.def Info: ../../figures/topics_example-the80s.pdf used on input 
-line 1787.
+line 1786.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
 
-Overfull \hbox (42.44708pt too wide) in paragraph at lines 1790--1795
+Overfull \hbox (42.44708pt too wide) in paragraph at lines 1789--1794
 \T1/ppl/m/n/12 Sen-ate that the pro-por-tion of eco-nomic top-ics ac-counts for
 . The em-pha-sis that the Hawke/Keating
  []
 
-<../../figures/topics_example-GFC.pdf, id=723, 578.16pt x 433.62pt>
+<../../figures/topics_example-GFC.pdf, id=721, 578.16pt x 433.62pt>
 File: ../../figures/topics_example-GFC.pdf Graphic file (type pdf)
 <use ../../figures/topics_example-GFC.pdf>
 Package pdftex.def Info: ../../figures/topics_example-GFC.pdf used on input lin
-e 1800.
+e 1799.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
 [39 <../../figures/topics_example-GreatD.pdf>] [40 <../../figures/topics_exampl
 e-the80s.pdf>] [41 <../../figures/topics_example-GFC.pdf>] [42] [43]
-Overfull \hbox (34.17764pt too wide) in alignment at lines 1919--1945
+Overfull \hbox (34.17764pt too wide) in alignment at lines 1918--1944
  [] [] [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (34.17764pt too wide) in alignment at lines 1945--1969
+Overfull \hbox (34.17764pt too wide) in alignment at lines 1944--1968
  [] [] [] [] [] [] [] [] 
  []
 
 [44] [45] (./paper_MA_structure_edit.bbl [46] [47] [48])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2000.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1999.
 [49]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2000.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1999.
 (./paper_MA_structure_edit.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2000.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2000.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1999.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1999.
 
 Package rerunfilecheck Info: File `paper_MA_structure_edit.out' has not changed
 .
-(rerunfilecheck)             Checksum: 7E943B8368F5B5FB30A1E8CF11FFBF2E;5819.
+(rerunfilecheck)             Checksum: 1414D0262805AA1890E4C43F60AEA734;5903.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.7201pt have occurred.
@@ -1191,13 +1191,13 @@ LaTeX Warning: There were undefined references.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2000.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1999.
  ) 
 Here is how much of TeX's memory you used:
- 14846 strings out of 492995
- 214786 string characters out of 6132704
- 322475 words of memory out of 5000000
- 17950 multiletter control sequences out of 15000+600000
+ 14844 strings out of 492995
+ 214782 string characters out of 6132704
+ 322466 words of memory out of 5000000
+ 17948 multiletter control sequences out of 15000+600000
  64858 words of font info for 143 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  44i,11n,49p,476b,518s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1217,10 +1217,10 @@ ts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type
 1/urw/palatino/uplb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/p
 alatino/uplr8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/palatino
 /uplri8a.pfb>
-Output written on paper_MA_structure_edit.pdf (49 pages, 3291530 bytes).
+Output written on paper_MA_structure_edit.pdf (49 pages, 3291737 bytes).
 PDF statistics:
- 894 PDF objects out of 1000 (max. 8388607)
- 781 compressed objects within 8 object streams
+ 892 PDF objects out of 1000 (max. 8388607)
+ 779 compressed objects within 8 object streams
  179 named destinations out of 1000 (max. 500000)
- 368 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 360 words of extra memory for PDF output out of 10000 (max. 10000000)
 

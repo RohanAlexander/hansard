@@ -340,23 +340,23 @@ knitr::include_graphics("../../figures/topics_examples_three.png", auto_pdf = FA
 ```
 
 
-## Analysis model
+## Results from analysis model
 
-### Main results
+As discussed in Section \@ref(analysismodelexplanation), the modelling process takes the topic proportions estimated by the CTM and reduced to the Comparative Agendas Project, and examines the association between these topic distributions and events.
 
-We are interested in considering the effect of various political and other events on what is talked about in the Australian Federal Parliament. As discussed in Section \@ref(analysismodelexplanation), the modelling process takes the topic proportions estimated by the CTM and reduced to the Comparative Agendas Project, and examines the association between these topic distributions and outside events. That is, the topic groupings are inputs for our analysis model.
-
-There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable, but using periods defined by prime ministers or elections tend not to provide enough variability. For instance, examining topics that have to do with war and conflict illustrates discussions of Australia's military involvement (Figure \@ref(fig:wartopicsgraph)). 
+There are several outputs of interest from this modelling stage. For example, the model provides estimates of topic prevalence by each sitting period. Figure \@ref(fig:wartopicsgraph) illustrates the estimated topic prevlance by sitting period for topic XX, one of the defense-related topics, overlayed with the daily topic prevalnce (as also illustrated in Figure XX above). This nicely illustrates how the topics change over time, as the daily estimates tend to be quite variable. 
 
 ```{r wartopicsgraph, cache = TRUE, echo = FALSE, fig.cap = "Model estimates of topic prevalance by sitting period for those related to war and conflict", out.width = '100%'}
 knitr::include_graphics("../../results-analysis_model/two_house_results/defense_topic_fitted_data.pdf")
 ```
 
-One of the main goals of the analysis model is to see which elections and changes of prime minister are associated with changes in the prevalence of topics over time. By way of background, as Australia has a parliamentary system it is possible for the prime minister to change without an election and we do not distinguish between terms or cabinet composition although this more-detailed analysis is possible. If a person was prime minister more than once then these periods are considered independently. 
+One of the main goals of the analysis model is to see which elections and changes of prime minister are associated with changes in the prevalence of topics over time. By way of background, as Australia has a parliamentary system it is possible for the prime minister to change without an election. If a person was prime minister more than once then these periods are considered independently. 
 
-As detailed in Section \@ref(analysismodelexplanation), the model estimates a mean level-effect for each prime minister, $\alpha_g$ and each election, $\alpha_e$. We identify differences between neighbouring prime ministers and between neighbouring elections based on calculating 95 per cent credible intervals from posterior samples of these respective mean effects. When these do not overlap we consider that the model finds a difference between either the neighbouring prime ministers or elections, as appropriate. 
+As detailed in Section \@ref(analysismodelexplanation), the model estimates an effect for each prime minister, $\alpha_g$ and each election, $\beta_e$. We identify differences between neighbouring prime ministers and between neighbouring elections based on calculating 95 per cent Bayesian credible intervals from posterior samples of these respective mean effects. When these do not overlap we consider that the model finds a difference between either the neighbouring prime ministers or elections, as appropriate. 
 
-We summarise our results in terms of prime ministers in Table \@ref(tab:primeministersresults) and in terms of elections in Table \@ref(tab:electionsresults). These tables focus on elections and prime ministers that were different to the ones that preceded them. Complete lists of the Australian elections and prime ministers are available in Appendices \@ref(fulllistofelections) and \@ref(fulllistofgovernments).
+We summarise our results in terms of prime ministers in Table \@ref(tab:primeministersresults) and in terms of elections in Table \@ref(tab:electionsresults). These tables focus on prime ministers and elections that were different to the ones that preceded them.[^listfootnote] A total of XX out of the XX prime ministers had significantly different topic discussions than their predecessor. In terms of elections, XX out of a total of XX elections were significant different to the previous cycle. 
+
+[^listfootnote]: Complete lists of the Australian elections and prime ministers are available in Appendices \@ref(fulllistofelections) and \@ref(fulllistofgovernments).
 
 
 ```{r primeministersresults, echo = FALSE, results = 'asis'}
@@ -384,7 +384,7 @@ elections_results %>%
 
 ```
 
-In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate significant differences between prime ministers and elections, respectively. In the graphs, the points show the estimated value of $\alpha_g$ and $\alpha_e$, respectively, for each of the topics specified. The error bars represent 95 per cent Bayesian credible intervals. As there are 80 topics it would be unwieldy to show all of them, and so we have again focused on Topics 4, 26, 28, 30 and 66 here which have to do with war and conflict. 
+In Figures \@ref(fig:mugov) and \@ref(fig:muelection) we focus on certain topics to illustrate significant differences between prime ministers and elections, respectively. In the graphs, the points show the estimated value of $\alpha_g$ and $\beta_e$, respectively, for each of the topics specified. The error bars represent 95 per cent Bayesian credible intervals. We have focused on Topics XX here which have to do with war and conflict. Large differences can be seen for XX ADD A BIT OF COMMENTARY HERE XX
 
 ```{r mugov, cache = TRUE, echo = FALSE, fig.cap = "Level effects for prime ministers by selected topics.", out.width = '90%'}
 knitr::include_graphics("../../results-analysis_model/two_house_results/mu_gov_big_topics")
@@ -400,13 +400,13 @@ knitr::include_graphics("../../results-analysis_model/two_house_results/mu_elect
 
 
 
-### Additional results
+### Additional results: identifying outlying days
 
 Once prime minister and election effects have been taken into consideration, some days stand out compared with others in their sitting period. We do not explicitly include them in the model because of over-fitting and effect-type concerns, but we are interested to see if these can be explained by events that occurred on or before that sitting day. For instance, we may expect that events of a historical magnitude, such as the 9/11 attacks would change the discussion, or that the sitting day when, for instance, the Apology to the Stolen Generation was delivered, or some particularly prominent legislation introduced, would be different to others in that sitting period.
 
-To do this we estimate sitting-period level-effects (essentially a mean for each topic by sitting period). The difference between this mean distribution and a particular day's topic distribution defines a measure that can be thought of as essentially a residual which allows us to identify outlying days. This approach means that the model generates dates that are interesting without us having to specify interesting dates. More specifically, we define a day to be 'outlying' or 'different-to-expected' if the topic distribution on that particular day is more than three standard deviations different to the mean topic distribution for the relevant sitting period. 
+The model set-up allows for these outlying days to be identified. In particular, we are estimating $\mu_{c,s,p}$, which can be thought of as the mean topic prevalence for topic $p$ in chamber $c$ and sitting period $s$. We can identify 'outlying days' by comparing this mean prevalence and a particular day's topic distribution. This approach means that the model generates dates that are interesting without us having to specify interesting dates. More specifically, we define a day to be 'outlying' or 'different-to-expected' if the topic distribution on that particular day is more than three standard deviations different to the mean topic distribution for the relevant sitting period. 
 
-Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week.
+Table \@ref(tab:keyeventsresultstable) summarises the days where parliamentary discussion was significantly different from the rest prevailing in that week. XX ADD A BIT OF COMMENTARY HERE XX
 
 
 ```{r keyeventsresultstable, echo = FALSE, results = 'asis'}
