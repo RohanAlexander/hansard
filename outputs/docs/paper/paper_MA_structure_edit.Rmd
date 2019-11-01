@@ -282,14 +282,17 @@ We run the model in JAGS using the \texttt{rjags} package of @Plummer2018.
 
 # Results
 
-Firstly, we describe the results of the CTM approach, which defined 80 topics over the period 1901 to 2018, and which we then further reduced to match the Comparative Agendas Project. We then describe the results of the Bayesian analysis model, which identified prime ministers, elections and other events that were associated with a change in the topics discussed. 
+Firstly, we describe the results of the topic modeling and aggregation using the CTM approach, which defined 80 topics over the period 1901 to 2018,which we then further reduced to match the Comparative Agendas Project. We then describe the results of the Bayesian analysis model, which identified prime ministers, elections and other events that were associated with a change in the topics discussed. 
 
 ## Topic modelling
-We applied the CTM approach discussed in Appendix \@ref(correlatedtopicmodelsection) on the processed Hansard text database outlined in Section \@ref(hansarddata). The main output of interest are the types of topics identified by the model, and the prevalence of each topic for each day of parliamentary discussion. 
+We applied the CTM approach on the processed Hansard text database outlined in Section \@ref(hansarddata). The main output of interest are the types of topics identified by the model, and the prevalence of each topic for each day of parliamentary discussion. 
 
 Our main results are based on a topic model with 80 distinct topics. With almost 15,000 days and 80 topics, the analysis model is being fit to more than a million observations. The choice of 80 topics was made as a trade-off between standard diagnostic tests that suggested a larger number of topics would be more appropriate, and the need for the analysis model to be tractable. Those diagnostic tests are detailed in Appendix \@ref(selecttopicnumber). 
 
 LDA output defines a topic as a distribution of probabilities over words. In Table \@ref(tab:topwordscomp) we display the ten words with the highest association for each of the 80 topics, but the topics are defined by probability distributions over all words. LDA does not apply labels to each topic, or collection of words, instead this has to be done by inspection. The topics cover areas such as budgets, demography, transport and infrastructure, war and conflict, health, education, agriculture, and trade. Similar to when topic models are run using the parliamentary text records of other countries, there are also some topics that seem to be about procedural or day-to-day matters, such as Topics 7 or 9. As expected, some topics seem to somewhat overlap with their content: for instance, Topics 4, 26, 28, 30 and 66 all relate to war and conflict. 
+
+In the final column of Table \@ref(tab:topwordscomp) we summarise the results of our 80-topic model using the categories of the Comparative Agendas Project (CAP), as summarised by @Bevan2017.\footnote{We use Version 1.0 of the Master Codebook, as at 31 July 2014 available at \url{http://sbevan.com/cap-master-codebook.html}.} We do this firstly, to assist other researchers in understanding our results, by trying to relate them to a more well-known approach. We also do this because it allows us to further reduce our 80-topic model to only 21 topics.\footnote{Although the CAP Codebook topic numbering goes to 23, there are only 21 topics because there is no topic 11 or topic 22. Our 80 topics did not relate to CAP topics 21 or 23, meaning that we have 19 CAP-based categories.} It is these 19 CAP groupings to which we apply our analysis model.
+
 
 ```{r topwords, echo = FALSE, results = 'asis'}
 # 
@@ -319,29 +322,22 @@ top_words_comp %>%
 ```
 
 
-
-
-Figure \@ref(fig:exampletopics) illustrates the CTM output based on a sample from the Hansard. It shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time. The highlighted topics are those related to war and conflict. The two chambers of the Australian Federal Parliament appear to be similar at a broad scale.
+Figure \@ref(fig:exampletopics) illustrates the CTM output based on a sample from the Hansard. The two panels refer to the two different chambers of the Australian Federal Parliament. The highlighted topics are categorised as 'Defense' in CAP terms, i.e. those related to war and conflict. The figure shows how each day's parliamentary discussion can be apportioned to a topic and highlights how these proportions change over time; for example, the highlighted defense topics have notable peaks around the two World Wars, and post-9/11 attacks. The two chambers appear to be similar at a broad scale in terms of the increases and decreases in the different topics. Appendix \@ref(topicmodeleconresultsdiscussion) provides another example from the topic model results in the context of economic events.
 
 ```{r exampletopics, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, with five topics highlighted", out.width = '100%'}
 knitr::include_graphics("../../figures/topics_example.png", auto_pdf = FALSE)
 
 ```
 
+
+
 Figure \@ref(fig:threeexamples) shows the topic model output in the context of three notable periods of Australian political history. 
+The first panel of Figure \@ref(fig:threeexamples) is the second Menzies term. The dashed lines show the elections. While the results here abstract from differences based on topic mix, the shape of the distribution seems to be reasonably similar. Given 80 topics, it may be difficult to see differences in the topic mix manually, and so we would like for the analysis model to be able to suggest whether the mix is changing. The second panel shows the 1983 election, and the subsequent change from Fraser to Hawke on 11 March 1983, identified by a dotted line on that date. The distribution of topics seems less bunched after the change, but it is difficult to tell how different it is. We would like the analysis model to be able to distinguish between the two if they seem different. The third panel shows the first Rudd term. The important aspect to note is that the period after the 2007 election and the Rudd term contain essentially the same Hansard dates. The analysis model needs to be able to deal with this situation. XX I FIND THESE FIGURES HARD TO READ... CONSIDER REDOING OR REMOVING XX
+
 
 ```{r threeexamples, cache = TRUE, echo=FALSE, fig.cap="Illustrative topic model output, for three periods", out.width = '100%'}
 knitr::include_graphics("../../figures/topics_examples_three.png", auto_pdf = FALSE)
 ```
-
-The first panel of Figure \@ref(fig:threeexamples) is the second Menzies term. The dashed lines show the elections. While the results here abstract from differences based on topic mix, the shape of the distribution seems to be reasonably similar. Given 80 topics, it may be difficult to see differences in the topic mix manually, and so we would like for the analysis model to be able to suggest whether the mix is changing. The second panel shows the 1983 election, and the subsequent change from Fraser to Hawke on 11 March 1983, identified by a dotted line on that date. The distribution of topics seems less bunched after the change, but it is difficult to tell how different it is. We would like the analysis model to be able to distinguish between the two if they seem different. The third panel shows the first Rudd term. The important aspect to note is that the period after the 2007 election and the Rudd term contain essentially the same Hansard dates. The analysis model needs to be able to deal with this situation.
-
-Appendix \@ref(topicmodeleconresultsdiscussion) provides another example from the topic model results in the context of economic events.
-
-In the final column of Table \@ref(tab:topwordscomp) we summarise the results of our 80-topic model using the categories of the Comparative Agendas Project (CAP), as summarised by @Bevan2017.\footnote{We use Version 1.0 of the Master Codebook, as at 31 July 2014 available at \url{http://sbevan.com/cap-master-codebook.html}.} We do this firstly, to assist other researchers in understanding our results, by trying to relate them to a more well-known approach. We also do this because it allows us to further reduce our 80-topic model to only 21 topics.\footnote{Although the CAP Codebook topic numbering goes to 23, there are only 21 topics because there is no topic 11 or topic 22. Our 80 topics did not relate to CAP topics 21 or 23, meaning that we have 19 CAP-based categories.} It is these 19 CAP groupings to which we apply our analysis model.
-
-
-
 
 
 ## Analysis model
