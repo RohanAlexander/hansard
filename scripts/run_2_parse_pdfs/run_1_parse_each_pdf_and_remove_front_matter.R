@@ -31,11 +31,14 @@ plan(multiprocess)
 # Change the path as required:
 # use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
 # use_this_path_to_get_pdfs  <- "inputs/for_testing_pdfs"
-use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
+# use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/hor"
+use_this_path_to_get_pdfs  <- "/Volumes/Hansard/pdfs/federal/senate"
+
 
 # use_this_path_to_save_csv_files  <- "outputs/hansard/run_1_output"
 # use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/hor"
-use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_1_output"
+# use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/for_zoe/run_1_output"
+use_this_path_to_save_csv_files  <- "/Volumes/Hansard/parsed/federal/senate/run_1_output"
 
 # Get list of Hansard PDF filenames
 file_names <-
@@ -51,7 +54,7 @@ file_names <- file_names %>% sample() # Randomise the order
 file_tibble <- tibble(filename = file_names)
 file_tibble <- file_tibble %>% 
   mutate(the_year = filename,
-         the_year = str_replace(the_year, "/Volumes/Hansard/pdfs/federal/hor/", ""),
+         the_year = str_replace(the_year, "/Volumes/Hansard/pdfs/federal/senate/", ""),
          the_year = str_replace(the_year, ".pdf", ""),
          the_year = ymd(the_year)) %>% 
   # filter(year(the_year) < 1981) %>% 

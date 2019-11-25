@@ -31,7 +31,7 @@ header-includes:
 - \usepackage{longtable}
 - \usepackage{array}
 - \usepackage{multirow}
-- \usepackage[table]{xcolor}
+# - \usepackage[table]{xcolor}
 - \usepackage{wrapfig}
 - \usepackage{float}
 - \usepackage{colortbl}
@@ -412,25 +412,31 @@ key_events_results_cols %>%
 
 <!-- **[Needs more.]** -->
 
-Of the 36 prime ministers over this period, we find that 17 of them were significantly different to the prime minister that preceded them, after we account for and remove some that had especially short terms. The three earliest of them occur in the first decade after Federation, and to a certain extent this may be due to the variety of the issues that had to be addressed in those initial years. Joseph Cook's time as prime minister is found to be significantly different to that of his predecessor, Andrew Fisher, although it may be that this is due to World War I.
+Of the 36 prime ministers over this period, we find that 17 of them were significantly different to the prime minister that preceeded them, after we account for and remove some that had especially short terms. The first three that are significant occur in the first decade after Federation. To a certain extent, this may be due to the variety of the issues that had to be addressed in those initial years. The fourth prime minister that was significantly different to his predecessor was Joseph Cook. This coincided with the initial period of World War I and it may be that this is the reason for difference, compared with his predecessor, and successor Andrew Fisher.
 
-The second Menzies term, beginning in 1949, is the next government that is significantly different to its predecessor. The other governments that are different are concentrated in the second half of our sample, with three of them being in the past twenty years. Similarly, of the 45 general elections that have been held we find that 14 of them define periods that were significantly different to their immediate predecessor. 1974, 1980, 1990, 1998, 2004, and 2007 stand out as elections where the government did not change, but the model suggests there was considerable change in the topics discussed in parliament.
+Stanley Bruce is significantly different from his predecessor Billy Hughes, even though they were ostensibly from the same party. Hughes had been prime minister for over six years, and Bruce was a compromise choice in order to form a coalition.
 
-The second Menzies term was associated with a variety of changes compared with the preceding Chifley Government. Chifley had governed through the end of World War II and the difficult economic times that followed. There was also a large increase in the number of seats in the House of Representatives at the 1949 election. Many new politicians entered parliament, and this changed representation may also have been partly to do with the changed distribution of discussion topics, although further investigation of this is left for future work. The sixteen-year length of the second Menzies term, and better economic conditions over this time make it understandable why parliamentary discussion would have been different. There were six elections within the second Menzies term. Three toward the middle of that government were associated with significant changes in the topics discussed. 
 
-Menzies was succeeded  Holt in January 1966. This is an example where there was a change in prime minister without an election, as the next election only happened in November 1966. We find that Holt is different to Menzies. 
+<!-- The Lyons 14 -->
 
-<!-- In Figures \@ref(fig:muelectionall) we compare the topics during Menzies' final term with the topics of Holt. -->
 
-<!-- ```{r muelectionall, cache = TRUE, echo = FALSE, fig.cap = "Differences between various elections", out.width = '100%'} -->
-<!-- knitr::include_graphics("../../figures/mu_election-differences.pdf") -->
-<!-- ``` -->
+<!-- The second Menzies term, beginning in 1949, is the next government that is significantly different to its predecessor. The other governments that are different are concentrated in the second half of our sample, with three of them being in the past twenty years. Similarly, of the 45 general elections that have been held we find that 14 of them define periods that were significantly different to their immediate predecessor. 1974, 1980, 1990, 1998, 2004, and 2007 stand out as elections where the government did not change, but the model suggests there was considerable change in the topics discussed in parliament. -->
 
-Whitlam's term is especially interesting as we find a difference in the topics after he was first elected in December 1972, compared with his second election win in May 1974. Figure \@ref(fig:muelectionall) compares the topics that are significant before and after the election.
+<!-- The second Menzies term was associated with a variety of changes compared with the preceding Chifley Government. Chifley had governed through the end of World War II and the difficult economic times that followed. There was also a large increase in the number of seats in the House of Representatives at the 1949 election. Many new politicians entered parliament, and this changed representation may also have been partly to do with the changed distribution of discussion topics, although further investigation of this is left for future work. The sixteen-year length of the second Menzies term, and better economic conditions over this time make it understandable why parliamentary discussion would have been different. There were six elections within the second Menzies term. Three toward the middle of that government were associated with significant changes in the topics discussed.  -->
 
-Howard is also interesting because of the significant differences between elections. For instance, each of the election periods is associated with fairly substantial differences compared with the preceding election periods, and all are actually significantly different at the 95 per cent level. Figure \@ref(fig:muelectionall) compares the topics that are significant in the different elections that Howard won.
+<!-- Menzies was succeeded  Holt in January 1966. This is an example where there was a change in prime minister without an election, as the next election only happened in November 1966. We find that Holt is different to Menzies.  -->
 
-To a certain extent the change after the November 2001 election is expected because of the 9/11 terrorist attacks that had only occurred two months earlier, the Bali Bombings that occurred in October 2002, and the dramatic increase in the discussion related to terrorism and conflict over these years. However, the change in 1998 and 2004 is more unexpected. Although Howard is the second-longest serving prime minister and commonly thought of as a period of stability because the senior ministers were consistent as well, it might be that it is better to think of Howard as a combination of three or four different periods and that Howard reinvented itself over this period.
+<!-- <!-- In Figures \@ref(fig:muelectionall) we compare the topics during Menzies' final term with the topics of Holt. --> 
+
+<!-- <!-- ```{r muelectionall, cache = TRUE, echo = FALSE, fig.cap = "Differences between various elections", out.width = '100%'} --> 
+<!-- <!-- knitr::include_graphics("../../figures/mu_election-differences.pdf") --> 
+<!-- <!-- ``` --> 
+
+<!-- Whitlam's term is especially interesting as we find a difference in the topics after he was first elected in December 1972, compared with his second election win in May 1974. Figure \@ref(fig:muelectionall) compares the topics that are significant before and after the election. -->
+
+<!-- Howard is also interesting because of the significant differences between elections. For instance, each of the election periods is associated with fairly substantial differences compared with the preceding election periods, and all are actually significantly different at the 95 per cent level. Figure \@ref(fig:muelectionall) compares the topics that are significant in the different elections that Howard won. -->
+
+<!-- To a certain extent the change after the November 2001 election is expected because of the 9/11 terrorist attacks that had only occurred two months earlier, the Bali Bombings that occurred in October 2002, and the dramatic increase in the discussion related to terrorism and conflict over these years. However, the change in 1998 and 2004 is more unexpected. Although Howard is the second-longest serving prime minister and commonly thought of as a period of stability because the senior ministers were consistent as well, it might be that it is better to think of Howard as a combination of three or four different periods and that Howard reinvented itself over this period. -->
 
 One advantage of our analysis model compared with using the STM approach is that we can create a measure that is equivalent to testing for outliers in a model where the underlying variables were not latent. The results of this reduction in supervision are promising, but suggest the specifics of our process may need further refinement. For instance, our approach appropriately identifies the sitting day that first follows 11 September 2001. But there are many dates that we would have expected to be identified that were not, and similarly some of the dates that were identified are surprising. When we examine this we find that some of them are associated with significant legislation. Although our results are not overly over-weighted in the first half of our sample, there is a substantial gap between 1965 and 1991. Table \@ref(tab:keyeventsresultstable) highlights further work is needed to improve this approach. For instance, it may be that our approach is not appropriately considering step-changes or it may be that our identification of sitting periods is not appropriate for the entire period, given the changed sitting pattern that we identify.
 
